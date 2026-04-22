@@ -394,13 +394,16 @@ main#specimen {
 
 /* ---- Vertical sig stack: long signatures fold into stations, with the
  *      trailing →/⇒/. right-aligned in its own column so the connectors
- *      form a vertical edge. Each station emits a body span (col 1) and
- *      an op span (col 2) directly into this 1fr/auto inner grid. */
+ *      form a vertical edge. Both columns size to max-content (auto) so
+ *      the connectors hug the longest body's right edge rather than
+ *      drifting to the cell's outer margin. */
 
 .row > .type .sig-stack {
   display: grid;
-  grid-template-columns: 1fr auto;
-  column-gap: 1.4rem;
+  grid-template-columns: max-content max-content;
+  width: max-content;     /* keep the stack only as wide as its widest body */
+  max-width: 100%;        /* fall back to wrap inside narrow viewports */
+  column-gap: 1.6rem;
   row-gap: 0.18rem;
   align-items: baseline;
   white-space: normal;
@@ -409,16 +412,28 @@ main#specimen {
   white-space: pre-wrap;
 }
 .row > .type .sig-stack .sig-station-op {
-  text-align: right;
-  color: var(--soft-ink);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
+/* Constraint vs function-arrow connectors carry different semantics —
+ * preconditions vs the function's own shape. Soften the constraint
+ * arrows so they read as qualifying matter; leave the function arrows
+ * in solid ink. */
+.row > .type .sig-stack .sig-op-constraint { color: var(--margin); }
+.row > .type .sig-stack .sig-op-arrow      { color: var(--ink); }
+
 .row > .type .sig-stack .sig-forall-dot {
   color: var(--margin);
   font-size: 1.15em;
   font-weight: 500;
   letter-spacing: 0;
+}
+
+/* Boundary between the constraint stack and the function-shape stack:
+ * a quiet vertical breath, no rule. The connector-color shift +
+ * extra space together signal the transition without ornament. */
+.row > .type .sig-stack .sig-args-start {
+  margin-top: 0.55rem;
 }
 
 /* ---------------------------------------------------------- Foot */

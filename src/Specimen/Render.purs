@@ -272,19 +272,39 @@ renderInline colors sig =
 
 -- | Vertical layout: each station emits a body span (left, type-text)
 -- | and an op span (right column, holds the trailing →/⇒/.). The two
--- | spans participate as direct items of `.sig-stack`'s 1fr/auto grid.
+-- | spans participate as direct items of `.sig-stack`'s auto/auto grid
+-- | so the connectors hug the right edge of the longest body rather
+-- | than floating at the cell's far right.
 renderStacked :: Map String String -> Array Station -> String
 renderStacked colors stations =
-  "<div class=\"sig-stack\">"
-    <> String.joinWith "" (map (renderStation colors) stations)
-    <> "</div>"
+  let
+    -- The boundary is the first non-constraint station after at least
+    -- one constraint — i.e. the start of the function's actual shape.
+    -- Marked so we can give it a small breath of vertical space.
+    firstArgIdx = case Array.findLastIndex isConstraint stations of
+      Just i -> Just (i + 1)
+      Nothing -> Nothing
+  in
+    "<div class=\"sig-stack\">"
+      <> String.joinWith ""
+           (Array.mapWithIndex
+              (\i s -> renderStation colors (Just i == firstArgIdx) s)
+              stations)
+      <> "</div>"
+  where
+  isConstraint s = case s.connector of
+    ConConstraint -> true
+    _             -> false
 
 -- | Render one station as a body span and an op span. The forall's
 -- | trailing `.` is embedded with the binders rather than placed in the
 -- | op column — it's binder syntax, not a connector to the next station,
 -- | and floating it across an empty gap reads as detached.
-renderStation :: Map String String -> Station -> String
-renderStation colors { body, connector } =
+-- |
+-- | `argsStart` toggles the typographic break between the constraint
+-- | section and the function-shape section.
+renderStation :: Map String String -> Boolean -> Station -> String
+renderStation colors argsStart { body, connector } =
   let
     coloredBody = decorateGlyphs (colorize colors (escape body))
     bodyHtml = case connector of
@@ -295,9 +315,18 @@ renderStation colors { body, connector } =
       ConConstraint -> "<span class=\"g\">⇒</span>"
       ConArrow      -> "<span class=\"g\">→</span>"
       ConNone       -> ""
+    opClass = case connector of
+      ConConstraint -> " sig-op-constraint"
+      ConArrow      -> " sig-op-arrow"
+      _             -> ""
+    boundaryClass = if argsStart then " sig-args-start" else ""
   in
-    "<span class=\"sig-station-body\">" <> bodyHtml <> "</span>"
-      <> "<span class=\"sig-station-op\">" <> opHtml <> "</span>"
+    "<span class=\"sig-station-body" <> boundaryClass <> "\">"
+      <> bodyHtml
+      <> "</span>"
+      <> "<span class=\"sig-station-op" <> opClass <> boundaryClass <> "\">"
+      <> opHtml
+      <> "</span>"
 
 renderBody :: Array String -> String
 renderBody lines =
