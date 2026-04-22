@@ -18,6 +18,7 @@ package:
     - language-cst-parser
     - maybe
     - nullable
+    - ordered-collections
     - prelude
     - sigil
     - strings

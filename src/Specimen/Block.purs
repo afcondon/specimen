@@ -235,7 +235,10 @@ parseMultilineSig lines = do
       let
         rest = Array.drop 1 lines
         { init: sigLines, rest: bodyLines } = Array.span isIndented rest
-        sig = String.trim (String.joinWith " " (map String.trim sigLines))
+        joined = String.trim (String.joinWith " " (map String.trim sigLines))
+        -- Indented continuation lines start with `::` (the operator that
+        -- introduces the type); strip it so we don't render `:: ::`.
+        sig = stripLeadingDoubleColon joined
       in
         if Array.any containsSig sigLines && sig /= ""
           then Just { name, sig: Just sig, body: bodyLines, marginalia: [] }
@@ -248,6 +251,13 @@ parseMultilineSig lines = do
 isBareIdent :: String -> Boolean
 isBareIdent s = s /= "" && not (String.contains (Pattern " ") s)
                        && not (String.contains (Pattern "(") s)
+
+stripLeadingDoubleColon :: String -> String
+stripLeadingDoubleColon s = case String.stripPrefix (Pattern ":: ") s of
+  Just rest -> rest
+  Nothing -> case String.stripPrefix (Pattern "::") s of
+    Just rest -> String.trim rest
+    Nothing   -> s
 
 isIndented :: String -> Boolean
 isIndented line = case String.stripPrefix (Pattern " ") line of

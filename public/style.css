@@ -383,6 +383,44 @@ main#specimen {
   vertical-align: -0.06em;
 }
 
+/* ---- Type variables — colored text via inline --vc custom property
+ *      set per occurrence by the renderer. */
+
+.row .sig-var {
+  color: var(--vc, #444);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ---- Vertical sig stack: long signatures fold into stations, with the
+ *      trailing →/⇒/. right-aligned in its own column so the connectors
+ *      form a vertical edge. Each station emits a body span (col 1) and
+ *      an op span (col 2) directly into this 1fr/auto inner grid. */
+
+.row > .type .sig-stack {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 1.4rem;
+  row-gap: 0.18rem;
+  align-items: baseline;
+  white-space: normal;
+}
+.row > .type .sig-stack .sig-station-body {
+  white-space: pre-wrap;
+}
+.row > .type .sig-stack .sig-station-op {
+  text-align: right;
+  color: var(--soft-ink);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.row > .type .sig-stack .sig-forall-dot {
+  color: var(--margin);
+  font-size: 1.15em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
 /* ---------------------------------------------------------- Foot */
 
 .specimen-foot {

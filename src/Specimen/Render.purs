@@ -13,8 +13,11 @@ import Data.String.Pattern (Pattern(..), Replacement(..))
 import Data.String.Regex (regex, test) as Regex
 import Data.String.Regex.Flags (noFlags) as Regex.Flags
 
+import Data.Map (Map)
+
 import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock)
 import Specimen.Markdown (docLinesToHtml)
+import Specimen.Sig (Connector(..), Station, assignColors, colorize, forallVars, segmentSig, shouldStack)
 
 type DocOpts =
   { moduleSlug :: String
@@ -242,7 +245,9 @@ renderValue v =
     <> "</section>"
 
 -- | Emit name + :: + type as direct grid items so the outer .specimen-stack
--- | aligns them vertically across siblings.
+-- | aligns them vertically across siblings. The type cell either holds an
+-- | inline sig (short) or a vertical stack of stations (long), both
+-- | colorized against the ∀-bound type variables when present.
 renderSig :: String -> Maybe String -> String
 renderSig name = case _ of
   Nothing ->
@@ -250,9 +255,49 @@ renderSig name = case _ of
       <> "<span class=\"sep\"></span>"
       <> "<span class=\"type\"></span>"
   Just sig ->
-    "<span class=\"name\">" <> escape name <> "</span>"
-      <> "<span class=\"sep\">::</span>"
-      <> "<span class=\"type\">" <> decorateGlyphs (escape sig) <> "</span>"
+    let
+      colors = assignColors (forallVars sig)
+      typeHtml =
+        if shouldStack sig
+          then renderStacked colors (segmentSig sig)
+          else renderInline  colors sig
+    in
+      "<span class=\"name\">" <> escape name <> "</span>"
+        <> "<span class=\"sep\">::</span>"
+        <> "<span class=\"type\">" <> typeHtml <> "</span>"
+
+renderInline :: Map String String -> String -> String
+renderInline colors sig =
+  decorateGlyphs (colorize colors (escape sig))
+
+-- | Vertical layout: each station emits a body span (left, type-text)
+-- | and an op span (right column, holds the trailing →/⇒/.). The two
+-- | spans participate as direct items of `.sig-stack`'s 1fr/auto grid.
+renderStacked :: Map String String -> Array Station -> String
+renderStacked colors stations =
+  "<div class=\"sig-stack\">"
+    <> String.joinWith "" (map (renderStation colors) stations)
+    <> "</div>"
+
+-- | Render one station as a body span and an op span. The forall's
+-- | trailing `.` is embedded with the binders rather than placed in the
+-- | op column — it's binder syntax, not a connector to the next station,
+-- | and floating it across an empty gap reads as detached.
+renderStation :: Map String String -> Station -> String
+renderStation colors { body, connector } =
+  let
+    coloredBody = decorateGlyphs (colorize colors (escape body))
+    bodyHtml = case connector of
+      ConDot -> coloredBody <> "<small class=\"sig-forall-dot\"> .</small>"
+      _      -> coloredBody
+    opHtml = case connector of
+      ConDot        -> ""
+      ConConstraint -> "<span class=\"g\">⇒</span>"
+      ConArrow      -> "<span class=\"g\">→</span>"
+      ConNone       -> ""
+  in
+    "<span class=\"sig-station-body\">" <> bodyHtml <> "</span>"
+      <> "<span class=\"sig-station-op\">" <> opHtml <> "</span>"
 
 renderBody :: Array String -> String
 renderBody lines =
