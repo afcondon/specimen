@@ -1,0 +1,11 @@
+{
+  "name": "specimen",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "spago build",
+    "bundle": "spago bundle",
+    "serve": "npx http-server public -p 3007 -c-1 --cors"
+  }
+}

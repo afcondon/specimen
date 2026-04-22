@@ -1,0 +1,14 @@
+# Build artifacts
+output/
+.spago/
+generated-docs/
+public/bundle.js
+
+# Dependencies
+node_modules/
+
+# Lock file
+spago.lock
+
+# OS
+.DS_Store

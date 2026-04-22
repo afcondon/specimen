@@ -1,0 +1,29 @@
+workspace:
+  packageSet:
+    registry: 63.2.0
+  extraPackages:
+    sigil:
+      path: /Users/afc/work/afc-work/purescript-hylograph-libs/purescript-sigil
+
+package:
+  name: specimen
+  description: "Typesets a single PureScript module as a Swiss-poster-quality printed specimen via Sigil — alignment passes, ornament layer."
+  dependencies:
+    - aff
+    - aff-promise
+    - arrays
+    - console
+    - effect
+    - foldable-traversable
+    - language-cst-parser
+    - maybe
+    - prelude
+    - sigil
+    - strings
+    - tuples
+    - web-dom
+    - web-html
+  bundle:
+    module: Specimen.Main
+    outfile: public/bundle.js
+    platform: browser
