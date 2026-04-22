@@ -5,6 +5,7 @@ module Specimen.Block
   , ClassBlock
   , InstanceBlock
   , ValueBlock
+  , ForeignBlock
   , extractBlocks
   ) where
 
@@ -22,12 +23,14 @@ type ImportLine    = { qualified :: Boolean, mod :: String, alias :: Maybe Strin
 type ClassBlock    = { head :: String, body :: Array String, marginalia :: Array String }
 type InstanceBlock = { head :: String, marginalia :: Array String }
 type ValueBlock    = { name :: String, sig :: Maybe String, body :: Array String, marginalia :: Array String }
+type ForeignBlock  = { name :: String, sig :: String, isType :: Boolean, marginalia :: Array String }
 
 data Block
   = BHeader   Header
   | BImports  (Array ImportLine)
   | BClass    ClassBlock
   | BInstance InstanceBlock
+  | BForeign  ForeignBlock
   | BValue    ValueBlock
   | BRaw      (Array String)
 
@@ -48,16 +51,29 @@ chunkLines src =
   groupChunks (String.split (Pattern "\n") src)
     # Array.filter (not <<< Array.null)
 
+-- | Group lines into decl-sized chunks. A blank line is normally a
+-- | chunk boundary, EXCEPT when the next non-blank line is indented —
+-- | which means it's a continuation of the current decl (e.g. a `where`
+-- | clause helper definition separated from the previous one by a
+-- | blank line). PureScript allows blank lines inside indented blocks.
 groupChunks :: Array String -> Array (Array String)
 groupChunks lines = go [] [] lines
   where
   go acc cur xs = case Array.uncons xs of
     Nothing -> if Array.null cur then acc else Array.snoc acc cur
     Just { head, tail }
-      | isBlank head -> if Array.null cur
-                          then go acc [] tail
-                          else go (Array.snoc acc cur) [] tail
-      | otherwise    -> go acc (Array.snoc cur head) tail
+      | isBlank head ->
+          if Array.null cur then
+            go acc [] tail
+          else if nextNonBlankIsIndented tail then
+            go acc (Array.snoc cur head) tail   -- interior blank
+          else
+            go (Array.snoc acc cur) [] tail     -- real boundary
+      | otherwise -> go acc (Array.snoc cur head) tail
+
+  nextNonBlankIsIndented xs = case Array.find (not <<< isBlank) xs of
+    Just l  -> isIndented l
+    Nothing -> false
 
 isBlank :: String -> Boolean
 isBlank line = String.trim line == ""
@@ -73,13 +89,34 @@ classifyChunk chunk =
   in case Array.head rest of
     Nothing -> BRaw chunk
     Just first
-      | startsWith "module "   first -> BHeader (parseHeader rest)
-      | startsWith "import "   first -> BImports (Array.mapMaybe parseImport rest)
-      | startsWith "class "    first -> BClass    { head: first, body: Array.drop 1 rest, marginalia }
-      | startsWith "instance " first -> BInstance { head: first, marginalia }
+      | startsWith "module "               first -> BHeader (parseHeader rest)
+      | startsWith "import "               first -> BImports (Array.mapMaybe parseImport rest)
+      | startsWith "foreign import data "  first -> BForeign (parseForeign true  first marginalia)
+      | startsWith "foreign import "       first -> BForeign (parseForeign false first marginalia)
+      | startsWith "class "                first -> BClass    { head: first, body: Array.drop 1 rest, marginalia }
+      | startsWith "instance "             first -> BInstance { head: first, marginalia }
       | otherwise -> case parseValue rest of
           Just v  -> BValue (v { marginalia = marginalia })
           Nothing -> BRaw chunk
+
+-- | Parse a single-line foreign import declaration.
+-- |   `foreign import data X :: Kind` (isType: true)
+-- |   `foreign import x :: Type`      (isType: false)
+parseForeign :: Boolean -> String -> Array String -> ForeignBlock
+parseForeign isType raw marginalia =
+  let
+    prefix = if isType then "foreign import data " else "foreign import "
+    after = case String.stripPrefix (Pattern prefix) (String.trim raw) of
+      Just s  -> s
+      Nothing -> raw
+  in case String.indexOf (Pattern " :: ") after of
+    Just i ->
+      { name: String.trim (String.take i after)
+      , sig:  String.trim (String.drop (i + 4) after)
+      , isType
+      , marginalia
+      }
+    Nothing -> { name: String.trim after, sig: "", isType, marginalia }
 
 peelComments :: Array String -> Tuple (Array String) (Array String)
 peelComments chunk =
@@ -153,6 +190,14 @@ parseImport raw = do
 
 -- ----------------------------------------------------------------------------
 -- Value (sig + optional body, or body alone)
+--
+-- Three shapes handled:
+--   (a) single-line sig:    `name :: type`     followed by body equation
+--   (b) multi-line sig:     `name`             followed by indented `::` cont.
+--                           `  :: forall ...`
+--                           `  -> ...`
+--                           `name args = ...`
+--   (c) bare value:         `name args = body`  (no sig at all)
 
 parseValue :: Array String -> Maybe ValueBlock
 parseValue lines = case Array.head lines of
@@ -166,14 +211,50 @@ parseValue lines = case Array.head lines of
              , body: Array.drop 1 lines
              , marginalia: []
              }
-      Nothing ->
-        case String.indexOf (Pattern " ") trimmed of
-          Just i  -> Just { name: String.take i trimmed
-                          , sig: Nothing
-                          , body: lines
-                          , marginalia: []
-                          }
-          Nothing -> Nothing
+      Nothing -> case parseMultilineSig lines of
+        Just v  -> Just v
+        Nothing ->
+          case String.indexOf (Pattern " ") trimmed of
+            Just i  -> Just { name: String.take i trimmed
+                            , sig: Nothing
+                            , body: lines
+                            , marginalia: []
+                            }
+            Nothing -> Nothing
+
+-- | Multi-line sig: bare identifier on line 0, indented continuation
+-- | lines containing `::`, then the body equation at column 0 starting
+-- | with the same identifier.
+parseMultilineSig :: Array String -> Maybe ValueBlock
+parseMultilineSig lines = do
+  first <- Array.head lines
+  let name = String.trim first
+  if not (isBareIdent name)
+    then Nothing
+    else
+      let
+        rest = Array.drop 1 lines
+        { init: sigLines, rest: bodyLines } = Array.span isIndented rest
+        sig = String.trim (String.joinWith " " (map String.trim sigLines))
+      in
+        if Array.any containsSig sigLines && sig /= ""
+          then Just { name, sig: Just sig, body: bodyLines, marginalia: [] }
+          else Nothing
+  where
+  containsSig l = case String.indexOf (Pattern "::") l of
+    Just _  -> true
+    Nothing -> false
+
+isBareIdent :: String -> Boolean
+isBareIdent s = s /= "" && not (String.contains (Pattern " ") s)
+                       && not (String.contains (Pattern "(") s)
+
+isIndented :: String -> Boolean
+isIndented line = case String.stripPrefix (Pattern " ") line of
+  Just _  -> true
+  Nothing -> case String.stripPrefix (Pattern "\t") line of
+    Just _  -> true
+    Nothing -> false
 
 -- ----------------------------------------------------------------------------
 -- Imports merging

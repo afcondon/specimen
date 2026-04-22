@@ -25,14 +25,20 @@ data MdNode
 -- |   2. group lines into paragraphs (blank line and `- ` both break)
 -- |   3. classify each paragraph as Para or LawList
 -- |   4. consolidate adjacent LawLists into one block (so colons align)
--- |   5. render
+-- |   5. render — the first node gets headline treatment (drop cap for
+-- |      prose-led; pulled-out code subhead for code-led), the rest stay
+-- |      as plain paragraphs.
 docLinesToHtml :: Array String -> String
 docLinesToHtml lines =
   let
     paras = groupParagraphs (Array.filter (not <<< isFenceMarker) lines)
     nodes = consolidateNodes (map paraToNode paras)
   in
-    String.joinWith "" (map renderNode nodes)
+    case Array.uncons nodes of
+      Nothing -> ""
+      Just { head, tail } ->
+        renderNode true head
+          <> String.joinWith "" (map (renderNode false) tail)
 
 isFenceMarker :: String -> Boolean
 isFenceMarker line =
@@ -99,27 +105,56 @@ consolidateNodes = Array.foldl step []
 -- ----------------------------------------------------------------------------
 -- Rendering
 
-renderNode :: MdNode -> String
-renderNode = case _ of
-  Para s         -> renderParagraph s
+renderNode :: Boolean -> MdNode -> String
+renderNode isFirst = case _ of
+  Para s         -> renderParagraph isFirst s
   LawList items  -> renderLawList items
 
-renderParagraph :: String -> String
-renderParagraph s =
+renderParagraph :: Boolean -> String -> String
+renderParagraph isFirst s =
   let
     trimmed = String.trim s
     body    = escape trimmed # stripPursuitLinks # renderInlineCode
-    -- Only paragraphs whose first character is a plain letter get the
-    -- drop cap. Paragraphs starting with `code`, [link], etc. don't —
-    -- ::first-letter would otherwise target a letter inside markup.
-    cls = if startsWithLetter trimmed then " class=\"can-dropcap\"" else ""
   in
-    if body == "" then "" else "<p" <> cls <> ">" <> body <> "</p>"
+    if body == "" then ""
+    else if isFirst && startsWithBacktick trimmed then
+      renderCodeLed body
+    else if isFirst && startsWithLetter trimmed then
+      "<p class=\"can-dropcap\">" <> body <> "</p>"
+    else
+      "<p>" <> body <> "</p>"
+
+-- | Pull the leading <code>X</code> out as a block-level subhead so the
+-- | comment block has a strong typographic opening even when the doc
+-- | starts with the function's own identifier (e.g. ``liftM1``).
+renderCodeLed :: String -> String
+renderCodeLed body = case extractLeadingCode body of
+  Just { code, rest } ->
+    "<p class=\"code-led\">"
+      <> "<span class=\"code-cap\">" <> code <> "</span>"
+      <> String.trim rest
+      <> "</p>"
+  Nothing ->
+    "<p>" <> body <> "</p>"
+
+extractLeadingCode :: String -> Maybe { code :: String, rest :: String }
+extractLeadingCode body = do
+  rest1 <- String.stripPrefix (Pattern "<code>") body
+  i <- String.indexOf (Pattern "</code>") rest1
+  pure
+    { code: String.take i rest1
+    , rest: String.drop (i + 7) rest1   -- 7 = length of "</code>"
+    }
 
 startsWithLetter :: String -> Boolean
 startsWithLetter s = case regex "^[A-Za-z]" noFlags of
   Right r -> test r s
   Left _  -> false
+
+startsWithBacktick :: String -> Boolean
+startsWithBacktick s = case String.stripPrefix (Pattern "`") s of
+  Just _  -> true
+  Nothing -> false
 
 renderLawList :: Array { name :: String, code :: String } -> String
 renderLawList items =

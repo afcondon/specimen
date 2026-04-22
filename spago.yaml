@@ -17,6 +17,7 @@ package:
     - foldable-traversable
     - language-cst-parser
     - maybe
+    - nullable
     - prelude
     - sigil
     - strings

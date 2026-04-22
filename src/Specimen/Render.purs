@@ -5,12 +5,15 @@ module Specimen.Render
 import Prelude
 
 import Data.Array as Array
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String as String
 import Data.String.Common (replaceAll)
 import Data.String.Pattern (Pattern(..), Replacement(..))
+import Data.String.Regex (regex, test) as Regex
+import Data.String.Regex.Flags (noFlags) as Regex.Flags
 
-import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock)
+import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock)
 import Specimen.Markdown (docLinesToHtml)
 
 type DocOpts =
@@ -109,7 +112,18 @@ categorizeExport raw =
     Just rest -> { kind: "class", label: "Class", name: String.trim rest }
     Nothing -> case String.stripPrefix (Pattern "module ") trimmed of
       Just rest -> { kind: "module", label: "Module", name: String.trim rest }
-      Nothing -> { kind: "value", label: "Function", name: trimmed }
+      Nothing -> case String.stripPrefix (Pattern "type ") trimmed of
+        Just rest -> { kind: "type", label: "Type", name: String.trim rest }
+        Nothing
+          | startsUpper trimmed -> { kind: "type", label: "Type", name: trimmed }
+          | otherwise           -> { kind: "value", label: "Function", name: trimmed }
+
+startsUpper :: String -> Boolean
+startsUpper s = case String.codePointAt 0 s of
+  Nothing -> false
+  Just _  -> case Regex.regex "^[A-Z]" Regex.Flags.noFlags of
+    Right r -> Regex.test r s
+    Left _  -> false
 
 renderHeaderFallback :: String -> String
 renderHeaderFallback name =
@@ -132,8 +146,24 @@ renderBlock = case _ of
   BImports is    -> renderImports is
   BClass    c    -> renderClass c
   BInstance i    -> renderInstance i
+  BForeign  f    -> renderForeign f
   BValue    v    -> renderValue v
   BRaw      ls   -> renderRaw ls
+
+-- ---- Foreign
+
+renderForeign :: ForeignBlock -> String
+renderForeign f =
+  let label = if f.isType then "Foreign Type" else "Foreign" in
+  "<section class=\"row kind-foreign\">"
+    <> renderLabel label
+    <> "<span class=\"name\">" <> escape f.name <> "</span>"
+    <> (if f.sig == ""
+          then "<span class=\"sep\"></span><span class=\"type\"></span>"
+          else "<span class=\"sep\">::</span>"
+            <> "<span class=\"type\">" <> decorateGlyphs (escape f.sig) <> "</span>")
+    <> renderMarginalia f.marginalia
+    <> "</section>"
 
 -- ---- Imports
 
@@ -175,15 +205,30 @@ renderClass { head, body, marginalia } =
     <> renderMarginalia marginalia
     <> "</section>"
 
--- ---- Instance
+-- ---- Instance — split `instance NAME :: TYPE` into name/sep/type so the
+-- ---- `::` aligns with value-decl sigs through the shared subgrid.
 
 renderInstance :: InstanceBlock -> String
 renderInstance { head, marginalia } =
+  let parts = parseInstanceHead head in
   "<section class=\"row kind-instance\">"
     <> renderLabel "Instance"
-    <> "<code class=\"instance-head\">" <> decorateGlyphs (escape head) <> "</code>"
+    <> "<span class=\"name\">" <> escape parts.name <> "</span>"
+    <> (case parts.sig of
+          Just s ->
+            "<span class=\"sep\">::</span>"
+              <> "<span class=\"type\">" <> decorateGlyphs (escape s) <> "</span>"
+          Nothing ->
+            "<span class=\"sep\"></span><span class=\"type\"></span>")
     <> renderMarginalia marginalia
     <> "</section>"
+
+parseInstanceHead :: String -> { name :: String, sig :: Maybe String }
+parseInstanceHead h =
+  let trimmed = String.trim h in
+  case String.indexOf (Pattern " :: ") trimmed of
+    Just i -> { name: String.take i trimmed, sig: Just (String.drop (i + 4) trimmed) }
+    Nothing -> { name: trimmed, sig: Nothing }
 
 -- ---- Value
 
