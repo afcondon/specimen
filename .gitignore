@@ -10,5 +10,8 @@ node_modules/
 # Lock file
 spago.lock
 
+# Editor / tooling
+.psc-ide-port
+
 # OS
 .DS_Store

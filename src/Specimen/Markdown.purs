@@ -1,5 +1,6 @@
 module Specimen.Markdown
   ( docLinesToHtml
+  , isCompactMarginalia
   ) where
 
 import Prelude
@@ -13,16 +14,20 @@ import Data.String.Pattern (Pattern(..), Replacement(..))
 import Data.String.Regex (regex, replace, test)
 import Data.String.Regex.Flags (global, noFlags)
 
--- | A parsed marginalia node — either prose or a "law list" (consecutive
--- | `- name: code` items rendered as a 3-column aligned-colon grid).
+-- | A parsed marginalia node — either prose, a "law list" (consecutive
+-- | `- name: code` items rendered as a 3-column aligned-colon grid), or
+-- | a fenced code block (markdown ``` … ``` lifted out as a quoted code
+-- | excerpt).
 data MdNode
   = Para  String
   | LawList (Array { name :: String, code :: String })
+  | Code (Array String)
 
 -- | Render an array of stripped doc-comment lines as HTML.
 -- | Pipeline:
--- |   1. drop fence markers (content flows into surrounding paragraphs as text)
--- |   2. group lines into paragraphs (blank line and `- ` both break)
+-- |   1. split on fence markers — prose runs go through the paragraph
+-- |      pipeline; fenced runs become Code nodes verbatim
+-- |   2. group prose lines into paragraphs (blank line and `- ` both break)
 -- |   3. classify each paragraph as Para or LawList
 -- |   4. consolidate adjacent LawLists into one block (so colons align)
 -- |   5. render — the first node gets headline treatment (drop cap for
@@ -31,14 +36,33 @@ data MdNode
 docLinesToHtml :: Array String -> String
 docLinesToHtml lines =
   let
-    paras = groupParagraphs (Array.filter (not <<< isFenceMarker) lines)
-    nodes = consolidateNodes (map paraToNode paras)
+    chunks = splitOnFences lines
+    nodes = consolidateNodes (Array.concatMap chunkToNodes chunks)
   in
     case Array.uncons nodes of
       Nothing -> ""
       Just { head, tail } ->
         renderNode true head
           <> String.joinWith "" (map (renderNode false) tail)
+
+-- | A chunk is either a run of prose lines or a run of fenced-code lines.
+-- | We tag with a Boolean: true = code, false = prose.
+splitOnFences :: Array String -> Array { isCode :: Boolean, lines :: Array String }
+splitOnFences lines = go [] [] false lines
+  where
+  flush acc cur isCode =
+    if Array.null cur then acc
+    else Array.snoc acc { isCode, lines: cur }
+
+  go acc cur isCode xs = case Array.uncons xs of
+    Nothing -> flush acc cur isCode
+    Just { head, tail }
+      | isFenceMarker head -> go (flush acc cur isCode) [] (not isCode) tail
+      | otherwise          -> go acc (Array.snoc cur head) isCode tail
+
+chunkToNodes :: { isCode :: Boolean, lines :: Array String } -> Array MdNode
+chunkToNodes { isCode: true,  lines } = [ Code lines ]
+chunkToNodes { isCode: false, lines } = map paraToNode (groupParagraphs lines)
 
 isFenceMarker :: String -> Boolean
 isFenceMarker line =
@@ -69,6 +93,25 @@ startsWithListMarker :: String -> Boolean
 startsWithListMarker s = case String.stripPrefix (Pattern "- ") (String.trim s) of
   Just _  -> true
   Nothing -> false
+
+-- | A marginalia block is "compact" when it parses to a single short
+-- | prose paragraph that would also receive a drop cap — i.e. starts
+-- | with a plain letter. The cream-block + drop-cap pull-quote treatment
+-- | reads as over-produced for one-sentence comments; the renderer
+-- | switches to a flatter, in-flow rendering when this returns true.
+-- | Threshold of 100 chars ≈ one line at 1.05rem inside the 58rem block.
+isCompactMarginalia :: Array String -> Boolean
+isCompactMarginalia lines =
+  let
+    chunks = splitOnFences lines
+    nodes  = consolidateNodes (Array.concatMap chunkToNodes chunks)
+  in case nodes of
+    [ Para s ] ->
+      let trimmed = String.trim s
+      in String.length trimmed > 0
+         && String.length trimmed < 100
+         && startsWithLetter trimmed
+    _ -> false
 
 -- ----------------------------------------------------------------------------
 -- Paragraph → node classification
@@ -109,6 +152,21 @@ renderNode :: Boolean -> MdNode -> String
 renderNode isFirst = case _ of
   Para s         -> renderParagraph isFirst s
   LawList items  -> renderLawList items
+  Code lines     -> renderCodeBlock lines
+
+-- | Render a fenced code block as a quoted excerpt — pre-formatted,
+-- | monospace, anchored by a left rule (see .marginalia pre.code-quote
+-- | in style.css). Empty blocks are dropped.
+renderCodeBlock :: Array String -> String
+renderCodeBlock lines =
+  let nonEmpty = Array.dropWhile isAllBlank (Array.reverse (Array.dropWhile isAllBlank (Array.reverse lines)))
+  in if Array.null nonEmpty then ""
+     else
+       "<pre class=\"code-quote\"><code>"
+         <> String.joinWith "\n" (map escape nonEmpty)
+         <> "</code></pre>"
+  where
+  isAllBlank l = String.trim l == ""
 
 renderParagraph :: Boolean -> String -> String
 renderParagraph isFirst s =

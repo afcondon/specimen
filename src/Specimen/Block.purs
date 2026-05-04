@@ -21,7 +21,7 @@ import Data.Tuple (Tuple(..))
 type Header        = { name :: String, exports :: Array String }
 type ImportLine    = { qualified :: Boolean, mod :: String, alias :: Maybe String, items :: Maybe String }
 type ClassBlock    = { head :: String, body :: Array String, marginalia :: Array String }
-type InstanceBlock = { head :: String, marginalia :: Array String }
+type InstanceBlock = { head :: String, body :: Array String, marginalia :: Array String }
 type ValueBlock    = { name :: String, sig :: Maybe String, body :: Array String, marginalia :: Array String }
 type ForeignBlock  = { name :: String, sig :: String, isType :: Boolean, marginalia :: Array String }
 
@@ -94,7 +94,7 @@ classifyChunk chunk =
       | startsWith "foreign import data "  first -> BForeign (parseForeign true  first marginalia)
       | startsWith "foreign import "       first -> BForeign (parseForeign false first marginalia)
       | startsWith "class "                first -> BClass    { head: first, body: Array.drop 1 rest, marginalia }
-      | startsWith "instance "             first -> BInstance { head: first, marginalia }
+      | startsWith "instance "             first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
       | otherwise -> case parseValue rest of
           Just v  -> BValue (v { marginalia = marginalia })
           Nothing -> BRaw chunk

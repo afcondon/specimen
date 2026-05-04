@@ -1,5 +1,7 @@
 module Specimen.Render
   ( renderDocument
+  , NoteCard
+  , Notes
   ) where
 
 import Prelude
@@ -14,27 +16,48 @@ import Data.String.Regex (regex, test) as Regex
 import Data.String.Regex.Flags (noFlags) as Regex.Flags
 
 import Data.Map (Map)
+import Data.Map as Map
+import Data.Tuple (Tuple(..))
 
 import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock)
-import Specimen.Markdown (docLinesToHtml)
+import Specimen.Markdown (docLinesToHtml, isCompactMarginalia)
 import Specimen.Sig (Connector(..), Station, assignColors, colorize, forallVars, segmentSig, shouldStack)
+
+-- | A single commentary entry. Multiple authors can write commentary on
+-- | the same symbol; the renderer stacks each one as a clickable card in
+-- | the right margin and emits a corresponding hidden expansion panel
+-- | that opens in the middle column.
+type NoteCard =
+  { authorSlug :: String
+  , authorName :: String
+  , body       :: String
+  }
+
+-- | Margin-note table: symbol-name → array of cards. Keys are written by
+-- | the commentary author as `## map`, `## class Functor`,
+-- | `## instance functorMaybe`, `## data Proxy`, etc. The renderer
+-- | computes the matching key per block, emits a stack of small author
+-- | chips in the notes column, and a hidden commentary panel per chip
+-- | in the middle column for click-to-expand.
+type Notes = Map String (Array NoteCard)
 
 type DocOpts =
   { moduleSlug :: String
   , source     :: String
   , blocks     :: Array Block
+  , notes      :: Notes
   }
 
 -- | Render the full document HTML.
 renderDocument :: DocOpts -> String
-renderDocument { moduleSlug, source, blocks } =
+renderDocument { moduleSlug, source, blocks, notes } =
   let
     header = case Array.find isHeader blocks of
       Just (BHeader h) -> renderHeader h
       _                -> renderHeaderFallback moduleSlug
     nonHeader = Array.filter (not <<< isHeader) blocks
-    body = renderStack nonHeader
-    foot = renderFoot { source, moduleSlug }
+    body = renderStack moduleSlug notes nonHeader
+    foot = renderFoot { source }
   in
     "<article class=\"specimen-doc\">"
       <> header
@@ -137,26 +160,130 @@ renderHeaderFallback name =
 -- ----------------------------------------------------------------------------
 -- Stack — one big subgrid that holds imports + class + instances + values.
 
-renderStack :: Array Block -> String
-renderStack blocks =
+renderStack :: String -> Notes -> Array Block -> String
+renderStack moduleSlug notes blocks =
   "<div class=\"specimen-stack\">"
-    <> String.joinWith "" (map renderBlock blocks)
+    <> String.joinWith "" (map (renderBlock moduleSlug notes) blocks)
     <> "</div>"
 
-renderBlock :: Block -> String
-renderBlock = case _ of
+renderBlock :: String -> Notes -> Block -> String
+renderBlock moduleSlug notes = case _ of
   BHeader _      -> ""  -- already rendered above the stack
   BImports is    -> renderImports is
-  BClass    c    -> renderClass c
-  BInstance i    -> renderInstance i
-  BForeign  f    -> renderForeign f
-  BValue    v    -> renderValue v
+  BClass    c    -> renderClass    (lookupNote moduleSlug notes (classKey c.head))    c
+  BInstance i    -> renderInstance (lookupNote moduleSlug notes (instanceKey i.head)) i
+  BForeign  f    -> renderForeign  (lookupNote moduleSlug notes (foreignKey f))       f
+  BValue    v    -> renderValue    (lookupNote moduleSlug notes v.name)               v
   BRaw      ls   -> renderRaw ls
+
+-- | Compute lookup keys per block kind. Authors write the matching `##`
+-- | heading in their commentary markdown.
+classKey :: String -> String
+classKey head = "class " <> classNameOf head
+
+instanceKey :: String -> String
+instanceKey head = case instanceNameOf head of
+  Just nm -> "instance " <> nm
+  Nothing -> ""    -- anonymous instances aren't keyable; lookup will miss
+
+foreignKey :: ForeignBlock -> String
+foreignKey f = (if f.isType then "data " else "") <> f.name
+
+-- | Extract the class name from a class declaration head. Handles
+-- | constraint contexts (`class Eq a <= Ord a where`) by skipping past
+-- | the `<=` or `=>` arrow before grabbing the first identifier.
+classNameOf :: String -> String
+classNameOf head =
+  let
+    afterClass = case String.stripPrefix (Pattern "class ") (String.trim head) of
+      Just s  -> s
+      Nothing -> head
+    afterCtx = case String.indexOf (Pattern " <= ") afterClass of
+      Just i  -> String.drop (i + 4) afterClass
+      Nothing -> case String.indexOf (Pattern " => ") afterClass of
+        Just i  -> String.drop (i + 4) afterClass
+        Nothing -> afterClass
+    trimmed = String.trim afterCtx
+  in
+    case String.indexOf (Pattern " ") trimmed of
+      Just i  -> String.take i trimmed
+      Nothing -> trimmed
+
+-- | Named instance? Returns the local name (e.g. "functorMaybe") if the
+-- | declaration is `instance NAME :: TYPE where`; Nothing for anonymous
+-- | instances (`instance Show (Foo a) where`).
+instanceNameOf :: String -> Maybe String
+instanceNameOf head = do
+  rest <- String.stripPrefix (Pattern "instance ") (String.trim head)
+  i    <- String.indexOf (Pattern " :: ") rest
+  pure (String.trim (String.take i rest))
+
+-- | Look up note cards for a symbol and render the margin chip stack
+-- | plus the hidden commentary panels. Returns "" if no track has
+-- | commentary for this symbol.
+-- |
+-- | Layout: cards stack in the `notes` column on the right; panels
+-- | place themselves in the middle column (`name / notes`) and stay
+-- | hidden until the corresponding card is clicked. The pairing is
+-- | by `data-panel` attribute referencing the panel's id.
+lookupNote :: String -> Notes -> String -> String
+lookupNote moduleSlug notes key
+  | key == "" = ""
+  | otherwise = case Map.lookup key notes of
+      Nothing    -> ""
+      Just cards
+        | Array.null cards -> ""
+        | otherwise        -> renderNoteCards moduleSlug key cards
+
+renderNoteCards :: String -> String -> Array NoteCard -> String
+renderNoteCards moduleSlug key cards =
+  let
+    indexed = Array.mapWithIndex (\i c -> Tuple (panelId moduleSlug key c.authorSlug i) c) cards
+    chips   = String.joinWith "" (map renderNoteChip indexed)
+    panels  = String.joinWith "" (map renderNotePanel indexed)
+  in
+    "<aside class=\"note-stack\">" <> chips <> "</aside>" <> panels
+
+renderNoteChip :: Tuple String NoteCard -> String
+renderNoteChip (Tuple pid c) =
+  "<button class=\"note-card\" data-panel=\"" <> pid <> "\">"
+    <> escape c.authorName
+    <> "</button>"
+
+renderNotePanel :: Tuple String NoteCard -> String
+renderNotePanel (Tuple pid c) =
+  "<div class=\"commentary-panel\" id=\"" <> pid <> "\" hidden>"
+    <> "<header class=\"commentary-panel-head\">"
+    <> "<span class=\"commentary-by\">Commentary — "
+    <> escape c.authorName
+    <> "</span>"
+    <> "<button class=\"commentary-close\" aria-label=\"Close commentary\">×</button>"
+    <> "</header>"
+    <> "<div class=\"commentary-body\">"
+    <> docLinesToHtml (String.split (Pattern "\n") c.body)
+    <> "</div>"
+    <> "</div>"
+
+panelId :: String -> String -> String -> Int -> String
+panelId moduleSlug key authorSlug i =
+  "panel-" <> moduleSlug <> "-" <> sanitizeId key <> "-" <> authorSlug <> "-" <> show i
+
+sanitizeId :: String -> String
+sanitizeId =
+  String.toLower
+    >>> replaceAll (Pattern " ") (Replacement "-")
+    >>> replaceAll (Pattern ".") (Replacement "-")
+    >>> replaceAll (Pattern ":") (Replacement "-")
+    >>> replaceAll (Pattern "(") (Replacement "")
+    >>> replaceAll (Pattern ")") (Replacement "")
+    >>> replaceAll (Pattern "=") (Replacement "")
+    >>> replaceAll (Pattern ">") (Replacement "")
+    >>> replaceAll (Pattern "<") (Replacement "")
 
 -- ---- Foreign
 
-renderForeign :: ForeignBlock -> String
-renderForeign f =
+renderForeign :: String -> ForeignBlock -> String
+renderForeign noteHtml f =
   let label = if f.isType then "Foreign Type" else "Foreign" in
   "<section class=\"row kind-foreign\">"
     <> renderLabel label
@@ -166,6 +293,7 @@ renderForeign f =
           else "<span class=\"sep\">::</span>"
             <> "<span class=\"type\">" <> decorateGlyphs (escape f.sig) <> "</span>")
     <> renderMarginalia f.marginalia
+    <> noteHtml
     <> "</section>"
 
 -- ---- Imports
@@ -197,22 +325,60 @@ renderImportLine { qualified, mod, alias, items } =
 
 -- ---- Class
 
-renderClass :: ClassBlock -> String
-renderClass { head, body, marginalia } =
+renderClass :: String -> ClassBlock -> String
+renderClass noteHtml { head, body, marginalia } =
   "<section class=\"row kind-class\">"
     <> renderLabel "Class"
     <> "<code class=\"class-head\">" <> decorateGlyphs (escape head) <> "</code>"
-    <> (if Array.null body
-          then ""
-          else "<pre class=\"defn-body\">" <> decorateGlyphs (escape (String.joinWith "\n" body)) <> "</pre>")
+    <> renderClassBody body
     <> renderMarginalia marginalia
+    <> noteHtml
     <> "</section>"
+
+-- | Render class-body lines. Each line that parses as a method sig
+-- | (`name :: type`) becomes its own nested subgrid row so the `::`
+-- | participates in the outer .specimen-stack column tracks. Lines
+-- | that don't parse fall back to a pre block (default impls etc.).
+renderClassBody :: Array String -> String
+renderClassBody body =
+  if Array.null body then ""
+  else
+    let parsed = map classifyClassLine body in
+    String.joinWith "" (map renderClassLine parsed)
+
+data ClassLine = ClassMethodSig String String | ClassRaw String
+
+classifyClassLine :: String -> ClassLine
+classifyClassLine raw =
+  let trimmed = String.trim raw in
+  case String.indexOf (Pattern " :: ") trimmed of
+    Just i  -> ClassMethodSig (String.take i trimmed)
+                              (String.drop (i + 4) trimmed)
+    Nothing -> ClassRaw raw
+
+renderClassLine :: ClassLine -> String
+renderClassLine = case _ of
+  ClassMethodSig name sig ->
+    let
+      colors = assignColors (forallVars sig)
+      typeHtml =
+        if shouldStack sig
+          then renderStacked colors (segmentSig sig)
+          else renderInline  colors sig
+    in
+      "<div class=\"class-method\">"
+        <> "<span class=\"name\">" <> escape name <> "</span>"
+        <> "<span class=\"sep\">::</span>"
+        <> "<span class=\"type\">" <> typeHtml <> "</span>"
+        <> "</div>"
+  ClassRaw raw ->
+    "<pre class=\"defn-body\">" <> decorateGlyphs (escape raw) <> "</pre>"
 
 -- ---- Instance — split `instance NAME :: TYPE` into name/sep/type so the
 -- ---- `::` aligns with value-decl sigs through the shared subgrid.
 
-renderInstance :: InstanceBlock -> String
-renderInstance { head, marginalia } =
+renderInstance :: String -> InstanceBlock -> String
+renderInstance noteHtml { head, body, marginalia } =
   let parts = parseInstanceHead head in
   "<section class=\"row kind-instance\">"
     <> renderLabel "Instance"
@@ -223,7 +389,9 @@ renderInstance { head, marginalia } =
               <> "<span class=\"type\">" <> decorateGlyphs (escape s) <> "</span>"
           Nothing ->
             "<span class=\"sep\"></span><span class=\"type\"></span>")
+    <> renderBody body
     <> renderMarginalia marginalia
+    <> noteHtml
     <> "</section>"
 
 parseInstanceHead :: String -> { name :: String, sig :: Maybe String }
@@ -235,13 +403,14 @@ parseInstanceHead h =
 
 -- ---- Value
 
-renderValue :: ValueBlock -> String
-renderValue v =
+renderValue :: String -> ValueBlock -> String
+renderValue noteHtml v =
   "<section class=\"row kind-value\">"
     <> renderLabel "Function"
     <> renderSig v.name v.sig
     <> renderBody v.body
     <> renderMarginalia v.marginalia
+    <> noteHtml
     <> "</section>"
 
 -- | Emit name + :: + type as direct grid items so the outer .specimen-stack
@@ -328,11 +497,40 @@ renderStation colors argsStart { body, connector } =
       <> opHtml
       <> "</span>"
 
+-- | Single-line bodies of the form `name args = expr` render as a
+-- | nested subgrid so the leading identifier aligns with the sig's
+-- | name above and the `=` lands in the same column as the sig's `::`.
+-- | Multi-line bodies (do-blocks, where-clauses, case expressions) keep
+-- | the pre fallback because their geometry doesn't fit the 3-col shape.
 renderBody :: Array String -> String
-renderBody lines =
-  if Array.null lines
-    then ""
-    else "<pre class=\"defn-body\">" <> decorateGlyphs (escape (String.joinWith "\n" lines)) <> "</pre>"
+renderBody = case _ of
+  [] -> ""
+  [single] -> case parseSingleLineBody single of
+    Just { lhs, rhs } ->
+      "<div class=\"value-body\">"
+        <> "<span class=\"name\">" <> escape lhs <> "</span>"
+        <> "<span class=\"sep\">=</span>"
+        <> "<span class=\"type\">" <> decorateGlyphs (escape rhs) <> "</span>"
+        <> "</div>"
+    Nothing -> renderPreBody [single]
+  lines -> renderPreBody lines
+
+renderPreBody :: Array String -> String
+renderPreBody lines =
+  "<pre class=\"defn-body\">" <> decorateGlyphs (escape (String.joinWith "\n" lines)) <> "</pre>"
+
+-- | Split `name args... = expr` into the lhs and rhs around the first
+-- | top-level `=`. Returns Nothing if there's no ` = ` (e.g. a guard
+-- | line, or some other body shape we don't yet handle).
+parseSingleLineBody :: String -> Maybe { lhs :: String, rhs :: String }
+parseSingleLineBody raw =
+  let trimmed = String.trim raw in
+  case String.indexOf (Pattern " = ") trimmed of
+    Just i -> Just
+      { lhs: String.trim (String.take i trimmed)
+      , rhs: String.trim (String.drop (i + 3) trimmed)
+      }
+    Nothing -> Nothing
 
 -- ---- Raw fallback
 
@@ -356,16 +554,19 @@ renderMarginalia :: Array String -> String
 renderMarginalia notes =
   if Array.null notes
     then ""
-    else "<div class=\"marginalia\">" <> docLinesToHtml notes <> "</div>"
+    else
+      let cls = if isCompactMarginalia notes
+                  then "marginalia marginalia-compact"
+                  else "marginalia"
+      in "<div class=\"" <> cls <> "\">" <> docLinesToHtml notes <> "</div>"
 
 -- ----------------------------------------------------------------------------
 -- Foot
 
-renderFoot :: { source :: String, moduleSlug :: String } -> String
-renderFoot { source, moduleSlug } =
+renderFoot :: { source :: String } -> String
+renderFoot { source } =
   "<footer class=\"specimen-foot\">"
-    <> "<div class=\"field\">Source — " <> escape source <> "</div>"
-    <> "<div class=\"field\">" <> escape moduleSlug <> " · Specimen · Hylograph Showcases</div>"
+    <> "<div class=\"field\">module from " <> escape source <> "</div>"
     <> "</footer>"
 
 -- ----------------------------------------------------------------------------

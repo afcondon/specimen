@@ -15,6 +15,7 @@
   --margin:     #8a877e;
   --accent:     #b03a2e;
   --gutter:     7rem;
+  --rhs-gutter: 14rem;
   --measure:    72rem;
 }
 
@@ -40,12 +41,23 @@ main#specimen {
 /* ---------------------------------------------------------- Header */
 
 .specimen-head {
+  position: relative;
   display: grid;
-  grid-template-columns: var(--gutter) 1fr;
+  grid-template-columns: var(--gutter) 1fr var(--rhs-gutter);
   column-gap: 1rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid var(--ink);
   margin-bottom: 3rem;
+}
+/* Rule under the head, clipped to the right edge of the type column so it
+ * doesn't project into the notes gutter (where editorial annotations
+ * live). Same clipping logic applies to row separators and the foot. */
+.specimen-head::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-bottom: 1px solid var(--ink);
 }
 .specimen-head .kicker {
   grid-column: 2;
@@ -135,23 +147,34 @@ main#specimen {
     [margin] var(--gutter)
     [name]   auto
     [colon]  auto
-    [type]   1fr;
+    [type]   1fr
+    [notes]  var(--rhs-gutter);
   column-gap: 1rem;
   row-gap: 0;
 }
 
 .specimen-stack > .row {
+  position: relative;
   display: grid;
   grid-template-columns: subgrid;
   grid-column: margin / -1;
   row-gap: 0.4rem;
   padding: 1.6rem 0;
-  border-top: 1px solid var(--hairline);
   align-items: baseline;
 }
+.specimen-stack > .row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-top: 1px solid var(--hairline);
+}
 .specimen-stack > .row:first-child {
-  border-top: none;
   padding-top: 0;
+}
+.specimen-stack > .row:first-child::before {
+  display: none;
 }
 
 /* ---- Left-gutter label */
@@ -180,9 +203,9 @@ main#specimen {
 
 /* ---- Code cells */
 
-.row > .name,
-.row > .sep,
-.row > .type,
+.row .name,
+.row .sep,
+.row .type,
 .row > .class-head,
 .row > .instance-head,
 .row > .defn-body,
@@ -206,7 +229,7 @@ main#specimen {
   white-space: pre-wrap;
 }
 .row > .defn-body {
-  grid-column: name / -1;
+  grid-column: name / notes;
   margin: 0.3rem 0 0;
   padding-left: 1rem;
   border-left: 1px solid var(--hairline);
@@ -215,14 +238,38 @@ main#specimen {
 }
 .row > .class-head,
 .row > .instance-head {
-  grid-column: name / -1;
+  grid-column: name / notes;
   font-weight: 500;
+}
+
+/* Class methods: each method-sig line is its own nested subgrid spanning
+ * name/-1, so its name/sep/type spans participate in the outer
+ * .specimen-stack column tracks — `::` on every method aligns with the
+ * `::` of every instance/function sig in the document.                  */
+.row.kind-class > .class-method,
+.row.kind-value > .value-body,
+.row.kind-instance > .value-body {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+
+/* Value body: visually subordinated to the sig above — same monospace
+ * (inherited via .row > .name etc.) but in --soft-ink, so the eye reads
+ * the sig as primary and the body equation as a kind of footnote. The
+ * `=` re-uses .sep's --margin color, mirroring the sig's `::`.          */
+.row.kind-value > .value-body > .name,
+.row.kind-value > .value-body > .type,
+.row.kind-instance > .value-body > .name,
+.row.kind-instance > .value-body > .type {
+  color: var(--soft-ink);
 }
 
 /* ---- Imports — inner subgrid */
 
 .row.kind-imports > .specimen-imports {
-  grid-column: name / -1;
+  grid-column: name / notes;
   display: grid;
   grid-template-columns: [kw] auto [mod] auto [as] auto [list] 1fr;
   column-gap: 0.65rem;
@@ -242,7 +289,7 @@ main#specimen {
 .row > .marginalia {
   position: relative;
   isolation: isolate;
-  grid-column: name / -1;
+  grid-column: name / notes;
   margin-top: 3rem;
   padding: 2.5rem 2.75rem 2.25rem;
   background: #fbf6e6;
@@ -292,8 +339,34 @@ main#specimen {
   float: left;
   font-weight: 700;
   font-style: normal;
-  margin: 0.05em 0.18em 0 0;
+  margin: 0.05em 0.04em 0 0;
   color: var(--ink);
+}
+
+/* Compact marginalia for one-line / very-short comments. The full pull-
+ * quote treatment (cream block + accent circle + serif drop cap) reads
+ * as over-produced for a single sentence — it ends up marooned in a
+ * wide rectangle. Compact mode drops the block, keeps the italic prose,
+ * and emphasises the sentence with a bold accent-coloured first letter. */
+.row > .marginalia.marginalia-compact {
+  margin-top: 1.6rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+}
+.row > .marginalia.marginalia-compact::before {
+  display: none;
+}
+.row > .marginalia.marginalia-compact p.can-dropcap:first-of-type::first-letter {
+  font-family: 'Iowan Old Style', 'STIX Two Text', Georgia, serif;
+  font-size: 1em;
+  line-height: inherit;
+  float: none;
+  font-weight: 700;
+  font-style: normal;
+  margin: 0;
+  color: var(--accent);
 }
 
 .row > .marginalia code {
@@ -304,6 +377,32 @@ main#specimen {
   padding: 0.05em 0.4em;
   border-radius: 2px;
   color: var(--ink);
+}
+
+/* Fenced code excerpts inside marginalia — same monospace family as the
+ * main code body above but smaller, gutter-anchored by a left rule, no
+ * pill background. Reads as "quoted code" embedded in the editorial
+ * block, not competing with the actual specimen code above.            */
+.row > .marginalia pre.code-quote {
+  margin: 1.1rem 0;
+  padding: 0.55rem 0 0.55rem 1.1rem;
+  border-left: 2px solid var(--margin);
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  white-space: pre;
+  overflow-x: auto;
+  hyphens: none;
+}
+.row > .marginalia pre.code-quote code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
 }
 
 /* When the first paragraph leads with a code identifier, pull it out as
@@ -373,6 +472,131 @@ main#specimen {
   font-size: inherit;
 }
 
+/* ---- Margin commentary chips and expansion panels.
+ *
+ * Each row that has commentary on its symbol shows a stack of chips in
+ * the right `notes` column — one per track that's written about it.
+ * Click a chip and the corresponding panel expands in the middle column,
+ * sitting alongside the code as clearly-delineated editorial space.
+ * The chips stay compact regardless of essay length; the panel is where
+ * arbitrary content lives (long prose, code excerpts, eventually
+ * Hylograph diagrams).                                                  */
+
+.row > .note-stack {
+  grid-column: notes;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--rule);
+}
+.row > .note-stack .note-card {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  padding: 0.35rem 0.6rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.row > .note-stack .note-card:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+.row > .note-stack .note-card.expanded {
+  background: var(--paper);
+  border-color: var(--accent);
+}
+
+/* Expansion panel — saturates in the module's own accent colour, with
+ * paper-coloured text. Each module's panel takes its hue from the
+ * beeswarm bubble that introduced it, tying the editorial register to
+ * the module identity. Lives in the middle column alongside the code,
+ * clearly demarcated as commentary by colour alone — no risk of being
+ * mistaken for marginalia (cream pull-quote) or code.                   */
+.row > .commentary-panel {
+  grid-column: name / notes;
+  margin-top: 1.2rem;
+  background: var(--accent);
+  border: none;
+  padding: 1.4rem 1.8rem 1.5rem;
+  font-family: 'Iowan Old Style', 'STIX Two Text', 'Charter', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--paper);
+  hyphens: none;
+}
+.row > .commentary-panel[hidden] {
+  display: none;
+}
+.row > .commentary-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+.row > .commentary-panel .commentary-by {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+.row > .commentary-panel .commentary-close {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0 0.3rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+.row > .commentary-panel .commentary-close:hover {
+  color: var(--paper);
+}
+.row > .commentary-panel .commentary-body p {
+  margin: 0 0 0.85rem;
+  font-style: italic;
+}
+.row > .commentary-panel .commentary-body p:last-child {
+  margin-bottom: 0;
+}
+.row > .commentary-panel .commentary-body code {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-style: normal;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.04em 0.4em;
+  border-radius: 2px;
+  color: var(--paper);
+}
+.row > .commentary-panel .commentary-body a {
+  color: var(--paper);
+  font-style: normal;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+.row > .commentary-panel .commentary-body a:hover {
+  border-bottom-color: var(--paper);
+}
+.row > .commentary-panel .commentary-body strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--paper);
+}
+
 /* ---- Glyph spans — bump substituted Unicode arrows up to match the
  *      visual weight of JetBrains Mono's contextual ligatures. */
 
@@ -439,22 +663,33 @@ main#specimen {
 /* ---------------------------------------------------------- Foot */
 
 .specimen-foot {
+  position: relative;
   margin-top: 4rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--ink);
   display: grid;
-  grid-template-columns: var(--gutter) 1fr;
+  grid-template-columns: var(--gutter) 1fr var(--rhs-gutter);
   column-gap: 1rem;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--margin);
 }
-.specimen-foot .field { grid-column: 2; line-height: 1.7; }
+/* Light delineation between modules — the right-aligned foot text and the
+ * next module's title carry the boundary; this is just a quiet rule, not
+ * a hard divider. Clipped to col-2 right edge like the other rules. */
+.specimen-foot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-top: 1px solid var(--rule);
+}
+.specimen-foot .field { grid-column: 2; line-height: 1.7; text-align: right; }
 
 /* Raw fallback */
 .row.kind-raw > .raw {
-  grid-column: name / -1;
+  grid-column: name / notes;
   white-space: pre;
   color: var(--soft-ink);
 }

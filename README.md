@@ -11,6 +11,15 @@ restraint.
 Sibling project of [`purescript-sigil`](../../purescript-hylograph-libs/purescript-sigil/).
 Marginalia: project 179 (`delta-yankee-tango-november`).
 
+## Status
+
+Specimen is a **library** consumed by typeset-book sites such as
+[The Prelude](https://github.com/afcondon/the-prelude). It is not yet
+published to the PureScript registry — the API surface is still
+shifting (most recently, the addition of swappable commentary tracks).
+Consume it via a `path:` extra-package entry in your `spago.yaml`
+until it stabilises.
+
 ## Pipeline
 
 ```
