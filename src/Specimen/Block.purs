@@ -6,6 +6,9 @@ module Specimen.Block
   , InstanceBlock
   , ValueBlock
   , ForeignBlock
+  , Ctor
+  , DataBlock
+  , TypeAliasBlock
   , extractBlocks
   ) where
 
@@ -25,14 +28,37 @@ type InstanceBlock = { head :: String, body :: Array String, marginalia :: Array
 type ValueBlock    = { name :: String, sig :: Maybe String, body :: Array String, marginalia :: Array String }
 type ForeignBlock  = { name :: String, sig :: String, isType :: Boolean, marginalia :: Array String }
 
+-- | One constructor of a data/newtype declaration. `comment` carries a
+-- | trailing inline `-- …` from the constructor's line, kept separate so
+-- | the renderer can set it as an aside rather than code.
+type Ctor = { name :: String, args :: String, comment :: Maybe String }
+
+-- | A data or newtype declaration. Sum types fill `ctors`; a
+-- | record-payload declaration (`newtype X = X { … }` across lines)
+-- | keeps its brace block verbatim in `payload` so it renders like a
+-- | record rather than a stacked sum.
+type DataBlock =
+  { isNewtype  :: Boolean
+  , name       :: String
+  , ctors      :: Array Ctor
+  , payload    :: Array String
+  , marginalia :: Array String
+  }
+
+-- | A type alias. `rhs` holds the right-hand side verbatim (one element
+-- | when the alias is single-line).
+type TypeAliasBlock = { name :: String, rhs :: Array String, marginalia :: Array String }
+
 data Block
-  = BHeader   Header
-  | BImports  (Array ImportLine)
-  | BClass    ClassBlock
-  | BInstance InstanceBlock
-  | BForeign  ForeignBlock
-  | BValue    ValueBlock
-  | BRaw      (Array String)
+  = BHeader    Header
+  | BImports   (Array ImportLine)
+  | BClass     ClassBlock
+  | BInstance  InstanceBlock
+  | BForeign   ForeignBlock
+  | BValue     ValueBlock
+  | BData      DataBlock
+  | BTypeAlias TypeAliasBlock
+  | BRaw       (Array String)
 
 -- | Extract typed blocks from a PureScript module source.
 -- |
@@ -93,6 +119,15 @@ classifyChunk chunk =
       | startsWith "import "               first -> BImports (Array.mapMaybe parseImport rest)
       | startsWith "foreign import data "  first -> BForeign (parseForeign true  first marginalia)
       | startsWith "foreign import "       first -> BForeign (parseForeign false first marginalia)
+      | startsWith "data "                 first -> case parseData false rest marginalia of
+          Just d  -> BData d
+          Nothing -> BRaw chunk
+      | startsWith "newtype "              first -> case parseData true rest marginalia of
+          Just d  -> BData d
+          Nothing -> BRaw chunk
+      | startsWith "type "                 first -> case parseTypeAlias rest marginalia of
+          Just t  -> BTypeAlias t
+          Nothing -> BRaw chunk
       | startsWith "class "                first -> BClass    { head: first, body: Array.drop 1 rest, marginalia }
       | startsWith "instance "             first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
       | otherwise -> case parseValue rest of
@@ -117,6 +152,100 @@ parseForeign isType raw marginalia =
       , marginalia
       }
     Nothing -> { name: String.trim after, sig: "", isType, marginalia }
+
+-- ----------------------------------------------------------------------------
+-- Data / newtype / type alias
+
+-- | Parse a data or newtype declaration chunk. Line-based, because
+-- | trailing `-- comments` are line-scoped: each line is split into
+-- | code and comment first, then constructors are read off.
+parseData :: Boolean -> Array String -> Array String -> Maybe DataBlock
+parseData isNewtype rest marginalia = do
+  first <- Array.head rest
+  let kw = if isNewtype then "newtype " else "data "
+  afterKw <- String.stripPrefix (Pattern kw) (String.trim first)
+  let
+    tailLines = Array.drop 1 rest
+    line1 = splitComment afterKw
+    headSplit = case String.indexOf (Pattern " = ") line1.code of
+      Just i  -> { name: String.take i line1.code
+                 , rhs1: String.trim (String.drop (i + 3) line1.code)
+                 }
+      Nothing -> case String.stripSuffix (Pattern " =") line1.code of
+        Just n  -> { name: n, rhs1: "" }
+        Nothing -> { name: line1.code, rhs1: "" }
+    payloadMode = Array.any (\l -> startsWith "{" (String.trim l)) tailLines
+    ctorOf code comment = case String.indexOf (Pattern " ") code of
+      Just i  -> { name: String.take i code
+                 , args: String.trim (String.drop i code)
+                 , comment
+                 }
+      Nothing -> { name: code, args: "", comment }
+    fromLine l =
+      let
+        s = splitComment l
+        code = fromMaybe s.code
+          (firstJust
+            [ String.stripPrefix (Pattern "= ") s.code
+            , String.stripPrefix (Pattern "| ") s.code
+            ])
+      in
+        if code == "" then Nothing else Just (ctorOf code s.comment)
+    inlineCtors =
+      Array.mapWithIndex
+        (\ix seg -> ctorOf seg (if ix == 0 then line1.comment else Nothing))
+        (Array.filter (_ /= "") (splitTopLevel '|' headSplit.rhs1))
+  if payloadMode then pure
+    { isNewtype
+    , name: String.trim headSplit.name
+    , ctors:
+        if headSplit.rhs1 == "" then []
+        else [ { name: headSplit.rhs1, args: "", comment: line1.comment } ]
+    , payload: tailLines
+    , marginalia
+    }
+  else
+    let ctors = inlineCtors <> Array.mapMaybe fromLine tailLines
+    in
+      if Array.null ctors then Nothing
+      else pure
+        { isNewtype
+        , name: String.trim headSplit.name
+        , ctors
+        , payload: []
+        , marginalia
+        }
+
+-- | Parse a type alias chunk. The right-hand side is kept verbatim —
+-- | record aliases arrive hand-formatted and the renderer preserves
+-- | that geometry.
+parseTypeAlias :: Array String -> Array String -> Maybe TypeAliasBlock
+parseTypeAlias rest marginalia = do
+  first <- Array.head rest
+  afterKw <- String.stripPrefix (Pattern "type ") (String.trim first)
+  split <- case String.indexOf (Pattern " = ") afterKw of
+    Just i  -> Just { name: String.take i afterKw
+                    , inline: String.trim (String.drop (i + 3) afterKw)
+                    }
+    Nothing -> case String.stripSuffix (Pattern " =") (String.trim afterKw) of
+      Just n  -> Just { name: n, inline: "" }
+      Nothing -> Nothing
+  let
+    rhs = (if split.inline == "" then [] else [ split.inline ])
+      <> Array.drop 1 rest
+  if Array.null rhs then Nothing
+  else pure { name: String.trim split.name, rhs, marginalia }
+
+-- | Split a line into code and trailing `-- comment` (if any). Position
+-- | 0 comments don't occur here — whole-comment lines were peeled off
+-- | as marginalia before classification.
+splitComment :: String -> { code :: String, comment :: Maybe String }
+splitComment l = case String.indexOf (Pattern "--") l of
+  Just i | i > 0 ->
+    { code: String.trim (String.take i l)
+    , comment: Just (String.trim (String.drop (i + 2) l))
+    }
+  _ -> { code: String.trim l, comment: Nothing }
 
 peelComments :: Array String -> Tuple (Array String) (Array String)
 peelComments chunk =

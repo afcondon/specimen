@@ -19,7 +19,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Tuple (Tuple(..))
 
-import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock)
+import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock, DataBlock, TypeAliasBlock)
 import Specimen.Markdown (docLinesToHtml, isCompactMarginalia)
 import Specimen.Sig (Connector(..), Station, assignColors, colorize, forallVars, segmentSig, shouldStack)
 
@@ -174,6 +174,8 @@ renderBlock moduleSlug notes = case _ of
   BInstance i    -> renderInstance (lookupNote moduleSlug notes (instanceKey i.head)) i
   BForeign  f    -> renderForeign  (lookupNote moduleSlug notes (foreignKey f))       f
   BValue    v    -> renderValue    (lookupNote moduleSlug notes v.name)               v
+  BData     d    -> renderData      (lookupNote moduleSlug notes (dataKey d))         d
+  BTypeAlias t   -> renderTypeAlias (lookupNote moduleSlug notes ("type " <> t.name)) t
   BRaw      ls   -> renderRaw ls
 
 -- | Compute lookup keys per block kind. Authors write the matching `##`
@@ -188,6 +190,9 @@ instanceKey head = case instanceNameOf head of
 
 foreignKey :: ForeignBlock -> String
 foreignKey f = (if f.isType then "data " else "") <> f.name
+
+dataKey :: DataBlock -> String
+dataKey d = (if d.isNewtype then "newtype " else "data ") <> d.name
 
 -- | Extract the class name from a class declaration head. Handles
 -- | constraint contexts (`class Eq a <= Ord a where`) by skipping past
@@ -293,6 +298,59 @@ renderForeign noteHtml f =
           else "<span class=\"sep\">::</span>"
             <> "<span class=\"type\">" <> decorateGlyphs (escape f.sig) <> "</span>")
     <> renderMarginalia f.marginalia
+    <> noteHtml
+    <> "</section>"
+
+-- ---- Data / newtype — the lever-frame look: each constructor on its
+-- ---- own nested subgrid row, with `=`/`|` landing in the shared
+-- ---- [colon] track so the sum's spine aligns with every `::` in the
+-- ---- document. Record payloads keep their hand-formatted brace block.
+
+renderData :: String -> DataBlock -> String
+renderData noteHtml d =
+  let label = if d.isNewtype then "Newtype" else "Data" in
+  "<section class=\"row kind-data" <> (if d.isNewtype then " kind-newtype" else "") <> "\">"
+    <> renderLabel label
+    <> "<span class=\"name\">" <> escape d.name <> "</span>"
+    <> String.joinWith "" (Array.mapWithIndex renderCtorLine d.ctors)
+    <> (if Array.null d.payload then "" else renderPreBody d.payload)
+    <> renderMarginalia d.marginalia
+    <> noteHtml
+    <> "</section>"
+
+renderCtorLine :: Int -> { name :: String, args :: String, comment :: Maybe String } -> String
+renderCtorLine i ctor =
+  "<div class=\"ctor-line\">"
+    <> "<span class=\"ctor-sep\">" <> (if i == 0 then "=" else "|") <> "</span>"
+    <> "<span class=\"ctor-body\">"
+    <> "<span class=\"ctor-name\">" <> escape ctor.name <> "</span>"
+    <> (if ctor.args == "" then ""
+        else " <span class=\"ctor-args\">" <> decorateGlyphs (escape ctor.args) <> "</span>")
+    <> (case ctor.comment of
+          Just c  -> "<span class=\"ctor-comment\">" <> escape c <> "</span>"
+          Nothing -> "")
+    <> "</span>"
+    <> "</div>"
+
+-- ---- Type alias — name and `=` in the shared tracks; a multi-line
+-- ---- right-hand side (record aliases) keeps its source geometry in a
+-- ---- defn-body block.
+
+renderTypeAlias :: String -> TypeAliasBlock -> String
+renderTypeAlias noteHtml t =
+  "<section class=\"row kind-type\">"
+    <> renderLabel "Type"
+    <> "<span class=\"name\">" <> escape t.name <> "</span>"
+    <> ( case t.rhs of
+           [ single ] ->
+             "<span class=\"sep\">=</span>"
+               <> "<span class=\"type\">" <> decorateGlyphs (escape single) <> "</span>"
+           lines ->
+             "<span class=\"sep\">=</span>"
+               <> "<span class=\"type\"></span>"
+               <> renderPreBody lines
+       )
+    <> renderMarginalia t.marginalia
     <> noteHtml
     <> "</section>"
 

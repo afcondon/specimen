@@ -693,3 +693,46 @@ main#specimen {
   white-space: pre;
   color: var(--soft-ink);
 }
+
+/* ---- Data / newtype declarations — constructor stack. Each .ctor-line
+ * is a nested subgrid row spanning name/notes, so the `=` and `|`
+ * separators sit in the shared [colon] track and align with every `::`
+ * in the document. The lever-frame look.                               */
+
+.row.kind-data > .ctor-line,
+.row.kind-type > .ctor-line {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+
+.ctor-line > .ctor-sep,
+.ctor-line > .ctor-body {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.ctor-line > .ctor-sep {
+  grid-column: colon;
+  color: var(--margin);
+}
+
+.ctor-line > .ctor-body {
+  grid-column: type;
+  color: var(--ink);
+}
+
+.ctor-body .ctor-name { font-weight: 500; }
+.ctor-body .ctor-args { color: var(--soft-ink); }
+
+.ctor-body .ctor-comment {
+  color: var(--margin);
+  font-style: italic;
+  font-size: 0.8rem;
+  margin-left: 2ch;
+}
+
+.row.kind-data > .label { color: var(--accent); }
+.row.kind-type > .label { }
