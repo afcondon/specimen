@@ -359,14 +359,12 @@ const page = `<!DOCTYPE html>
 <link rel="stylesheet" href="sigil.css">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Long code lines must never widen the page: the specimen grid sizes
-     tracks to min-content, so one long white-space:pre line inflates every
-     subgrid row. Let tracks compress and scroll the long line in place. */
+  /* Long code lines must never widen the page (the specimen grid sizes
+     shared tracks to min-content), but they are also never clipped behind
+     a scrollbar — a line that outruns the measure simply extends into the
+     right margin, visible for close reading. Only the page edge cuts it. */
   body { overflow-x: hidden; }
   .specimen-stack > .row > * { min-width: 0; }
-  .row > .defn-body, .row.kind-raw > .raw,
-  .row > .class-head, .row > .instance-head { overflow-x: auto; }
-  .specimen-doc { overflow-x: auto; }   /* catch-all: truly wide code scrolls in place */
   /* morph banner-nav layer (specimen-site) */
   #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: visible; z-index: 5; pointer-events: none; }
   #stage a { pointer-events: auto; cursor: pointer; }

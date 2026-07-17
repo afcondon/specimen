@@ -10,6 +10,7 @@ import Data.Array as Array
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as String
+import Data.String.CodeUnits as SCU
 import Data.String.Common (replaceAll)
 import Data.String.Pattern (Pattern(..), Replacement(..))
 import Data.String.Regex (regex, replace, test) as Regex
@@ -528,20 +529,93 @@ renderClassLine = case _ of
 
 renderInstance :: String -> InstanceBlock -> String
 renderInstance noteHtml { head, body, marginalia } =
-  let parts = parseInstanceHead head in
+  let gathered = gatherInstanceHead head body in
   "<section class=\"row kind-instance\">"
     <> renderLabel "Instance"
-    <> "<span class=\"name\">" <> quietKeywords (escape parts.name) <> "</span>"
-    <> (case parts.sig of
-          Just s ->
-            "<span class=\"sep\">::</span>"
-              <> "<span class=\"type\">" <> decorateGlyphs (escape s) <> "</span>"
-          Nothing ->
-            "<span class=\"sep\"></span><span class=\"type\"></span>")
-    <> renderBody body
+    <> renderInstanceSig (parseInstanceHead gathered.headFull)
+    <> renderBody gathered.rest
     <> renderMarginalia marginalia
     <> noteHtml
     <> "</section>"
+
+-- | An instance head may continue past its first line: the constraint
+-- | block, the target type, and the closing `where` arrive as body
+-- | lines. Gather them back into one logical head (whitespace-
+-- | normalised, exactly as multi-line function sigs are) so instances
+-- | get the same signature typesetting functions do. Anything after
+-- | the instance's own `where` is the real body. Nested `where`s in
+-- | method bodies can't precede the instance's own, so scanning for
+-- | the first is safe.
+gatherInstanceHead :: String -> Array String -> { headFull :: String, rest :: Array String }
+gatherInstanceHead head body =
+  let trimmedHead = String.trim head in
+  if endsWithWhere trimmedHead then { headFull: trimmedHead, rest: body }
+  else case Array.findIndex (endsWithWhere <<< String.trim) body of
+    Just i ->
+      { headFull: String.joinWith " " ([ trimmedHead ] <> map String.trim (Array.take (i + 1) body))
+      , rest: Array.drop (i + 1) body
+      }
+    Nothing -> { headFull: trimmedHead, rest: body }
+
+endsWithWhere :: String -> Boolean
+endsWithWhere s = s == "where" || case String.stripSuffix (Pattern " where") s of
+  Just _  -> true
+  Nothing -> false
+
+-- | Typeset an instance head. Named instances split at ` :: ` into the
+-- | name column and a signature; anonymous instances put everything
+-- | after the (quieted) keyword run through the signature machinery.
+-- | The trailing `where` is set at the sig's foot in the head weight —
+-- | the same emphasis it gets in a class head.
+renderInstanceSig :: { name :: String, sig :: Maybe String } -> String
+renderInstanceSig parts =
+  let
+    sigHtml s =
+      let
+        stripped = case String.stripSuffix (Pattern " where") (String.trim s) of
+          Just s' -> { sig: s', hasWhere: true }
+          Nothing -> { sig: String.trim s, hasWhere: false }
+        colors = assignColors (forallVars stripped.sig)
+        typeHtml =
+          if shouldStack stripped.sig
+            then renderStacked colors (segmentSig stripped.sig)
+            else renderInline colors stripped.sig
+      in
+        typeHtml <> (if stripped.hasWhere then "<span class=\"inst-where\"> where</span>" else "")
+  in case parts.sig of
+    Just s ->
+      "<span class=\"name\">" <> quietKeywords (escape parts.name) <> "</span>"
+        <> "<span class=\"sep\">::</span>"
+        <> "<span class=\"type\">" <> sigHtml s <> "</span>"
+    Nothing -> case splitLeadingInstanceKeywords parts.name of
+      Just { kws, rest } ->
+        "<span class=\"name\"><span class=\"kw\">" <> escape kws <> "</span></span>"
+          <> "<span class=\"sep\"></span>"
+          <> "<span class=\"type\">" <> sigHtml rest <> "</span>"
+      Nothing ->
+        "<span class=\"name\">" <> quietKeywords (escape parts.name) <> "</span>"
+          <> "<span class=\"sep\"></span><span class=\"type\"></span>"
+
+-- | Split the leading keyword run off an anonymous instance head.
+-- | Longest candidates first.
+splitLeadingInstanceKeywords :: String -> Maybe { kws :: String, rest :: String }
+splitLeadingInstanceKeywords s0 =
+  Array.head (Array.mapMaybe try candidates)
+  where
+  s = String.trim s0
+  candidates =
+    [ "else derive newtype instance "
+    , "else derive instance "
+    , "else newtype instance "
+    , "else instance "
+    , "derive newtype instance "
+    , "derive instance "
+    , "newtype instance "
+    , "instance "
+    ]
+  try p = case String.stripPrefix (Pattern p) s of
+    Just rest | rest /= "" -> Just { kws: String.trim p, rest }
+    _ -> Nothing
 
 parseInstanceHead :: String -> { name :: String, sig :: Maybe String }
 parseInstanceHead h =
@@ -594,8 +668,9 @@ renderInline colors sig =
 -- | so the connectors hug the right edge of the longest body rather
 -- | than floating at the cell's far right.
 renderStacked :: Map String String -> Array Station -> String
-renderStacked colors stations =
+renderStacked colors stations0 =
   let
+    stations = Array.concatMap splitTupleConstraint stations0
     -- The boundary is the first non-constraint station after at least
     -- one constraint — i.e. the start of the function's actual shape.
     -- Marked so we can give it a small breath of vertical space.
@@ -613,6 +688,52 @@ renderStacked colors stations =
   isConstraint s = case s.connector of
     ConConstraint -> true
     _             -> false
+
+-- | A long constraint station whose body is one parenthesized tuple —
+-- | the multi-line source style that head-gathering collapsed — breaks
+-- | back into one line per constraint. Pure line-breaking: the pieces
+-- | concatenate back to the original text.
+splitTupleConstraint :: Station -> Array Station
+splitTupleConstraint s = case s.connector of
+  ConConstraint | String.length s.body > 60 ->
+    case oneParenGroup (String.trim s.body) of
+      Just inner ->
+        let pieces = splitTopLevelComma inner in
+        if Array.length pieces < 2 then [ s ]
+        else
+          Array.mapWithIndex
+            (\i p -> { body: (if i == 0 then "( " else ", ") <> p, connector: ConNone })
+            pieces
+            <> [ { body: ")", connector: ConConstraint } ]
+      Nothing -> [ s ]
+  _ -> [ s ]
+
+-- | The string with its outer parens removed, provided those parens
+-- | enclose the WHOLE string as a single balanced group.
+oneParenGroup :: String -> Maybe String
+oneParenGroup t = do
+  inner0 <- String.stripPrefix (Pattern "(") t
+  inner <- String.stripSuffix (Pattern ")") inner0
+  let
+    depths = Array.scanl
+      (\d c -> if c == '(' then d + 1 else if c == ')' then d - 1 else d)
+      0
+      (SCU.toCharArray inner)
+  if Array.all (_ >= 0) depths && Array.last depths /= Just (-1)
+    then Just (String.trim inner)
+    else Nothing
+
+splitTopLevelComma :: String -> Array String
+splitTopLevelComma s0 = go [] [] 0 (SCU.toCharArray s0)
+  where
+  go acc cur depth xs = case Array.uncons xs of
+    Nothing -> Array.snoc acc (String.trim (SCU.fromCharArray cur))
+    Just { head: c, tail }
+      | c == '(' || c == '{' || c == '[' -> go acc (Array.snoc cur c) (depth + 1) tail
+      | c == ')' || c == '}' || c == ']' -> go acc (Array.snoc cur c) (depth - 1) tail
+      | c == ',' && depth == 0 ->
+          go (Array.snoc acc (String.trim (SCU.fromCharArray cur))) [] 0 tail
+      | otherwise -> go acc (Array.snoc cur c) depth tail
 
 -- | Render one station as a body span and an op span. The forall's
 -- | trailing `.` is embedded with the binders rather than placed in the

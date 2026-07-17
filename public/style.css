@@ -135,6 +135,13 @@ main#specimen {
   color: var(--margin);
   font-weight: 400;
 }
+
+/* The instance's closing `where`, set at the sig's foot in the head
+ * weight — the same emphasis it carries in a class head. */
+.kind-instance .inst-where {
+  font-weight: 500;
+  color: var(--ink);
+}
 .export-cell.exp-class .export-kind  { color: var(--accent); }
 .export-cell.exp-module {
   background: #f4f3ed;
