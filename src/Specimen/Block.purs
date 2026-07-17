@@ -71,6 +71,7 @@ data Block
   | BData      DataBlock
   | BTypeAlias TypeAliasBlock
   | BFixity    FixityBlock
+  | BSection   (Array String)
   | BRaw       (Array String)
 
 -- | Extract typed blocks from a PureScript module source.
@@ -80,7 +81,24 @@ data Block
 -- | consecutive import-chunks. Doc-comment lines preceding a decl
 -- | become marginalia for that decl.
 extractBlocks :: String -> Array Block
-extractBlocks src = mergeImports (map classifyChunk (chunkLines src))
+extractBlocks src =
+  demoteLeadingSections (mergeImports (map classifyChunk (chunkLines src)))
+
+-- | An all-comment chunk before the module header is a license or
+-- | pragma preamble, not a section heading — keep it verbatim.
+demoteLeadingSections :: Array Block -> Array Block
+demoteLeadingSections blocks =
+  let
+    headerAt = Array.findIndex (case _ of
+      BHeader _ -> true
+      _         -> false) blocks
+  in case headerAt of
+    Nothing -> blocks
+    Just h -> Array.mapWithIndex
+      (\i b -> case b of
+        BSection lines | i < h -> BRaw lines
+        _                      -> b)
+      blocks
 
 -- ----------------------------------------------------------------------------
 -- Chunking
@@ -126,7 +144,7 @@ classifyChunk chunk =
     Tuple comments rest = peelComments chunk
     marginalia = stripDocPrefix comments
   in case Array.head rest of
-    Nothing -> BRaw chunk
+    Nothing -> BSection chunk
     Just first
       | startsWith "module "               first -> BHeader (parseHeader rest)
       | startsWith "import "               first -> BImports (Array.mapMaybe parseImport rest)

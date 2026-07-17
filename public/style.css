@@ -280,6 +280,23 @@ main#specimen {
 }
 .fixity-line .kw { color: var(--margin); }
 
+/* Section headings — the author's own comment dividers, typeset as a
+ * real rule + small-caps title spanning the text column. */
+.specimen-stack > .row.kind-section {
+  padding: 3rem 0 0.2rem;
+}
+.specimen-stack > .row.kind-section::before {
+  border-top-color: var(--rule);
+}
+.row.kind-section > .section-title {
+  grid-column: name / notes;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--soft-ink);
+}
+
 /* Consecutive instances read as one series — a wall of near-identical
  * rows gets tight leading; hairlines stay so the rows remain countable. */
 .specimen-stack > .row.kind-instance:has(+ .row.kind-instance) { padding-bottom: 0.6rem; }

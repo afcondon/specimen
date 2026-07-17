@@ -8,7 +8,7 @@ import Prelude
 
 import Data.Array as Array
 import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as String
 import Data.String.Common (replaceAll)
 import Data.String.Pattern (Pattern(..), Replacement(..))
@@ -177,6 +177,7 @@ renderBlock moduleSlug notes = case _ of
   BData     d    -> renderData      (lookupNote moduleSlug notes (dataKey d))         d
   BTypeAlias t   -> renderTypeAlias (lookupNote moduleSlug notes ("type " <> t.name)) t
   BFixity   fx   -> renderFixity (lookupNote moduleSlug notes (fixityKey fx)) fx
+  BSection  ls   -> renderSection ls
   BRaw      ls   -> renderRaw ls
 
 -- | Compute lookup keys per block kind. Authors write the matching `##`
@@ -414,6 +415,35 @@ renderKindSig = case _ of
     Nothing ->
       "<div class=\"decl-kind-sig\"><span class=\"name\">"
         <> quietKeywords (escape sig) <> "</span></div>"
+
+-- ---- Section headings — an all-comment chunk in the body is the
+-- ---- author's own section divider. The decoration lines (runs of
+-- ---- ━ ─ - = etc.) are a rule drawn in the only medium a comment
+-- ---- allows; we typeset the real rule and set the text as a title.
+
+renderSection :: Array String -> String
+renderSection chunk =
+  let
+    stripComment l =
+      let t = String.trim l in
+      fromMaybe t (firstJustOf
+        [ String.stripPrefix (Pattern "-- |") t
+        , String.stripPrefix (Pattern "--") t
+        ])
+    isRule s = case Regex.regex "^[\\s━─\\-=_*~═▔#]*$" Regex.Flags.noFlags of
+      Right r -> Regex.test r s
+      Left _  -> false
+    titles = Array.filter (\s -> s /= "" && not (isRule s))
+      (map (String.trim <<< stripComment) chunk)
+  in
+    "<section class=\"row kind-section\">"
+      <> "<div class=\"section-title\">"
+      <> String.joinWith "<br>" (map escape titles)
+      <> "</div>"
+      <> "</section>"
+
+firstJustOf :: forall a. Array (Maybe a) -> Maybe a
+firstJustOf xs = Array.head (Array.catMaybes xs)
 
 -- ---- Imports
 
