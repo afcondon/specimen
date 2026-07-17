@@ -290,6 +290,14 @@ const page = `<!DOCTYPE html>
 <link rel="stylesheet" href="sigil.css">
 <link rel="stylesheet" href="style.css">
 <style>
+  /* Long code lines must never widen the page: the specimen grid sizes
+     tracks to min-content, so one long white-space:pre line inflates every
+     subgrid row. Let tracks compress and scroll the long line in place. */
+  body { overflow-x: hidden; }
+  .specimen-stack > .row > * { min-width: 0; }
+  .row > .defn-body, .row.kind-raw > .raw,
+  .row > .class-head, .row > .instance-head { overflow-x: auto; }
+  .specimen-doc { overflow-x: auto; }   /* catch-all: truly wide code scrolls in place */
   /* morph banner-nav layer (specimen-site) */
   #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: visible; z-index: 5; pointer-events: none; }
   #stage a { pointer-events: auto; cursor: pointer; }
@@ -364,9 +372,15 @@ for (const d of DATA) {
     c.setAttribute('fill', '#111'); inner.appendChild(c);
   }
   g.appendChild(inner);
+  const label = document.createElementNS(NS, 'text');
+  label.textContent = d.name;
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('y', d.rA + 13);
+  label.setAttribute('style', 'font-family: Inter, sans-serif; font-size: ${mods.length >= 30 ? 7.5 : 10}px; letter-spacing: 0.08em; fill: #999;');
+  g.appendChild(label);
   const t = document.createElementNS(NS, 'title'); t.textContent = d.name; g.appendChild(t);
   a.appendChild(g); svg.appendChild(a);
-  gs[d.slug] = { g, bubble, ring, inner, d };
+  gs[d.slug] = { g, bubble, ring, inner, label, d };
 }
 
 let active = null;
@@ -388,6 +402,8 @@ function layout() {
     s.ring.setAttribute('r', r);
     s.inner.setAttribute('transform', 'scale(' + (r / d.rA) + ')');
     s.inner.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
+    s.label.setAttribute('y', r + 13);
+    s.label.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
     s.bubble.setAttribute('r', r);
     s.x = x; s.y = y; s.r = r;
     const isActive = s.d.slug === active;
