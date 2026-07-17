@@ -104,7 +104,8 @@ const page = `<!DOCTYPE html>
     -webkit-font-smoothing: antialiased; }
   main { max-width: 72rem; margin: 4rem auto 6rem; padding: 0 2rem; }
   .kicker { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); margin-bottom: 0.6rem; }
-  h1 { font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 0.8rem; }
+  /* the title is a word, not an identifier — display sans, not code mono */
+  h1 { font-family: Inter, sans-serif; font-size: 4rem; font-weight: 800; letter-spacing: -0.035em; margin: 0 0 0.8rem; }
   .deck { font-size: 1.02rem; color: var(--soft-ink); max-width: 44rem; margin: 0 0 1rem; line-height: 1.6; }
   .scale-note { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); margin: 0 0 3rem; }
   .shelf { margin: 4.5rem 0; }

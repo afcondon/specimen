@@ -279,6 +279,7 @@ main#specimen {
  * the alias sits in the name column like any other declaration; the
  * fixity machinery (infixr 9, as) is quieted to the margin colour. */
 .row.kind-operator > .fixity-line,
+.row.kind-role > .fixity-line,
 .row > .decl-kind-sig {
   display: grid;
   grid-template-columns: subgrid;
@@ -286,6 +287,7 @@ main#specimen {
   align-items: baseline;
 }
 .fixity-line .kw { color: var(--margin); }
+.role-list { color: var(--soft-ink); }
 
 /* Section headings — the author's own comment dividers, typeset as a
  * real rule + small-caps title spanning the text column. */

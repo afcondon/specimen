@@ -11,6 +11,7 @@ module Specimen.Block
   , TypeAliasBlock
   , FixityLine
   , FixityBlock
+  , RoleLine
   , extractBlocks
   ) where
 
@@ -23,7 +24,7 @@ import Data.String.CodeUnits as SCU
 import Data.String.Pattern (Pattern(..))
 import Data.Tuple (Tuple(..))
 
-type Header        = { name :: String, exports :: Array String }
+type Header        = { name :: String, exports :: Array String, doc :: Array String }
 type ImportLine    = { qualified :: Boolean, mod :: String, alias :: Maybe String, items :: Maybe String }
 type ClassBlock    = { head :: String, body :: Array String, marginalia :: Array String }
 type InstanceBlock = { head :: String, body :: Array String, marginalia :: Array String }
@@ -71,8 +72,14 @@ data Block
   | BData      DataBlock
   | BTypeAlias TypeAliasBlock
   | BFixity    FixityBlock
+  | BRole      (Array RoleLine)
   | BSection   (Array String)
   | BRaw       (Array String)
+
+-- | One `type role T r1 r2 …` declaration: the compiler directive that
+-- | fixes a type's parameter roles. `name` is the type, `roles` the
+-- | role list, `code` the line verbatim.
+type RoleLine = { name :: String, roles :: String, code :: String }
 
 -- | Extract typed blocks from a PureScript module source.
 -- |
@@ -82,23 +89,36 @@ data Block
 -- | become marginalia for that decl.
 extractBlocks :: String -> Array Block
 extractBlocks src =
-  demoteLeadingSections (mergeImports (map classifyChunk (chunkLines src)))
+  adoptLeadingSections (mergeImports (map classifyChunk (chunkLines src)))
 
--- | An all-comment chunk before the module header is a license or
--- | pragma preamble, not a section heading — keep it verbatim.
-demoteLeadingSections :: Array Block -> Array Block
-demoteLeadingSections blocks =
+-- | All-comment chunks before the module header: a `-- |` doc chunk is
+-- | the module's own introduction — it becomes the header's doc (many
+-- | authors leave a blank line between it and `module …`, detaching
+-- | it). Anything else up there (licenses, pragmas) stays verbatim raw.
+adoptLeadingSections :: Array Block -> Array Block
+adoptLeadingSections blocks =
   let
     headerAt = Array.findIndex (case _ of
       BHeader _ -> true
       _         -> false) blocks
   in case headerAt of
     Nothing -> blocks
-    Just h -> Array.mapWithIndex
-      (\i b -> case b of
-        BSection lines | i < h -> BRaw lines
-        _                      -> b)
-      blocks
+    Just h ->
+      let
+        docLines = Array.concatMap (case _ of
+          BSection lines | isDocChunk lines -> stripDocPrefix lines
+          _ -> []) (Array.take h blocks)
+        adopted = Array.mapWithIndex
+          (\i b -> case b of
+            BSection lines
+              | i < h && isDocChunk lines -> Nothing
+              | i < h                     -> Just (BRaw lines)
+            BHeader hd | i == h -> Just (BHeader (hd { doc = docLines }))
+            _ -> Just b)
+          blocks
+      in Array.catMaybes adopted
+  where
+  isDocChunk = Array.any (\l -> startsWith "-- |" (String.trim l))
 
 -- ----------------------------------------------------------------------------
 -- Chunking
@@ -156,6 +176,7 @@ classifyChunk chunk =
       | startsWith "newtype "              first -> case parseData true rest marginalia of
           Just d  -> BData d
           Nothing -> BRaw chunk
+      | startsWith "type role "            first -> BRole (map parseRoleLine rest)
       | startsWith "type "                 first -> case parseTypeAlias rest marginalia of
           Just t  -> BTypeAlias t
           Nothing -> BRaw chunk
@@ -180,6 +201,13 @@ parseFixityLine :: String -> FixityLine
 parseFixityLine l = case String.lastIndexOf (Pattern " as ") l of
   Just i  -> { alias: String.trim (String.drop (i + 4) l), code: l }
   Nothing -> { alias: String.trim l, code: l }
+
+parseRoleLine :: String -> RoleLine
+parseRoleLine l = case String.stripPrefix (Pattern "type role ") (String.trim l) of
+  Just after -> case String.indexOf (Pattern " ") after of
+    Just i  -> { name: String.take i after, roles: String.trim (String.drop i after), code: l }
+    Nothing -> { name: after, roles: "", code: l }
+  Nothing -> { name: String.trim l, roles: "", code: l }
 
 -- | Parse a single-line foreign import declaration.
 -- |   `foreign import data X :: Kind` (isType: true)
@@ -286,7 +314,9 @@ parseDataDecl isNewtype rest marginalia = do
   else
     let ctors = inlineCtors <> Array.mapMaybe fromLine tailLines
     in
-      if Array.null ctors then Nothing
+      -- zero constructors with trailing lines is a misparse; zero
+      -- constructors alone is an opaque data declaration (data Foo a)
+      if Array.null ctors && not (Array.null tailLines) then Nothing
       else pure
         { isNewtype
         , name: String.trim headSplit.name
@@ -381,7 +411,7 @@ parseHeader lines =
       Nothing -> []
       Just s  -> Array.filter (\x -> x /= "")
                    (splitTopLevel ',' s)
-  in { name, exports }
+  in { name, exports, doc: [] }
 
 -- ----------------------------------------------------------------------------
 -- Imports

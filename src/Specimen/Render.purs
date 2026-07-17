@@ -20,7 +20,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Tuple (Tuple(..))
 
-import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock, DataBlock, TypeAliasBlock, FixityBlock)
+import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock, DataBlock, TypeAliasBlock, FixityBlock, RoleLine)
 import Specimen.Markdown (docLinesToHtml, isCompactMarginalia)
 import Specimen.Sig (Connector(..), Station, assignColors, colorize, forallVars, segmentSig, shouldStack)
 
@@ -74,11 +74,12 @@ isHeader _           = false
 -- Header
 
 renderHeader :: Header -> String
-renderHeader { name, exports } =
+renderHeader { name, exports, doc } =
   "<header class=\"specimen-head\">"
     <> "<div class=\"kicker\">PureScript Module</div>"
     <> "<h1>" <> escape name <> "</h1>"
     <> renderExports exports
+    <> renderMarginalia doc
     <> "</header>"
 
 -- | Render the export list as a cosmetics-label-style grid of bordered
@@ -178,6 +179,7 @@ renderBlock moduleSlug notes = case _ of
   BData     d    -> renderData      (lookupNote moduleSlug notes (dataKey d))         d
   BTypeAlias t   -> renderTypeAlias (lookupNote moduleSlug notes ("type " <> t.name)) t
   BFixity   fx   -> renderFixity (lookupNote moduleSlug notes (fixityKey fx)) fx
+  BRole     rs   -> renderRoles rs
   BSection  ls   -> renderSection ls
   BRaw      ls   -> renderRaw ls
 
@@ -416,6 +418,26 @@ renderKindSig = case _ of
     Nothing ->
       "<div class=\"decl-kind-sig\"><span class=\"name\">"
         <> quietKeywords (escape sig) <> "</span></div>"
+
+-- ---- Role declarations — `type role T nominal representational …`,
+-- ---- the compiler directive fixing a type's parameter roles. The
+-- ---- type takes the name column (keyword quieted), the role list
+-- ---- sits in the type column in the margin voice.
+
+renderRoles :: Array RoleLine -> String
+renderRoles rs =
+  "<section class=\"row kind-role\">"
+    <> renderLabel "Roles"
+    <> String.joinWith "" (map renderRoleLine rs)
+    <> "</section>"
+
+renderRoleLine :: RoleLine -> String
+renderRoleLine r =
+  "<div class=\"fixity-line\">"
+    <> "<span class=\"name\"><span class=\"kw\">type role </span>" <> escape r.name <> "</span>"
+    <> "<span class=\"sep\"></span>"
+    <> "<span class=\"type role-list\">" <> escape r.roles <> "</span>"
+    <> "</div>"
 
 -- ---- Section headings — an all-comment chunk in the body is the
 -- ---- author's own section divider. The decoration lines (runs of
