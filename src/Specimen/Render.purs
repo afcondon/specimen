@@ -346,10 +346,14 @@ quietFixity s =
 
 renderData :: String -> DataBlock -> String
 renderData noteHtml d =
-  let label = if d.isNewtype then "Newtype" else "Data" in
+  let
+    label = if d.isNewtype then "Newtype" else "Data"
+    kw = if d.isNewtype then "newtype " else "data "
+  in
   "<section class=\"row kind-data" <> (if d.isNewtype then " kind-newtype" else "") <> "\">"
     <> renderLabel label
-    <> "<span class=\"name\">" <> escape d.name <> "</span>"
+    <> renderKindSig d.kindSig
+    <> "<span class=\"name\"><span class=\"kw\">" <> kw <> "</span>" <> escape d.name <> "</span>"
     <> String.joinWith "" (Array.mapWithIndex renderCtorLine d.ctors)
     <> (if Array.null d.payload then "" else renderPreBody d.payload)
     <> renderMarginalia d.marginalia
@@ -378,8 +382,10 @@ renderTypeAlias :: String -> TypeAliasBlock -> String
 renderTypeAlias noteHtml t =
   "<section class=\"row kind-type\">"
     <> renderLabel "Type"
-    <> "<span class=\"name\">" <> escape t.name <> "</span>"
+    <> renderKindSig t.kindSig
+    <> "<span class=\"name\"><span class=\"kw\">type </span>" <> escape t.name <> "</span>"
     <> ( case t.rhs of
+           [] -> ""
            [ single ] ->
              "<span class=\"sep\">=</span>"
                <> "<span class=\"type\">" <> decorateGlyphs (escape single) <> "</span>"
@@ -391,6 +397,23 @@ renderTypeAlias noteHtml t =
     <> renderMarginalia t.marginalia
     <> noteHtml
     <> "</section>"
+
+-- | A standalone kind-signature line preceding a data/newtype/type
+-- | declaration, typeset through the same name/::/type tracks as every
+-- | other signature in the document, with its keyword quieted.
+renderKindSig :: Maybe String -> String
+renderKindSig = case _ of
+  Nothing -> ""
+  Just sig -> case String.indexOf (Pattern " :: ") sig of
+    Just i ->
+      "<div class=\"decl-kind-sig\">"
+        <> "<span class=\"name\">" <> quietKeywords (escape (String.take i sig)) <> "</span>"
+        <> "<span class=\"sep\">::</span>"
+        <> "<span class=\"type\">" <> decorateGlyphs (escape (String.drop (i + 4) sig)) <> "</span>"
+        <> "</div>"
+    Nothing ->
+      "<div class=\"decl-kind-sig\"><span class=\"name\">"
+        <> quietKeywords (escape sig) <> "</span></div>"
 
 -- ---- Imports
 
@@ -691,7 +714,7 @@ softBreaks s = case Regex.regex "([a-z0-9])([A-Z])" Regex.Flags.global of
 -- | is untouched. Applied after `escape`.
 quietKeywords :: String -> String
 quietKeywords s =
-  case Regex.regex "^((?:else\\s+)?(?:derive\\s+)?(?:newtype\\s+)?(?:class|instance)\\b)" Regex.Flags.noFlags of
+  case Regex.regex "^((?:else\\s+)?(?:derive\\s+)?(?:newtype\\s+)?(?:class|instance)\\b|(?:newtype|data|type)\\b)" Regex.Flags.noFlags of
     Right r -> Regex.replace r "<span class=\"kw\">$1</span>" s
     Left _  -> s
 

@@ -130,7 +130,8 @@ main#specimen {
  * to the margin colour — the gutter label already names the block kind.
  * Same treatment the imports column gives its `import` keyword. */
 .class-head .kw,
-.kind-instance > .name .kw {
+.row > .name .kw,
+.decl-kind-sig .kw {
   color: var(--margin);
   font-weight: 400;
 }
@@ -270,7 +271,8 @@ main#specimen {
 /* Fixity rows: each declared operator is its own nested subgrid line so
  * the alias sits in the name column like any other declaration; the
  * fixity machinery (infixr 9, as) is quieted to the margin colour. */
-.row.kind-operator > .fixity-line {
+.row.kind-operator > .fixity-line,
+.row > .decl-kind-sig {
   display: grid;
   grid-template-columns: subgrid;
   grid-column: name / notes;

@@ -38,18 +38,21 @@ type Ctor = { name :: String, args :: String, comment :: Maybe String }
 -- | A data or newtype declaration. Sum types fill `ctors`; a
 -- | record-payload declaration (`newtype X = X { … }` across lines)
 -- | keeps its brace block verbatim in `payload` so it renders like a
--- | record rather than a stacked sum.
+-- | record rather than a stacked sum. A standalone kind signature line
+-- | preceding the declaration (`newtype Endo :: forall k. …`) is kept
+-- | verbatim in `kindSig`.
 type DataBlock =
   { isNewtype  :: Boolean
   , name       :: String
   , ctors      :: Array Ctor
   , payload    :: Array String
+  , kindSig    :: Maybe String
   , marginalia :: Array String
   }
 
 -- | A type alias. `rhs` holds the right-hand side verbatim (one element
--- | when the alias is single-line).
-type TypeAliasBlock = { name :: String, rhs :: Array String, marginalia :: Array String }
+-- | when the alias is single-line); `kindSig` as for DataBlock.
+type TypeAliasBlock = { name :: String, rhs :: Array String, kindSig :: Maybe String, marginalia :: Array String }
 
 -- | One fixity declaration: `infixr 9 compose as <<<`. `alias` is the
 -- | operator being introduced (for the name column); `code` is the
@@ -182,11 +185,42 @@ parseForeign isType raw marginalia =
 -- ----------------------------------------------------------------------------
 -- Data / newtype / type alias
 
--- | Parse a data or newtype declaration chunk. Line-based, because
--- | trailing `-- comments` are line-scoped: each line is split into
--- | code and comment first, then constructors are read off.
+-- | A declaration head whose right-hand side is a kind signature rather
+-- | than constructors: has ` :: ` and no ` = ` (a record payload line
+-- | has both, so it stays a declaration).
+isKindSigRhs :: String -> Boolean
+isKindSigRhs s =
+  String.contains (Pattern " :: ") s
+    && not (String.contains (Pattern " = ") s)
+    && case String.stripSuffix (Pattern " =") s of
+         Just _  -> false
+         Nothing -> true
+
+-- | Parse a data or newtype declaration chunk. A leading standalone
+-- | kind-signature line is peeled into `kindSig`; the declaration
+-- | proper is parsed from the following line.
 parseData :: Boolean -> Array String -> Array String -> Maybe DataBlock
 parseData isNewtype rest marginalia = do
+  first <- Array.head rest
+  let kw = if isNewtype then "newtype " else "data "
+  afterKw <- String.stripPrefix (Pattern kw) (String.trim first)
+  if isKindSigRhs afterKw then
+    let remaining = Array.drop 1 rest in
+    if Array.null remaining then pure
+      { isNewtype
+      , name: String.trim (takeBefore [" :: "] afterKw)
+      , ctors: []
+      , payload: []
+      , kindSig: Just (String.trim first)
+      , marginalia
+      }
+    else
+      (_ { kindSig = Just (String.trim first) })
+        <$> parseDataDecl isNewtype remaining marginalia
+  else parseDataDecl isNewtype rest marginalia
+
+parseDataDecl :: Boolean -> Array String -> Array String -> Maybe DataBlock
+parseDataDecl isNewtype rest marginalia = do
   first <- Array.head rest
   let kw = if isNewtype then "newtype " else "data "
   afterKw <- String.stripPrefix (Pattern kw) (String.trim first)
@@ -228,6 +262,7 @@ parseData isNewtype rest marginalia = do
         if headSplit.rhs1 == "" then []
         else [ { name: headSplit.rhs1, args: "", comment: line1.comment } ]
     , payload: tailLines
+    , kindSig: Nothing
     , marginalia
     }
   else
@@ -239,6 +274,7 @@ parseData isNewtype rest marginalia = do
         , name: String.trim headSplit.name
         , ctors
         , payload: []
+        , kindSig: Nothing
         , marginalia
         }
 
@@ -247,6 +283,23 @@ parseData isNewtype rest marginalia = do
 -- | that geometry.
 parseTypeAlias :: Array String -> Array String -> Maybe TypeAliasBlock
 parseTypeAlias rest marginalia = do
+  first <- Array.head rest
+  afterKw0 <- String.stripPrefix (Pattern "type ") (String.trim first)
+  if isKindSigRhs afterKw0 then
+    let remaining = Array.drop 1 rest in
+    if Array.null remaining then pure
+      { name: String.trim (takeBefore [" :: "] afterKw0)
+      , rhs: []
+      , kindSig: Just (String.trim first)
+      , marginalia
+      }
+    else
+      (_ { kindSig = Just (String.trim first) })
+        <$> parseTypeAliasDecl remaining marginalia
+  else parseTypeAliasDecl rest marginalia
+
+parseTypeAliasDecl :: Array String -> Array String -> Maybe TypeAliasBlock
+parseTypeAliasDecl rest marginalia = do
   first <- Array.head rest
   afterKw <- String.stripPrefix (Pattern "type ") (String.trim first)
   split <- case String.indexOf (Pattern " = ") afterKw of
@@ -260,7 +313,7 @@ parseTypeAlias rest marginalia = do
     rhs = (if split.inline == "" then [] else [ split.inline ])
       <> Array.drop 1 rest
   if Array.null rhs then Nothing
-  else pure { name: String.trim split.name, rhs, marginalia }
+  else pure { name: String.trim split.name, rhs, kindSig: Nothing, marginalia }
 
 -- | Split a line into code and trailing `-- comment` (if any). Position
 -- | 0 comments don't occur here — whole-comment lines were peeled off
