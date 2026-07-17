@@ -34,7 +34,7 @@ import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SPECIMEN = resolve(HERE, '..');
 const OUTPUT = join(SPECIMEN, 'output');
-const PRELUDE_BOOK = resolve(SPECIMEN, '..', 'the-prelude', 'public');
+const ASSETS = join(HERE, 'assets');   // vendored book stylesheet (canonical copy: the-prelude/public)
 
 const { glyphify } = await import(OUTPUT + '/Specimen.Preprocess/index.js');
 const { extractBlocks } = await import(OUTPUT + '/Specimen.Block/index.js');
@@ -584,7 +584,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape') modal.hidden = true; 
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'index.html'), page);
 writeFileSync(join(outDir, 'waxseal.svg'), sealSvg);
-for (const f of ['style.css', 'sigil.css']) cpSync(join(PRELUDE_BOOK, f), join(outDir, f));
+for (const f of ['style.css', 'sigil.css']) cpSync(join(ASSETS, f), join(outDir, f));
 
 // static banner plate (layout A) + machine-readable facts, for shelf pages
 {
