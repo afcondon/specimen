@@ -99,6 +99,66 @@ function resolveTarget(t) {
 const pkg = resolveTarget(target);
 if (pkg.files.length === 0) { console.error('no .purs files found'); process.exit(1); }
 
+// ── release history (registry metadata; the stability record) ────────────
+async function fetchReleases(name) {
+  const cache = join(tmpdir(), 'specimen-site-fetch', name, 'registry-metadata.json');
+  let meta;
+  try {
+    if (existsSync(cache)) meta = JSON.parse(readFileSync(cache, 'utf8'));
+    else {
+      const res = await fetch(`https://raw.githubusercontent.com/purescript/registry/main/metadata/${name}.json`);
+      if (!res.ok) return null;
+      meta = await res.json();
+      mkdirSync(dirname(cache), { recursive: true });
+      writeFileSync(cache, JSON.stringify(meta));
+    }
+  } catch { return null; }
+  const rows = Object.entries(meta.published ?? {})
+    .map(([v, m]) => ({ v, t: Date.parse(m.publishedTime) }))
+    .filter(r => Number.isFinite(r.t))
+    .sort((a, b) => a.t - b.t);
+  if (rows.length === 0) return null;
+  let prevMajor = null;
+  for (const r of rows) {
+    const major = parseInt(r.v, 10);
+    r.major = prevMajor !== null && major !== prevMajor;
+    prevMajor = major;
+  }
+  return rows;
+}
+const releases = pkg.local ? null : await fetchReleases(pkg.name);
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+const monthYear = t => { const d = new Date(t); return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+
+// timeline of releases, left edge = first publish, right edge = today;
+// the empty stretch after the last tick is the point being made
+function versionSparkline(rows) {
+  const W = 300, PAD = 4, AX = 20, H = 32;
+  const t0 = rows[0].t, t1 = Date.now();
+  const x = t => (PAD + (W - 2 * PAD) * (t1 === t0 ? 0 : (t - t0) / (t1 - t0))).toFixed(1);
+  const ticks = rows.map(r =>
+    `<line x1="${x(r.t)}" y1="${AX - (r.major ? 13 : 8)}" x2="${x(r.t)}" y2="${AX}" stroke="#1a1a1a" stroke-width="${r.major ? 1.6 : 1}"/>`).join('');
+  const y0 = new Date(t0).getFullYear(), y1 = new Date(t1).getFullYear();
+  return `<svg class="version-spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="release timeline">
+    <line x1="${PAD}" y1="${AX}" x2="${W - PAD}" y2="${AX}" stroke="#d8d6cf" stroke-width="1"/>
+    ${ticks}
+    <circle cx="${W - PAD}" cy="${AX}" r="2.5" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    <text x="${PAD}" y="${H - 1}" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">${y0}</text>
+    <text x="${W - PAD}" y="${H - 1}" text-anchor="end" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">${y1 === y0 ? 'today' : y1}</text>
+  </svg>`;
+}
+const last = releases ? releases[releases.length - 1] : null;
+const stableSince = last ? monthYear(last.t) : null;
+const versionsBlock = releases ? `
+  <div class="book-versions">
+    ${versionSparkline(releases)}
+    <p>${releases.length === 1
+      ? `1 release &middot; published ${stableSince}`
+      : `${releases.length} releases since ${new Date(releases[0].t).getFullYear()} &middot; stable since ${stableSince}`}</p>
+  </div>` : '';
+
 const title = opt('--title') ?? pkg.name;
 const outDir = resolve(opt('--out', '-o') ?? join('site', pkg.name));
 
@@ -315,6 +375,9 @@ const page = `<!DOCTYPE html>
   #hero-title .book-kicker { margin-bottom: 0.5rem; }
   #hero-title .book-title { font-size: 1.9rem; margin: 0 0 0.5rem; }
   #hero-title .book-deck { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); max-width: none; }
+  .book-versions { margin-top: 1.1rem; }
+  .book-versions .version-spark { display: block; }
+  .book-versions p { margin: 0.15rem 0 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); }
   main#book { padding-top: 74vh; }
   .book-colophon { margin: 8rem 0 4rem; text-align: center; }
   .book-colophon svg { width: 300px; height: 300px; }
@@ -349,7 +412,7 @@ const page = `<!DOCTYPE html>
 <header id="hero-title" class="book-head">
   <div class="book-kicker">PureScript &middot; specimen book</div>
   <h1 class="book-title">${title}</h1>
-  <p class="book-deck">${deck}</p>
+  <p class="book-deck">${deck}</p>${versionsBlock}
 </header>
 
 <svg id="stage"></svg>
@@ -361,7 +424,7 @@ ${articles.join('\n')}
   <footer class="book-colophon">
     ${sealSvg.replace('<rect width="100%" height="100%" fill="#fff"/>', '')}
     <div class="facts">
-      ${sourceLabel}<br>
+      ${sourceLabel}${stableSince ? ` &middot; stable since ${stableSince}` : ''}<br>
       ${mods.length} modules &middot; ${declTotal} declarations &middot; ${locTotal} lines<br>
       typeset by specimen &middot; ${today}
     </div>
