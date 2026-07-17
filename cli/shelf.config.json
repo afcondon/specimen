@@ -5,24 +5,64 @@
   "shelves": [
     {
       "title": "Core Libraries",
+      "color": "#e05c22",
       "blurb": "The standard library in the broad sense: the packages nearly every PureScript program stands on. They change rarely, and on purpose — read them to learn how the language wants to be written.",
       "books": ["prelude", "foldable-traversable", "transformers", "either", "maybe", "effect", "aff", "lists", "ordered-collections", "tailrec"]
     },
     {
       "title": "Further Reading",
+      "color": "#00785f",
       "blurb": "Beautiful constructions worth reading for their own sake: the free monad and its relatives, and the classic parser-combinator library.",
       "books": ["free", "parsing"]
     },
     {
       "title": "The Rowtype-Yoga Project",
+      "color": "#2b6f9e",
       "blurb": "Pragmatic packages built on PureScript's row types, from the rowtype-yoga organisation — JSON without boilerplate, and friends.",
       "books": ["yoga-json"]
     },
     {
       "title": "Surgical Instruments",
+      "color": "#8d2547",
       "blurb": "Very sharp tools for very specific cuts. Code this dense is a standing temptation to keep writing JavaScript, just with an extraordinary amount of type noise — but where a polymorphic variant or a heterogeneous fold is genuinely needed, nothing else will do. Presented here as instruments: read slowly, use sparingly.",
       "books": ["variant", "heterogeneous", "yoga-sql-types"]
     }
   ],
+  "authors": {
+    "prelude": "The PureScript Core Team",
+    "foldable-traversable": "The PureScript Core Team",
+    "transformers": "The PureScript Core Team",
+    "either": "The PureScript Core Team",
+    "maybe": "The PureScript Core Team",
+    "effect": "The PureScript Core Team",
+    "aff": "PureScript Contributors",
+    "lists": "The PureScript Core Team",
+    "ordered-collections": "The PureScript Core Team",
+    "tailrec": "The PureScript Core Team",
+    "free": "PureScript Contributors",
+    "parsing": "PureScript Contributors",
+    "yoga-json": "Rowtype Yoga",
+    "variant": "Nathan Faubion",
+    "heterogeneous": "Nathan Faubion",
+    "yoga-sql-types": "Rowtype Yoga"
+  },
+  "quotes": {
+    "prelude": { "text": "Begin here. End here, years later.", "source": "The Curry Review" },
+    "foldable-traversable": { "text": "The whole doctrine of iteration in eleven modules.", "source": "The Morning Composition" },
+    "transformers": { "text": "A tower you can actually climb.", "source": "The Kleisli Courier" },
+    "either": { "text": "Takes sides, beautifully.", "source": "The Disjunction Herald" },
+    "maybe": { "text": "Says nothing, perfectly.", "source": "The Nothing Gazette" },
+    "effect": { "text": "At last, consequences.", "source": "The Pure Review" },
+    "aff": { "text": "Concurrency without apology.", "source": "The Fiber Dispatch" },
+    "lists": { "text": "Cons after cons after cons.", "source": "The Recursion Chronicle" },
+    "ordered-collections": { "text": "Balanced, in every sense.", "source": "The AVL Inquirer" },
+    "tailrec": { "text": "One module. No stack. All heart.", "source": "Trampoline Weekly" },
+    "free": { "text": "Structure for nothing, interpretation for all.", "source": "The Coyoneda Times" },
+    "parsing": { "text": "Reads everything, so you don't have to.", "source": "The Combinator" },
+    "yoga-json": { "text": "Boilerplate, banished.", "source": "Row Types Today" },
+    "variant": { "text": "Open to alternatives.", "source": "The Polymorphic Press" },
+    "heterogeneous": { "text": "All types welcome.", "source": "The Fold Standard" },
+    "yoga-sql-types": { "text": "SELECT, well-typed.", "source": "The Query Quarterly" }
+  },
   "footnote": "Release timelines show the PureScript registry's record, which begins with the registry itself (2017–18); several of these libraries are older, and legacy re-imports can carry recent timestamps. The quiet stretches are the point — in this ecosystem a library that hasn't changed in years is usually finished, not abandoned."
 }
