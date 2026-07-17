@@ -376,7 +376,7 @@ const page = `<!DOCTYPE html>
   .book-versions { margin-top: 1.1rem; }
   .book-versions .version-spark { display: block; }
   .book-versions p { margin: 0.15rem 0 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); }
-  main#book { padding-top: 74vh; }
+  main#book { padding-top: calc(66vh + 220px); }
   .book-colophon { margin: 8rem 0 4rem; text-align: center; }
   .book-colophon svg { width: 300px; height: 300px; }
   .book-colophon .facts { margin-top: 1.4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); line-height: 2; }
@@ -488,17 +488,22 @@ for (const d of DATA) {
 }
 
 let active = null;
+const heroEl = document.getElementById('hero-title');
 function layout() {
   const W = innerWidth, H = innerHeight;
   const p = ease(Math.min(1, Math.max(0, scrollY / MORPH)));
   svg.classList.toggle('railed', p > 0.95);
   const bannerH = H * 0.66;
-  document.getElementById('hero-title').style.opacity = String(Math.max(0, 1 - p * 1.4));
+  // at rest the banner band sits below the hero block (tall left columns
+  // were overwriting the masthead); the band's top eases back toward the
+  // page top as the morph runs, since layout B's rail already lives there
+  const bandTop = Math.max(90, heroEl.getBoundingClientRect().bottom + 28) * (1 - p) + 90 * p;
+  heroEl.style.opacity = String(Math.max(0, 1 - p * 1.4));
   // rail column: centred in the left margin, same slot as the-prelude's beeswarm
   const railLeft = Math.max(12, 0.5 * W - 36 * 16 - 12 * 16);
   for (const s of Object.values(gs)) {
     const d = s.d;
-    const axp = d.ax * W, ayp = 90 + d.ay * (bannerH - 90);
+    const axp = d.ax * W, ayp = bandTop + d.ay * (bannerH - 90);
     const bxp = railLeft + d.bx, byp = 60 + (d.by / 900) * (H - 120);
     const x = axp + (bxp - axp) * p, y = ayp + (byp - ayp) * p;
     const r = d.rA + (d.rB - d.rA) * p;

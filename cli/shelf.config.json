@@ -6,7 +6,12 @@
     {
       "title": "Core Libraries",
       "blurb": "The standard library in the broad sense: the packages nearly every PureScript program stands on. They change rarely, and on purpose — read them to learn how the language wants to be written.",
-      "books": ["prelude", "aff", "ordered-collections"]
+      "books": ["prelude", "foldable-traversable", "transformers", "either", "maybe", "effect", "aff", "lists", "ordered-collections", "tailrec"]
+    },
+    {
+      "title": "Further Reading",
+      "blurb": "Beautiful constructions worth reading for their own sake: the free monad and its relatives, and the classic parser-combinator library.",
+      "books": ["free", "parsing"]
     },
     {
       "title": "The Rowtype-Yoga Project",
