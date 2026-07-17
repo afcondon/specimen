@@ -12,8 +12,8 @@ import Data.Maybe (Maybe(..))
 import Data.String as String
 import Data.String.Common (replaceAll)
 import Data.String.Pattern (Pattern(..), Replacement(..))
-import Data.String.Regex (regex, test) as Regex
-import Data.String.Regex.Flags (noFlags) as Regex.Flags
+import Data.String.Regex (regex, replace, test) as Regex
+import Data.String.Regex.Flags (global, noFlags) as Regex.Flags
 
 import Data.Map (Map)
 import Data.Map as Map
@@ -127,7 +127,7 @@ renderExportCell { kind, label, name } =
           else "<span class=\"export-kind\">" <> escape label <> "</span>")
     <> (if name == ""
           then ""
-          else "<span class=\"export-name\">" <> escape name <> "</span>")
+          else "<span class=\"export-name\">" <> softBreaks (escape name) <> "</span>")
     <> "</div>"
 
 categorizeExport :: String -> { kind :: String, label :: String, name :: String }
@@ -387,7 +387,7 @@ renderClass :: String -> ClassBlock -> String
 renderClass noteHtml { head, body, marginalia } =
   "<section class=\"row kind-class\">"
     <> renderLabel "Class"
-    <> "<code class=\"class-head\">" <> decorateGlyphs (escape head) <> "</code>"
+    <> "<code class=\"class-head\">" <> decorateGlyphs (quietKeywords (escape head)) <> "</code>"
     <> renderClassBody body
     <> renderMarginalia marginalia
     <> noteHtml
@@ -440,7 +440,7 @@ renderInstance noteHtml { head, body, marginalia } =
   let parts = parseInstanceHead head in
   "<section class=\"row kind-instance\">"
     <> renderLabel "Instance"
-    <> "<span class=\"name\">" <> escape parts.name <> "</span>"
+    <> "<span class=\"name\">" <> quietKeywords (escape parts.name) <> "</span>"
     <> (case parts.sig of
           Just s ->
             "<span class=\"sep\">::</span>"
@@ -635,6 +635,27 @@ escape = replaceAll (Pattern "&")  (Replacement "&amp;")
      >>> replaceAll (Pattern "<")  (Replacement "&lt;")
      >>> replaceAll (Pattern ">")  (Replacement "&gt;")
      >>> replaceAll (Pattern "\"") (Replacement "&quot;")
+
+-- | Insert soft break opportunities at an identifier's morpheme seams —
+-- | the lower→Upper camelCase transitions and after underscores — so a
+-- | long export name wraps like a hyphenated word (ReadForeign /
+-- | Variant), never mid-letter. Applied after `escape`; escape entities
+-- | are all-lowercase so the seam regex cannot fire inside them.
+softBreaks :: String -> String
+softBreaks s = case Regex.regex "([a-z0-9])([A-Z])" Regex.Flags.global of
+  Right r -> Regex.replace r "$1<wbr>$2" (replaceAll (Pattern "_") (Replacement "_<wbr>") s)
+  Left _  -> s
+
+-- | Quiet the leading declaration keyword(s): the left-gutter label
+-- | already names the block kind, so `class` / `instance` in the code
+-- | line is typeset in the margin colour — the same emphasis treatment
+-- | the imports column gives the `import` keyword. The code text itself
+-- | is untouched. Applied after `escape`.
+quietKeywords :: String -> String
+quietKeywords s =
+  case Regex.regex "^((?:else\\s+)?(?:derive\\s+)?(?:newtype\\s+)?(?:class|instance)\\b)" Regex.Flags.noFlags of
+    Right r -> Regex.replace r "<span class=\"kw\">$1</span>" s
+    Left _  -> s
 
 -- | Wrap each substituted Unicode glyph in `<span class="g">` so CSS can
 -- | bump its size to match the visual weight of the JetBrains Mono

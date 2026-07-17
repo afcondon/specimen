@@ -120,7 +120,19 @@ main#specimen {
   font-size: 0.95rem;
   font-weight: 500;
   color: var(--ink);
-  word-break: break-word;
+  /* break only at the <wbr> morpheme seams the renderer inserts;
+     mid-word breaking is the last resort for a seamless overlong segment */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Leading declaration keywords (class / instance / derive …) are quieted
+ * to the margin colour — the gutter label already names the block kind.
+ * Same treatment the imports column gives its `import` keyword. */
+.class-head .kw,
+.kind-instance > .name .kw {
+  color: var(--margin);
+  font-weight: 400;
 }
 .export-cell.exp-class .export-kind  { color: var(--accent); }
 .export-cell.exp-module {
