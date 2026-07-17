@@ -130,6 +130,8 @@ classifyChunk chunk =
           Nothing -> BRaw chunk
       | startsWith "class "                first -> BClass    { head: first, body: Array.drop 1 rest, marginalia }
       | startsWith "instance "             first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
+      | startsWith "derive "               first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
+      | startsWith "else "                 first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
       | otherwise -> case parseValue rest of
           Just v  -> BValue (v { marginalia = marginalia })
           Nothing -> BRaw chunk
