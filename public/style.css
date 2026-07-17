@@ -267,6 +267,22 @@ main#specimen {
   align-items: baseline;
 }
 
+/* Fixity rows: each declared operator is its own nested subgrid line so
+ * the alias sits in the name column like any other declaration; the
+ * fixity machinery (infixr 9, as) is quieted to the margin colour. */
+.row.kind-operator > .fixity-line {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+.fixity-line .kw { color: var(--margin); }
+
+/* Consecutive instances read as one series — a wall of near-identical
+ * rows gets tight leading; hairlines stay so the rows remain countable. */
+.specimen-stack > .row.kind-instance:has(+ .row.kind-instance) { padding-bottom: 0.6rem; }
+.specimen-stack > .row.kind-instance + .row.kind-instance { padding-top: 0.6rem; }
+
 /* Value body: visually subordinated to the sig above — same monospace
  * (inherited via .row > .name etc.) but in --soft-ink, so the eye reads
  * the sig as primary and the body equation as a kind of footnote. The

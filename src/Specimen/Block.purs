@@ -9,6 +9,8 @@ module Specimen.Block
   , Ctor
   , DataBlock
   , TypeAliasBlock
+  , FixityLine
+  , FixityBlock
   , extractBlocks
   ) where
 
@@ -49,6 +51,13 @@ type DataBlock =
 -- | when the alias is single-line).
 type TypeAliasBlock = { name :: String, rhs :: Array String, marginalia :: Array String }
 
+-- | One fixity declaration: `infixr 9 compose as <<<`. `alias` is the
+-- | operator being introduced (for the name column); `code` is the
+-- | declaration line verbatim. A chunk may declare several operators
+-- | back-to-back, hence the block carries an array.
+type FixityLine = { alias :: String, code :: String }
+type FixityBlock = { fixities :: Array FixityLine, marginalia :: Array String }
+
 data Block
   = BHeader    Header
   | BImports   (Array ImportLine)
@@ -58,6 +67,7 @@ data Block
   | BValue     ValueBlock
   | BData      DataBlock
   | BTypeAlias TypeAliasBlock
+  | BFixity    FixityBlock
   | BRaw       (Array String)
 
 -- | Extract typed blocks from a PureScript module source.
@@ -134,9 +144,21 @@ classifyChunk chunk =
       | startsWith "derive "               first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
       | startsWith "else "                 first -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
       | first == "else"                          -> BInstance { head: first, body: Array.drop 1 rest, marginalia }
+      | isFixityLine first                       -> BFixity { fixities: map parseFixityLine rest, marginalia }
       | otherwise -> case parseValue rest of
           Just v  -> BValue (v { marginalia = marginalia })
           Nothing -> BRaw chunk
+
+isFixityLine :: String -> Boolean
+isFixityLine l =
+  startsWith "infixl " l || startsWith "infixr " l || startsWith "infix " l
+
+-- | The operator alias is whatever follows the final ` as `; a line that
+-- | somehow lacks one keeps the whole line as its alias so nothing is lost.
+parseFixityLine :: String -> FixityLine
+parseFixityLine l = case String.lastIndexOf (Pattern " as ") l of
+  Just i  -> { alias: String.trim (String.drop (i + 4) l), code: l }
+  Nothing -> { alias: String.trim l, code: l }
 
 -- | Parse a single-line foreign import declaration.
 -- |   `foreign import data X :: Kind` (isType: true)

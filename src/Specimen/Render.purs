@@ -19,7 +19,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Tuple (Tuple(..))
 
-import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock, DataBlock, TypeAliasBlock)
+import Specimen.Block (Block(..), Header, ImportLine, ClassBlock, InstanceBlock, ValueBlock, ForeignBlock, DataBlock, TypeAliasBlock, FixityBlock)
 import Specimen.Markdown (docLinesToHtml, isCompactMarginalia)
 import Specimen.Sig (Connector(..), Station, assignColors, colorize, forallVars, segmentSig, shouldStack)
 
@@ -176,6 +176,7 @@ renderBlock moduleSlug notes = case _ of
   BValue    v    -> renderValue    (lookupNote moduleSlug notes v.name)               v
   BData     d    -> renderData      (lookupNote moduleSlug notes (dataKey d))         d
   BTypeAlias t   -> renderTypeAlias (lookupNote moduleSlug notes ("type " <> t.name)) t
+  BFixity   fx   -> renderFixity (lookupNote moduleSlug notes (fixityKey fx)) fx
   BRaw      ls   -> renderRaw ls
 
 -- | Compute lookup keys per block kind. Authors write the matching `##`
@@ -300,6 +301,43 @@ renderForeign noteHtml f =
     <> renderMarginalia f.marginalia
     <> noteHtml
     <> "</section>"
+
+-- ---- Fixity — the operator itself takes the name column; the full
+-- ---- declaration line sits in the type column with the fixity
+-- ---- machinery (`infixr 9`, `as`) quieted to the margin colour, so
+-- ---- the eye reads `<<<` … `compose` and the plumbing recedes.
+
+renderFixity :: String -> FixityBlock -> String
+renderFixity noteHtml fx =
+  "<section class=\"row kind-operator\">"
+    <> renderLabel "Operator"
+    <> String.joinWith "" (map renderFixityLine fx.fixities)
+    <> renderMarginalia fx.marginalia
+    <> noteHtml
+    <> "</section>"
+
+renderFixityLine :: { alias :: String, code :: String } -> String
+renderFixityLine f =
+  "<div class=\"fixity-line\">"
+    <> "<span class=\"name\">" <> decorateGlyphs (escape f.alias) <> "</span>"
+    <> "<span class=\"sep\"></span>"
+    <> "<span class=\"type\">" <> decorateGlyphs (quietFixity (escape f.code)) <> "</span>"
+    <> "</div>"
+
+fixityKey :: FixityBlock -> String
+fixityKey fx = case Array.head fx.fixities of
+  Just f  -> "operator " <> f.alias
+  Nothing -> ""
+
+-- | Quiet the fixity machinery: `infixr 9` / `infixl 4 type` and the
+-- | ` as ` connective drop to the margin colour, leaving the target and
+-- | the operator in ink. Applied after `escape`.
+quietFixity :: String -> String
+quietFixity s =
+  case Regex.regex "^(infix[lr]?\\s+\\d+\\s+(?:type\\s+)?)" Regex.Flags.noFlags of
+    Right r -> Regex.replace r "<span class=\"kw\">$1</span>"
+                 (replaceAll (Pattern " as ") (Replacement "<span class=\"kw\"> as </span>") s)
+    Left _  -> s
 
 -- ---- Data / newtype — the lever-frame look: each constructor on its
 -- ---- own nested subgrid row, with `=`/`|` landing in the shared

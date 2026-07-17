@@ -129,7 +129,11 @@ const mods = pkg.files.map(p => {
   });
   const imports = [...src.matchAll(/^import\s+([\w.]+)/gm)].map(m => m[1]);
   const loc = lines.filter(l => l.trim() !== '').length;
-  return { name, src, loc, decls, imports };
+  // FFI sidecars, keyed by language; only JavaScript ships in registry
+  // tarballs today — erlang/julia/python/go slots await the polyglot backends
+  const jsPath = p.replace(/\.purs$/, '.js');
+  const ffi = existsSync(jsPath) ? { javascript: readFileSync(jsPath, 'utf8') } : null;
+  return { name, src, loc, decls, imports, ffi };
 }).filter(Boolean);
 
 const known = new Set(mods.map(m => m.name));
@@ -210,9 +214,14 @@ const articles = mods.map(m => {
     if (['BValue', 'BData', 'BClass', 'BInstance', 'BForeign', 'BTypeAlias'].includes(tag)) declTotal++;
   }
   locTotal += m.loc;
-  const article = renderDocument({ moduleSlug: m.name, source: sourceLabel, blocks, notes: M.empty });
+  let article = renderDocument({ moduleSlug: m.name, source: sourceLabel, blocks, notes: M.empty });
+  if (m.ffi) article = article.replaceAll(
+    '<section class="row kind-foreign">',
+    `<section class="row kind-foreign" data-ffi="${slug(m.name)}">`);
   return `<div class="book-module" id="mod-${slug(m.name)}" data-module="${m.name}" style="--accent: ${m.accent}">${article}</div>`;
 });
+const ffiPayload = Object.fromEntries(
+  mods.filter(m => m.ffi).map(m => [slug(m.name), { name: m.name, langs: m.ffi }]));
 
 // ── waxseal (B-ink) ───────────────────────────────────────────────────────
 function waxseal() {
@@ -312,6 +321,27 @@ const page = `<!DOCTYPE html>
   .book-colophon .facts { margin-top: 1.4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); line-height: 2; }
   @media (max-width: 1320px) { #stage.railed { opacity: 0; pointer-events: none; } }
   #stage { transition: opacity .3s ease; }
+  /* FFI modal: foreign rows with a sidecar implementation are clickable */
+  .row.kind-foreign[data-ffi] { cursor: pointer; }
+  .row.kind-foreign[data-ffi] > .label::after { content: " · js"; color: var(--accent); }
+  .row.kind-foreign[data-ffi]:hover > .label { color: var(--ink); }
+  #ffi-modal[hidden] { display: none; }
+  #ffi-modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+  #ffi-modal .ffi-backdrop { position: absolute; inset: 0; background: rgba(26,26,26,0.35); }
+  #ffi-modal .ffi-card { position: relative; background: var(--paper); border: 1px solid var(--ink);
+    width: min(60rem, 92vw); max-height: 82vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+  #ffi-modal header { display: flex; align-items: baseline; gap: 1.4rem;
+    padding: 1rem 1.4rem; border-bottom: 1px solid var(--ink); }
+  #ffi-modal .ffi-title { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 1rem; }
+  #ffi-modal .ffi-sub { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--margin); }
+  #ffi-modal nav { margin-left: auto; display: flex; gap: 1rem; }
+  #ffi-modal nav button { font: inherit; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em;
+    background: none; border: none; padding: 0; color: var(--margin); cursor: pointer; }
+  #ffi-modal nav button.on { color: var(--accent); border-bottom: 1px solid var(--accent); }
+  #ffi-modal .ffi-close { font: inherit; background: none; border: none; cursor: pointer; color: var(--margin); font-size: 1rem; }
+  #ffi-modal pre { margin: 0; padding: 1.2rem 1.4rem; overflow: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.55; color: var(--ink); }
 </style>
 </head>
 <body>
@@ -337,6 +367,19 @@ ${articles.join('\n')}
     </div>
   </footer>
 </main>
+
+<div id="ffi-modal" hidden>
+  <div class="ffi-backdrop"></div>
+  <div class="ffi-card">
+    <header>
+      <span class="ffi-title"></span>
+      <span class="ffi-sub">foreign implementation</span>
+      <nav></nav>
+      <button class="ffi-close" aria-label="close">&#10005;</button>
+    </header>
+    <pre></pre>
+  </div>
+</div>
 
 <script>
 const DATA = ${JSON.stringify(data)};
@@ -432,6 +475,40 @@ function spy() {
 addEventListener('scroll', () => { spy(); requestAnimationFrame(layout); }, { passive: true });
 addEventListener('resize', () => requestAnimationFrame(layout));
 spy(); layout();
+
+// ── FFI modal ──
+const FFI = ${JSON.stringify(ffiPayload).replace(/</g, '\\u003c')};
+const LANG_NAMES = { javascript: 'JavaScript', erlang: 'Erlang', julia: 'Julia', python: 'Python', go: 'Go' };
+const modal = document.getElementById('ffi-modal');
+const mTitle = modal.querySelector('.ffi-title');
+const mTabs = modal.querySelector('nav');
+const mPre = modal.querySelector('pre');
+function openFfi(slug) {
+  const entry = FFI[slug];
+  if (!entry) return;
+  mTitle.textContent = entry.name;
+  mTabs.innerHTML = '';
+  const langs = Object.keys(entry.langs);
+  const show = lang => {
+    mPre.textContent = entry.langs[lang];
+    for (const b of mTabs.children) b.classList.toggle('on', b.dataset.lang === lang);
+  };
+  for (const lang of langs) {
+    const b = document.createElement('button');
+    b.textContent = LANG_NAMES[lang] ?? lang;
+    b.dataset.lang = lang;
+    b.addEventListener('click', () => show(lang));
+    mTabs.appendChild(b);
+  }
+  show(langs[0]);
+  modal.hidden = false;
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest('.row.kind-foreign[data-ffi]');
+  if (row) { openFfi(row.dataset.ffi); return; }
+  if (e.target.closest('.ffi-close') || e.target.classList.contains('ffi-backdrop')) modal.hidden = true;
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') modal.hidden = true; });
 </script>
 </body>
 </html>
