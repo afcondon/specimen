@@ -581,6 +581,34 @@ writeFileSync(join(outDir, 'index.html'), page);
 writeFileSync(join(outDir, 'waxseal.svg'), sealSvg);
 for (const f of ['style.css', 'sigil.css']) cpSync(join(PRELUDE_BOOK, f), join(outDir, f));
 
+// static banner plate (layout A) + machine-readable facts, for shelf pages
+{
+  const BW = 1600, BH = mods.length < 6 ? 380 : 640, TOP = 40;
+  const px = m => ({ x: m.ax * BW, y: TOP + m.ay * (BH - 2 * TOP) });
+  let svgEdges = '';
+  for (const m of mods) for (const i of m.imports) {
+    const a = px(m), b = px(byName.get(i));
+    svgEdges += `<path d="M ${a.x.toFixed(1)} ${a.y.toFixed(1)} C ${((a.x + b.x) / 2).toFixed(1)} ${a.y.toFixed(1)}, ${((a.x + b.x) / 2).toFixed(1)} ${b.y.toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}" fill="none" stroke="#111" stroke-width="0.6" opacity="0.10"/>`;
+  }
+  let svgNodes = '';
+  const labelFs = mods.length >= 30 ? 8.5 : 11;
+  for (const m of mods) {
+    const { x, y } = px(m);
+    svgNodes += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})">
+      <circle r="${m.rA.toFixed(1)}" fill="#fff" stroke="#111" stroke-width="1.5"/>
+      ${m.pack.map(p => `<circle cx="${p.dx}" cy="${p.dy}" r="${p.r}" fill="#111"/>`).join('')}
+      <text y="${-(m.rA + 10).toFixed(1)}" text-anchor="middle" font-family="Inter, sans-serif" font-size="${labelFs}" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${m.name}</text>
+    </g>`;
+  }
+  writeFileSync(join(outDir, 'banner.svg'),
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BW} ${BH}">${svgEdges}${svgNodes}</svg>`);
+  writeFileSync(join(outDir, 'book.json'), JSON.stringify({
+    name: pkg.name, version: pkg.version, title,
+    modules: mods.length, decls: declTotal, loc: locTotal, layers: maxLevel,
+    stableSince, releases: releases ?? [],
+  }, null, 2));
+}
+
 console.log(`${pkg.name}${pkg.version === 'local' ? '' : ' v' + pkg.version}: ${mods.length} modules, ${declTotal} declarations, ${locTotal} lines, layers 0..${maxLevel}`);
 console.log(`unclassified blocks (BRaw): ${braw}`);
 console.log(`→ ${outDir}`);

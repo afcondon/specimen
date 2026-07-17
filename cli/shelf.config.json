@@ -1,0 +1,23 @@
+{
+  "kicker": "PureScript · typeset reading editions",
+  "title": "Specimen",
+  "deck": "Typeset reading editions of PureScript libraries, generated from the code itself. The banner over each book is its dependency graph — every plate a module, its declarations packed by size, import order running left to right. The timelines share one scale.",
+  "shelves": [
+    {
+      "title": "Core Libraries",
+      "blurb": "The standard library in the broad sense: the packages nearly every PureScript program stands on. They change rarely, and on purpose — read them to learn how the language wants to be written.",
+      "books": ["prelude", "aff", "ordered-collections"]
+    },
+    {
+      "title": "The Rowtype-Yoga Project",
+      "blurb": "Pragmatic packages built on PureScript's row types, from the rowtype-yoga organisation — JSON without boilerplate, and friends.",
+      "books": ["yoga-json"]
+    },
+    {
+      "title": "Surgical Instruments",
+      "blurb": "Very sharp tools for very specific cuts. Code this dense is a standing temptation to keep writing JavaScript, just with an extraordinary amount of type noise — but where a polymorphic variant or a heterogeneous fold is genuinely needed, nothing else will do. Presented here as instruments: read slowly, use sparingly.",
+      "books": ["variant", "heterogeneous", "yoga-sql-types"]
+    }
+  ],
+  "footnote": "Release timelines show the PureScript registry's record, which begins with the registry itself (2017–18); several of these libraries are older, and legacy re-imports can carry recent timestamps. The quiet stretches are the point — in this ecosystem a library that hasn't changed in years is usually finished, not abandoned."
+}
