@@ -375,8 +375,8 @@ for (const d of DATA) {
   const label = document.createElementNS(NS, 'text');
   label.textContent = d.name;
   label.setAttribute('text-anchor', 'middle');
-  label.setAttribute('y', d.rA + 13);
-  label.setAttribute('style', 'font-family: Inter, sans-serif; font-size: ${mods.length >= 30 ? 7.5 : 10}px; letter-spacing: 0.08em; fill: #999;');
+  label.setAttribute('y', -(d.rA + 9));
+  label.setAttribute('style', 'font-family: Inter, sans-serif; font-size: ${mods.length >= 30 ? 7.5 : 10}px; letter-spacing: 0.08em; fill: #777; stroke: rgba(250,250,247,0.88); stroke-width: 3px; paint-order: stroke; stroke-linejoin: round;');
   g.appendChild(label);
   const t = document.createElementNS(NS, 'title'); t.textContent = d.name; g.appendChild(t);
   a.appendChild(g); svg.appendChild(a);
@@ -402,7 +402,7 @@ function layout() {
     s.ring.setAttribute('r', r);
     s.inner.setAttribute('transform', 'scale(' + (r / d.rA) + ')');
     s.inner.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
-    s.label.setAttribute('y', r + 13);
+    s.label.setAttribute('y', -(r + 9));
     s.label.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
     s.bubble.setAttribute('r', r);
     s.x = x; s.y = y; s.r = r;
