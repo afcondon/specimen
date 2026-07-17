@@ -1,0 +1,22 @@
+{
+  "name": "yoga-sql-types",
+  "version": "0.2.0",
+  "title": "yoga-sql-types",
+  "modules": 2,
+  "decls": 136,
+  "loc": 568,
+  "layers": 0,
+  "stableSince": "February 2026",
+  "releases": [
+    {
+      "v": "0.1.0",
+      "t": 1770244453407,
+      "major": false
+    },
+    {
+      "v": "0.2.0",
+      "t": 1771281837345,
+      "major": false
+    }
+  ]
+}

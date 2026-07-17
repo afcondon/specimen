@@ -1,0 +1,42 @@
+{
+  "name": "maybe",
+  "version": "6.0.0",
+  "title": "maybe",
+  "modules": 3,
+  "decls": 69,
+  "loc": 368,
+  "layers": 1,
+  "stableSince": "April 2022",
+  "releases": [
+    {
+      "v": "3.0.0",
+      "t": 1490485430000,
+      "major": false
+    },
+    {
+      "v": "3.1.0",
+      "t": 1523123192000,
+      "major": false
+    },
+    {
+      "v": "4.0.0",
+      "t": 1527033842000,
+      "major": true
+    },
+    {
+      "v": "4.0.1",
+      "t": 1543667795000,
+      "major": false
+    },
+    {
+      "v": "5.0.0",
+      "t": 1614360769000,
+      "major": true
+    },
+    {
+      "v": "6.0.0",
+      "t": 1651084287000,
+      "major": true
+    }
+  ]
+}

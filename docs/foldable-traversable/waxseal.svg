@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <rect width="100%" height="100%" fill="#fff"/>
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; FOLDABLE TRAVERSABLE</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.80377912987922" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="180.531955604465" cy="225.39367255669643" r="56.32431395701027" fill="#111"/><circle cx="291.4606819376789" cy="225.39367255669643" r="50.40819150608285" fill="#111"/><circle cx="243.090079012416" cy="346.11533020774107" r="75.44724602679207" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="242.3530905475833" cy="120.04405309761685" r="61.62853412481852" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="140.25394506849688" cy="136.0136023812258" r="37.51575986676088" fill="#111"/><circle cx="132.5221677445059" cy="309.9279598937751" r="36.695644206741996" fill="#111"/><circle cx="332.94243597600564" cy="151.55490775946242" r="30.08855725456022" fill="#111"/><circle cx="330.9042633672276" cy="292.5064942215961" r="23.241120236876185" fill="#111"/><circle cx="213.57839835059923" cy="346.11533020774107" r="41.73934449485455" fill="#111"/><circle cx="286.9275339423309" cy="346.11533020774107" r="27.4135702267564" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="218.36233899199416" cy="120.04405309761685" r="33.44156169910863" fill="#111"/><circle cx="277.8927626817523" cy="120.04405309761685" r="21.89264112052876" fill="#111"/><circle cx="279.31299646467" cy="346.11533020774107" r="15.602811878974741" fill="#111"/><circle cx="304.628456256366" cy="346.11533020774107" r="5.516427042600528" fill="#111"/></g>
+</svg>

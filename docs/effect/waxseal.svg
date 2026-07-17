@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <rect width="100%" height="100%" fill="#fff"/>
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; EFFECT</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.30864197530863" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="180.02240731876208" cy="240" r="120.63969126937936" fill="#111"/><circle cx="362.985370281725" cy="240" r="57.63191366889223" fill="#111"/><circle cx="314.52022434806906" cy="319.8505606774114" r="31.084342615248467" fill="#111"/><circle cx="310.3708051095002" cy="177.9443187994173" r="19.035194599302287" fill="#111"/></g>
+</svg>

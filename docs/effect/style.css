@@ -1,0 +1,913 @@
+/* Specimen — Swiss-poster typography for typeset PureScript modules.
+ * Light theme, restrained palette, alignment via CSS subgrid.
+ *
+ * Layout:
+ *   left gutter (narrow) → kind label only (FUNCTION / CLASS / INSTANCE)
+ *   code area            → name :: type, body, then marginalia prose below
+ */
+
+:root {
+  --paper:      #fafaf7;
+  --ink:        #1a1a1a;
+  --soft-ink:   #555;
+  --rule:       #d8d6cf;
+  --hairline:   #ecebe5;
+  --margin:     #8a877e;
+  --accent:     #b03a2e;
+  --gutter:     7rem;
+  --rhs-gutter: 14rem;
+  --measure:    72rem;
+}
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-weight: 300;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+main#specimen,
+main#book {
+  max-width: var(--measure);
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+
+/* Book chrome (the title block above the concatenated articles). */
+.book-head {
+  margin: 0 0 4rem;
+}
+.book-kicker {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--margin);
+  margin-bottom: 0.6rem;
+}
+.book-title {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.8rem;
+  color: var(--ink);
+}
+.book-deck {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--soft-ink);
+  max-width: 38rem;
+  margin: 0;
+}
+
+/* Book body: a series of .book-module wrappers, each carrying its own
+ * --accent CSS variable so the marginalia dot and CLASS/INSTANCE labels
+ * shift hue per module. The variable cascades into the .marginalia
+ * ::before circle and the .label color rules without further changes.
+ *
+ * No border between modules — the preceding module's foot already has a
+ * dark rule above it, and an extra light rule above the next title only
+ * adds visual noise. The foot's right-aligned text + the next module's
+ * massive monospace heading carry the boundary on contrast alone.       */
+.book-module {
+  margin: 6rem 0;
+}
+.book-module:first-child {
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------- Beeswarm
+ *
+ * Vertical column of bubbles in the left margin, fixed-position so it
+ * persists across scroll. One bubble per module, in topological order
+ * (top of column = first in topo = leaf-most). Initial state: all
+ * bubbles are coloured per the same hue gradient as the articles
+ * below — the eye learns the bubble↔section mapping. Once the reader
+ * has scrolled past the title block (.scrolled is added by the inline
+ * JS), the non-active bubbles desaturate to a soft gray; only the
+ * currently-most-visible module's bubble stays in colour and grows
+ * slightly. The beeswarm becomes a "you are here" indicator without
+ * adding chrome.
+ *
+ * Hidden on narrow viewports (<1100px) where there's no left margin
+ * to spare without overlapping the content.                            */
+.beeswarm {
+  position: fixed;
+  top: 3rem;
+  bottom: 3rem;
+  /* Sit just left of the centred content column.
+   * 36rem = half of --measure (72rem); 12rem = sidebar width + breathing
+   * room. On viewports too narrow to leave that gap, the @media rule
+   * below hides the sidebar entirely. */
+  left: max(0.75rem, calc(50vw - 36rem - 12rem));
+  width: 11rem;
+  z-index: 5;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  pointer-events: none;
+}
+.beeswarm-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 86vh;
+  display: block;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.beeswarm circle.bubble {
+  fill: var(--bubble-color);
+  transition:
+    fill 0.35s ease,
+    opacity 0.35s ease,
+    r 0.25s ease;
+  cursor: pointer;
+}
+.beeswarm circle.bubble:hover {
+  filter: brightness(1.12);
+}
+
+/* Scrolled state: mute all bubbles except the active one. */
+.beeswarm.scrolled circle.bubble {
+  fill: #c8c5bc;
+  opacity: 0.55;
+}
+.beeswarm.scrolled circle.bubble.active {
+  fill: var(--bubble-color);
+  opacity: 1.0;
+  r: 7;
+}
+
+@media (max-width: 1320px) {
+  .beeswarm { display: none; }
+}
+
+.specimen-doc { display: block; }
+
+/* ---------------------------------------------------------- Header */
+
+.specimen-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--gutter) 1fr var(--rhs-gutter);
+  column-gap: 1rem;
+  padding-bottom: 2rem;
+  margin-bottom: 3rem;
+}
+/* Rule under the head, clipped to the right edge of the type column so it
+ * doesn't project into the notes gutter (where editorial annotations
+ * live). Same clipping logic applies to row separators and the foot. */
+.specimen-head::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-bottom: 1px solid var(--ink);
+}
+.specimen-head .kicker {
+  grid-column: 2;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--margin);
+  margin-bottom: 0.6rem;
+}
+.specimen-head h1 {
+  grid-column: 2;
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 500;
+  font-size: 4rem;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+}
+.specimen-head .colophon {
+  grid-column: 2;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--margin);
+  line-height: 1.6;
+}
+
+/* ---- Exports — cosmetics-line bordered grid */
+
+.specimen-head .exports {
+  grid-column: 2;
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--ink);
+  border-bottom: none;
+  border-right: none;
+  background: var(--paper);
+}
+.export-cell {
+  padding: 0.85rem 1rem 0.95rem;
+  border-bottom: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 4rem;
+  justify-content: space-between;
+}
+.export-kind {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--margin);
+  font-weight: 500;
+}
+.export-name {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  /* break only at the <wbr> morpheme seams the renderer inserts;
+     mid-word breaking is the last resort for a seamless overlong segment */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Leading declaration keywords (class / instance / derive …) are quieted
+ * to the margin colour — the gutter label already names the block kind.
+ * Same treatment the imports column gives its `import` keyword. */
+.class-head .kw,
+.row > .name .kw,
+.decl-kind-sig .kw {
+  color: var(--margin);
+  font-weight: 400;
+}
+
+/* The instance's closing `where`, set at the sig's foot in the head
+ * weight — the same emphasis it carries in a class head. */
+.kind-instance .inst-where {
+  font-weight: 500;
+  color: var(--ink);
+}
+.export-cell.exp-class .export-kind  { color: var(--accent); }
+.export-cell.exp-module {
+  background: #f4f3ed;
+}
+.export-cell.exp-module .export-name {
+  font-size: 0.85rem;
+}
+.export-cell.exp-empty {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--paper),
+    var(--paper) 4px,
+    var(--hairline) 4px,
+    var(--hairline) 5px
+  );
+}
+
+/* ---------------------------------------------------------- Stack */
+
+.specimen-stack {
+  display: grid;
+  grid-template-columns:
+    [margin] var(--gutter)
+    [name]   auto
+    [colon]  auto
+    [type]   1fr
+    [notes]  var(--rhs-gutter);
+  column-gap: 1rem;
+  row-gap: 0;
+}
+
+.specimen-stack > .row {
+  position: relative;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: margin / -1;
+  row-gap: 0.4rem;
+  padding: 1.6rem 0;
+  align-items: baseline;
+}
+.specimen-stack > .row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-top: 1px solid var(--hairline);
+}
+.specimen-stack > .row:first-child {
+  padding-top: 0;
+}
+.specimen-stack > .row:first-child::before {
+  display: none;
+}
+
+/* ---- Left-gutter label */
+
+.row > .label {
+  grid-column: margin;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--margin);
+  text-align: right;
+  padding-top: 0.25rem;
+  align-self: start;
+}
+
+.row.kind-class > .label,
+.row.kind-instance > .label {
+  color: var(--accent);
+}
+.row.kind-instance > .label::before {
+  content: "§ ";
+  color: var(--accent);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+}
+
+/* ---- Code cells */
+
+.row .name,
+.row .sep,
+.row .type,
+.row > .class-head,
+.row > .instance-head,
+.row > .defn-body,
+.row > .raw {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.row > .name {
+  grid-column: name;
+  font-weight: 500;
+}
+.row > .sep {
+  grid-column: colon;
+  color: var(--margin);
+}
+.row > .type {
+  grid-column: type;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+.row > .defn-body {
+  grid-column: name / notes;
+  margin: 0.3rem 0 0;
+  padding-left: 1rem;
+  border-left: 1px solid var(--hairline);
+  white-space: pre;
+  color: var(--soft-ink);
+}
+.row > .class-head,
+.row > .instance-head {
+  grid-column: name / notes;
+  font-weight: 500;
+}
+
+/* Class methods: each method-sig line is its own nested subgrid spanning
+ * name/-1, so its name/sep/type spans participate in the outer
+ * .specimen-stack column tracks — `::` on every method aligns with the
+ * `::` of every instance/function sig in the document.                  */
+.row.kind-class > .class-method,
+.row.kind-value > .value-body,
+.row.kind-instance > .value-body {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+
+/* Fixity rows: each declared operator is its own nested subgrid line so
+ * the alias sits in the name column like any other declaration; the
+ * fixity machinery (infixr 9, as) is quieted to the margin colour. */
+.row.kind-operator > .fixity-line,
+.row.kind-role > .fixity-line,
+.row > .decl-kind-sig {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+.fixity-line .kw { color: var(--margin); }
+.role-list { color: var(--soft-ink); }
+
+/* ---- Data / newtype declarations — constructor stack. Each .ctor-line
+ * is a nested subgrid row spanning name/notes, so the `=` and `|`
+ * separators sit in the shared [colon] track and align with every `::`
+ * in the document. The lever-frame look. (Ported from specimen's
+ * stylesheet — the two sheets had drifted.)                            */
+
+.row.kind-data > .ctor-line,
+.row.kind-type > .ctor-line {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: name / notes;
+  align-items: baseline;
+}
+
+.ctor-line > .ctor-sep,
+.ctor-line > .ctor-body {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.ctor-line > .ctor-sep {
+  grid-column: colon;
+  color: var(--margin);
+}
+
+.ctor-line > .ctor-body {
+  grid-column: type;
+  color: var(--ink);
+}
+
+.ctor-body .ctor-name { font-weight: 500; }
+.ctor-body .ctor-args { color: var(--soft-ink); }
+
+.ctor-body .ctor-comment {
+  color: var(--margin);
+  font-style: italic;
+  font-size: 0.8rem;
+  margin-left: 2ch;
+}
+
+.row.kind-data > .label { color: var(--accent); }
+
+/* Section headings — the author's own comment dividers, typeset as a
+ * real rule + small-caps title spanning the text column. */
+.specimen-stack > .row.kind-section {
+  padding: 3rem 0 0.2rem;
+}
+.specimen-stack > .row.kind-section::before {
+  border-top-color: var(--rule);
+}
+.row.kind-section > .section-title {
+  grid-column: name / notes;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--soft-ink);
+}
+
+/* Consecutive instances read as one series — a wall of near-identical
+ * rows gets tight leading; hairlines stay so the rows remain countable. */
+.specimen-stack > .row.kind-instance:has(+ .row.kind-instance) { padding-bottom: 0.6rem; }
+.specimen-stack > .row.kind-instance + .row.kind-instance { padding-top: 0.6rem; }
+
+/* Value body: visually subordinated to the sig above — same monospace
+ * (inherited via .row > .name etc.) but in --soft-ink, so the eye reads
+ * the sig as primary and the body equation as a kind of footnote. The
+ * `=` re-uses .sep's --margin color, mirroring the sig's `::`.          */
+.row.kind-value > .value-body > .name,
+.row.kind-value > .value-body > .type,
+.row.kind-instance > .value-body > .name,
+.row.kind-instance > .value-body > .type {
+  color: var(--soft-ink);
+}
+
+/* ---- Imports — inner subgrid */
+
+.row.kind-imports > .specimen-imports {
+  grid-column: name / notes;
+  display: grid;
+  grid-template-columns: [kw] auto [mod] auto [as] auto [list] 1fr;
+  column-gap: 0.65rem;
+  row-gap: 0.3rem;
+  align-items: baseline;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+}
+.row.kind-imports .kw   { grid-column: kw;   color: var(--margin); }
+.row.kind-imports .mod  { grid-column: mod;  font-weight: 500; }
+.row.kind-imports .as   { grid-column: as;   color: var(--margin); font-style: italic; }
+.row.kind-imports .list { grid-column: list; color: var(--soft-ink); }
+
+/* ---- Marginalia (editorial pull-quote: cream block, serif italic,
+ *      drop cap, solid accent circle peeking from behind upper-left)  */
+
+.row > .marginalia {
+  position: relative;
+  isolation: isolate;
+  grid-column: name / notes;
+  margin-top: 3rem;
+  padding: 2.5rem 2.75rem 2.25rem;
+  background: #fbf6e6;
+  border: 1.5px solid var(--ink);
+  max-width: 58rem;
+  font-family: 'Iowan Old Style', 'STIX Two Text', 'Charter', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.55;
+  color: #1a1a1a;
+  text-align: left;
+  hyphens: none;
+}
+
+/* Solid accent circle peeking from behind the block, top-left.
+ * Sized + offset so it never extends above the cream block's top edge
+ * by more than the available margin to the code body above. */
+.row > .marginalia::before {
+  content: "";
+  position: absolute;
+  top: -1.75rem;
+  left: -1.75rem;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  z-index: -1;
+}
+
+.row > .marginalia p {
+  margin: 0 0 0.9rem;
+}
+.row > .marginalia p:last-child {
+  margin-bottom: 0;
+}
+
+/* Drop cap on the first paragraph, but only when it starts with a plain
+ * letter — markup-leading paragraphs (`code`, [link] etc.) skip it
+ * because ::first-letter would otherwise target a letter inside the
+ * inline element and look broken. The PureScript markdown renderer
+ * tags qualifying paragraphs with .can-dropcap. */
+.row > .marginalia p.can-dropcap:first-of-type::first-letter {
+  font-family: 'Iowan Old Style', 'STIX Two Text', Georgia, serif;
+  font-size: 3.8em;
+  line-height: 0.85;
+  float: left;
+  font-weight: 700;
+  font-style: normal;
+  margin: 0.05em 0.04em 0 0;
+  color: var(--ink);
+}
+
+/* Compact marginalia for one-line / very-short comments. The full pull-
+ * quote treatment (cream block + accent circle + serif drop cap) reads
+ * as over-produced for a single sentence — it ends up marooned in a
+ * wide rectangle. Compact mode drops the block, keeps the italic prose,
+ * and emphasises the sentence with a bold accent-coloured first letter. */
+.row > .marginalia.marginalia-compact {
+  margin-top: 1.6rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+}
+.row > .marginalia.marginalia-compact::before {
+  display: none;
+}
+.row > .marginalia.marginalia-compact p.can-dropcap:first-of-type::first-letter {
+  font-family: 'Iowan Old Style', 'STIX Two Text', Georgia, serif;
+  font-size: 1em;
+  line-height: inherit;
+  float: none;
+  font-weight: 700;
+  font-style: normal;
+  margin: 0;
+  color: var(--accent);
+}
+
+.row > .marginalia code {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-style: normal;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.05em 0.4em;
+  border-radius: 2px;
+  color: var(--ink);
+}
+
+/* Fenced code excerpts inside marginalia — same monospace family as the
+ * main code body above but smaller, gutter-anchored by a left rule, no
+ * pill background. Reads as "quoted code" embedded in the editorial
+ * block, not competing with the actual specimen code above.            */
+.row > .marginalia pre.code-quote {
+  margin: 1.1rem 0;
+  padding: 0.55rem 0 0.55rem 1.1rem;
+  border-left: 2px solid var(--margin);
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  white-space: pre;
+  overflow-x: auto;
+  hyphens: none;
+}
+.row > .marginalia pre.code-quote code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* When the first paragraph leads with a code identifier, pull it out as
+ * a block-level subhead — the visual anchor that the drop cap provides
+ * for prose-led paragraphs. Keeps the symmetry across blocks without
+ * forcing a serif drop cap onto a monospace identifier. */
+.row > .marginalia .code-led {
+  margin-top: 0;
+}
+.row > .marginalia .code-cap {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 2.4em;
+  font-weight: 700;
+  font-style: normal;
+  background: transparent;
+  padding: 0;
+  margin: 0 0 0.55rem;
+  color: var(--ink);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+}
+.row > .marginalia strong {
+  font-weight: 600;
+  font-style: normal;
+  color: var(--ink);
+}
+.row > .marginalia strong code {
+  background: transparent;
+  padding: 0;
+}
+
+/* ---- Laws inside the editorial block — aligned-colon grid */
+
+.row > .marginalia .laws {
+  display: grid;
+  grid-template-columns: [name] auto [colon] auto [code] 1fr;
+  column-gap: 0.8rem;
+  row-gap: 0.5rem;
+  margin: 1.4rem 0 0.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  font-style: normal;
+  align-items: baseline;
+}
+.row > .marginalia .law-name {
+  grid-column: name;
+  font-family: 'Iowan Old Style', serif;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+.row > .marginalia .law-sep {
+  grid-column: colon;
+  color: var(--margin);
+}
+.row > .marginalia .law-code {
+  grid-column: code;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  font-style: normal;
+  color: var(--ink);
+}
+.row > .marginalia .law-code code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ---- Margin commentary chips and expansion panels.
+ *
+ * Each row that has commentary on its symbol shows a stack of chips in
+ * the right `notes` column — one per track that's written about it.
+ * Click a chip and the corresponding panel expands in the middle column,
+ * sitting alongside the code as clearly-delineated editorial space.
+ * The chips stay compact regardless of essay length; the panel is where
+ * arbitrary content lives (long prose, code excerpts, eventually
+ * Hylograph diagrams).                                                  */
+
+.row > .note-stack {
+  grid-column: notes;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--rule);
+}
+.row > .note-stack .note-card {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  padding: 0.35rem 0.6rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.row > .note-stack .note-card:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+.row > .note-stack .note-card.expanded {
+  background: var(--paper);
+  border-color: var(--accent);
+}
+
+/* Expansion panel — saturates in the module's own accent colour, with
+ * paper-coloured text. Each module's panel takes its hue from the
+ * beeswarm bubble that introduced it, tying the editorial register to
+ * the module identity. Lives in the middle column alongside the code,
+ * clearly demarcated as commentary by colour alone — no risk of being
+ * mistaken for marginalia (cream pull-quote) or code.                   */
+.row > .commentary-panel {
+  grid-column: name / notes;
+  margin-top: 1.2rem;
+  background: var(--accent);
+  border: none;
+  padding: 1.4rem 1.8rem 1.5rem;
+  font-family: 'Iowan Old Style', 'STIX Two Text', 'Charter', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--paper);
+  hyphens: none;
+}
+.row > .commentary-panel[hidden] {
+  display: none;
+}
+.row > .commentary-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+.row > .commentary-panel .commentary-by {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+.row > .commentary-panel .commentary-close {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0 0.3rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+.row > .commentary-panel .commentary-close:hover {
+  color: var(--paper);
+}
+.row > .commentary-panel .commentary-body p {
+  margin: 0 0 0.85rem;
+  font-style: italic;
+}
+.row > .commentary-panel .commentary-body p:last-child {
+  margin-bottom: 0;
+}
+.row > .commentary-panel .commentary-body code {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-style: normal;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.04em 0.4em;
+  border-radius: 2px;
+  color: var(--paper);
+}
+.row > .commentary-panel .commentary-body a {
+  color: var(--paper);
+  font-style: normal;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+.row > .commentary-panel .commentary-body a:hover {
+  border-bottom-color: var(--paper);
+}
+.row > .commentary-panel .commentary-body strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--paper);
+}
+
+/* ---- Glyph spans — bump substituted Unicode arrows up to match the
+ *      visual weight of JetBrains Mono's contextual ligatures. */
+
+.row .g {
+  font-size: 1.18em;
+  line-height: 1;
+  font-weight: 500;
+  vertical-align: -0.06em;
+}
+
+/* ---- Type variables — colored text via inline --vc custom property
+ *      set per occurrence by the renderer. */
+
+.row .sig-var {
+  color: var(--vc, #444);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ---- Vertical sig stack: long signatures fold into stations, with the
+ *      trailing →/⇒/. right-aligned in its own column so the connectors
+ *      form a vertical edge. Both columns size to max-content (auto) so
+ *      the connectors hug the longest body's right edge rather than
+ *      drifting to the cell's outer margin. */
+
+.row > .type .sig-stack {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  width: max-content;     /* keep the stack only as wide as its widest body */
+  max-width: 100%;        /* fall back to wrap inside narrow viewports */
+  column-gap: 1.6rem;
+  row-gap: 0.18rem;
+  align-items: baseline;
+  white-space: normal;
+}
+.row > .type .sig-stack .sig-station-body {
+  white-space: pre-wrap;
+}
+
+/* A station carrying a string literal (Warn/Text compiler messages) is
+ * prose — cap its width so pre-wrap engages and it wraps like a
+ * sentence. Type-geometry stations are never capped; they extend. */
+.sig-station-body.sig-station-prose {
+  max-width: 48ch;
+}
+.row > .type .sig-stack .sig-station-op {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+/* Constraint vs function-arrow connectors carry different semantics —
+ * preconditions vs the function's own shape. Soften the constraint
+ * arrows so they read as qualifying matter; leave the function arrows
+ * in solid ink. */
+.row > .type .sig-stack .sig-op-constraint { color: var(--margin); }
+.row > .type .sig-stack .sig-op-arrow      { color: var(--ink); }
+
+.row > .type .sig-stack .sig-forall-dot {
+  color: var(--margin);
+  font-size: 1.15em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Boundary between the constraint stack and the function-shape stack:
+ * a quiet vertical breath, no rule. The connector-color shift +
+ * extra space together signal the transition without ornament. */
+.row > .type .sig-stack .sig-args-start {
+  margin-top: 0.55rem;
+}
+
+/* ---------------------------------------------------------- Foot */
+
+.specimen-foot {
+  position: relative;
+  margin-top: 4rem;
+  padding-top: 1rem;
+  display: grid;
+  grid-template-columns: var(--gutter) 1fr var(--rhs-gutter);
+  column-gap: 1rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--margin);
+}
+/* Light delineation between modules — the right-aligned foot text and the
+ * next module's title carry the boundary; this is just a quiet rule, not
+ * a hard divider. Clipped to col-2 right edge like the other rules. */
+.specimen-foot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--rhs-gutter) + 1rem);
+  border-top: 1px solid var(--rule);
+}
+.specimen-foot .field { grid-column: 2; line-height: 1.7; text-align: right; }
+
+/* Raw fallback */
+.row.kind-raw > .raw {
+  grid-column: name / notes;
+  white-space: pre;
+  color: var(--soft-ink);
+}

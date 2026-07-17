@@ -1,0 +1,37 @@
+{
+  "name": "heterogeneous",
+  "version": "0.7.0",
+  "title": "heterogeneous",
+  "modules": 3,
+  "decls": 66,
+  "loc": 408,
+  "layers": 1,
+  "stableSince": "June 2025",
+  "releases": [
+    {
+      "v": "0.4.1",
+      "t": 1559235344000,
+      "major": false
+    },
+    {
+      "v": "0.5.0",
+      "t": 1614877729000,
+      "major": false
+    },
+    {
+      "v": "0.5.1",
+      "t": 1623872240000,
+      "major": false
+    },
+    {
+      "v": "0.6.0",
+      "t": 1651508287000,
+      "major": false
+    },
+    {
+      "v": "0.7.0",
+      "t": 1750535306000,
+      "major": false
+    }
+  ]
+}

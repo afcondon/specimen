@@ -1,0 +1,57 @@
+{
+  "name": "ordered-collections",
+  "version": "3.2.0",
+  "title": "ordered-collections",
+  "modules": 5,
+  "decls": 160,
+  "loc": 1250,
+  "layers": 3,
+  "stableSince": "March 2024",
+  "releases": [
+    {
+      "v": "1.0.0",
+      "t": 1527125057000,
+      "major": false
+    },
+    {
+      "v": "1.6.1",
+      "t": 1555073078000,
+      "major": false
+    },
+    {
+      "v": "2.0.0",
+      "t": 1614366243000,
+      "major": true
+    },
+    {
+      "v": "2.0.1",
+      "t": 1618974355000,
+      "major": false
+    },
+    {
+      "v": "2.0.2",
+      "t": 1630072984000,
+      "major": false
+    },
+    {
+      "v": "3.0.0",
+      "t": 1651098750000,
+      "major": true
+    },
+    {
+      "v": "3.1.0",
+      "t": 1691783591000,
+      "major": false
+    },
+    {
+      "v": "3.1.1",
+      "t": 1693421658000,
+      "major": false
+    },
+    {
+      "v": "3.2.0",
+      "t": 1710878524000,
+      "major": false
+    }
+  ]
+}

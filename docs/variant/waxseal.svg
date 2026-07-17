@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <rect width="100%" height="100%" fill="#fff"/>
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; VARIANT</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.58139534883722" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="173.2244439713749" cy="240" r="114.38723466904935" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="356.59653699463075" cy="240" r="64.56625370304369" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="123.89851373390533" cy="240" r="60.642699780416976" fill="#111"/><circle cx="236.0764460773733" cy="240" r="47.116627911888195" fill="#111"/><circle cx="356.59653699463075" cy="240" r="60.14764905188088" fill="#111"/></g>
+</svg>

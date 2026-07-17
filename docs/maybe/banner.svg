@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 380"><path d="M 1094.4 168.2 C 800.0 168.2, 800.0 188.9, 505.6 188.9" fill="none" stroke="#111" stroke-width="0.6" opacity="0.10"/><path d="M 1094.4 211.6 C 800.0 211.6, 800.0 188.9, 505.6 188.9" fill="none" stroke="#111" stroke-width="0.6" opacity="0.10"/><g transform="translate(505.6,188.9)">
+      <circle r="83.4" fill="#fff" stroke="#111" stroke-width="1.5"/>
+      <circle cx="-23" cy="1.4" r="54" fill="#111"/><circle cx="52.1" cy="1.4" r="19.8" fill="#111"/><circle cx="38.9" cy="35.5" r="15.4" fill="#111"/><circle cx="38.7" cy="-32" r="14.9" fill="#111"/><circle cx="18.2" cy="-55.4" r="14.9" fill="#111"/><circle cx="17.5" cy="58" r="14.3" fill="#111"/><circle cx="-10" cy="-67" r="14.3" fill="#111"/><circle cx="-9.3" cy="68.3" r="13" fill="#111"/><circle cx="65.5" cy="-27.7" r="10.9" fill="#111"/><circle cx="65.2" cy="29.7" r="10.1" fill="#111"/><circle cx="-31.6" cy="64.4" r="8.3" fill="#111"/><circle cx="-33.3" cy="-61.3" r="8.3" fill="#111"/><circle cx="41.6" cy="-55.2" r="7.1" fill="#111"/><circle cx="39" cy="58.1" r="5.8" fill="#111"/><circle cx="-45.7" cy="58.2" r="5.8" fill="#111"/>
+      <text y="-93.4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Data.Maybe</text>
+    </g><g transform="translate(1094.4,168.2)">
+      <circle r="33.5" fill="#fff" stroke="#111" stroke-width="1.5"/>
+      <circle cx="-15" cy="0" r="17.2" fill="#111"/><circle cx="17.9" cy="0" r="14.3" fill="#111"/><circle cx="3.4" cy="14.4" r="4.8" fill="#111"/>
+      <text y="-43.5" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Data.Maybe.First</text>
+    </g><g transform="translate(1094.4,211.6)">
+      <circle r="33.5" fill="#fff" stroke="#111" stroke-width="1.5"/>
+      <circle cx="-15" cy="0" r="17.2" fill="#111"/><circle cx="17.9" cy="0" r="14.3" fill="#111"/><circle cx="3.4" cy="14.4" r="4.8" fill="#111"/>
+      <text y="-43.5" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Data.Maybe.Last</text>
+    </g></svg>

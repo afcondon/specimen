@@ -1,0 +1,47 @@
+{
+  "name": "variant",
+  "version": "8.0.0",
+  "title": "variant",
+  "modules": 3,
+  "decls": 120,
+  "loc": 1273,
+  "layers": 1,
+  "stableSince": "April 2022",
+  "releases": [
+    {
+      "v": "6.0.1",
+      "t": 1558991320000,
+      "major": false
+    },
+    {
+      "v": "7.0.0",
+      "t": 1614701078000,
+      "major": true
+    },
+    {
+      "v": "7.0.1",
+      "t": 1614701288000,
+      "major": false
+    },
+    {
+      "v": "7.0.2",
+      "t": 1614901280000,
+      "major": false
+    },
+    {
+      "v": "7.0.3",
+      "t": 1623872247000,
+      "major": false
+    },
+    {
+      "v": "7.1.0",
+      "t": 1646337440000,
+      "major": false
+    },
+    {
+      "v": "8.0.0",
+      "t": 1651331896000,
+      "major": true
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tailrec &mdash; a specimen book</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0ODAgNDgwIiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjI0MCIgcj0iMjM0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjI0MCIgcj0iMTk0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPGRlZnM+PHBhdGggaWQ9InJpbSIgZD0iTSAyNSAyNDAgYSAyMTUgMjE1IDAgMSAxIDQzMCAwIi8+PC9kZWZzPgogIDx0ZXh0IGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjciIGZpbGw9IiMxMTEiPgogICAgPHRleHRQYXRoIGhyZWY9IiNyaW0iIHN0YXJ0T2Zmc2V0PSI1MCUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBVUkVTQ1JJUFQgJiMxODM7IFRBSUxSRUM8L3RleHRQYXRoPgogIDwvdGV4dD4KICA8dGV4dCB4PSIyNDAiIHk9IjQ1OCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsIHNlcmlmIiBmb250LXNpemU9IjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTExIj7OuzwvdGV4dD4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLDYpIj48Y2lyY2xlIGN4PSIyNDAiIGN5PSIyNDAiIHI9IjE4NS40NzYxOTA0NzYxOTA0OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTExIiBzdHJva2Utd2lkdGg9IjEuMyIvPjxjaXJjbGUgY3g9IjI0MCIgY3k9IjI0MCIgcj0iMTgwLjk1MjM4MDk1MjM4MDk2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMS4zIi8+PGNpcmNsZSBjeD0iMjQwIiBjeT0iMjQwIiByPSIxNzYuNDI4NTcxNDI4NTcxNDQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzExMSIgc3Ryb2tlLXdpZHRoPSIxLjMiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIyNDAiIHI9IjE3MS45MDQ3NjE5MDQ3NjE5IiBmaWxsPSIjMTExIi8+PC9nPgo8L3N2Zz4=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigil.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Long code lines must never widen the page (the specimen grid sizes
+     shared tracks to min-content), but they are also never clipped behind
+     a scrollbar — a line that outruns the measure simply extends into the
+     right margin, visible for close reading. Only the page edge cuts it. */
+  body { overflow-x: hidden; }
+  .specimen-stack > .row > * { min-width: 0; }
+  /* morph banner-nav layer (specimen-site) */
+  #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: visible; z-index: 5; pointer-events: none; }
+  #stage a { pointer-events: auto; cursor: pointer; }
+  #stage circle.ring { transition: stroke-width .2s ease; }
+  #hero-title { position: fixed; top: 34px; left: 60px; z-index: 6; pointer-events: none; }
+  #hero-title .book-kicker { margin-bottom: 0.5rem; }
+  #hero-title .book-title { font-size: 1.9rem; margin: 0 0 0.5rem; }
+  #hero-title .book-deck { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); max-width: none; }
+  .book-versions { margin-top: 1.1rem; }
+  .book-versions .version-spark { display: block; }
+  .book-versions p { margin: 0.15rem 0 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); }
+  main#book { padding-top: calc(66vh + 220px); }
+  .book-colophon { margin: 8rem 0 4rem; text-align: center; }
+  .book-colophon svg { width: 300px; height: 300px; }
+  .book-colophon .facts { margin-top: 1.4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); line-height: 2; }
+  @media (max-width: 1320px) { #stage.railed { opacity: 0; pointer-events: none; } }
+  #stage { transition: opacity .3s ease; }
+  /* FFI modal: foreign rows with a sidecar implementation are clickable */
+  .row.kind-foreign[data-ffi] { cursor: pointer; }
+  .row.kind-foreign[data-ffi] > .label::after { content: " · js"; color: var(--accent); }
+  .row.kind-foreign[data-ffi]:hover > .label { color: var(--ink); }
+  #ffi-modal[hidden] { display: none; }
+  #ffi-modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+  #ffi-modal .ffi-backdrop { position: absolute; inset: 0; background: rgba(26,26,26,0.35); }
+  #ffi-modal .ffi-card { position: relative; background: var(--paper); border: 1px solid var(--ink);
+    width: min(60rem, 92vw); max-height: 82vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+  #ffi-modal header { display: flex; align-items: baseline; gap: 1.4rem;
+    padding: 1rem 1.4rem; border-bottom: 1px solid var(--ink); }
+  #ffi-modal .ffi-title { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 1rem; }
+  #ffi-modal .ffi-sub { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--margin); }
+  #ffi-modal nav { margin-left: auto; display: flex; gap: 1rem; }
+  #ffi-modal nav button { font: inherit; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em;
+    background: none; border: none; padding: 0; color: var(--margin); cursor: pointer; }
+  #ffi-modal nav button.on { color: var(--accent); border-bottom: 1px solid var(--accent); }
+  #ffi-modal .ffi-close { font: inherit; background: none; border: none; cursor: pointer; color: var(--margin); font-size: 1rem; }
+  #ffi-modal pre { margin: 0; padding: 1.2rem 1.4rem; overflow: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.55; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header id="hero-title" class="book-head">
+  <div class="book-kicker">PureScript &middot; specimen book</div>
+  <h1 class="book-title">tailrec</h1>
+  <p class="book-deck">1 modules &middot; 19 declarations &middot; import order left to right &middot; the swarm is the nav</p>
+  <div class="book-versions">
+    <svg class="version-spark" viewBox="0 0 300 32" width="300" height="32" role="img" aria-label="release timeline">
+    <line x1="4" y1="20" x2="296" y2="20" stroke="#d8d6cf" stroke-width="1"/>
+    <line x1="4.0" y1="12" x2="4.0" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="6.2" y1="12" x2="6.2" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="9.4" y1="12" x2="9.4" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="10.1" y1="12" x2="10.1" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="40.4" y1="7" x2="40.4" y2="20" stroke="#1a1a1a" stroke-width="1.6"/><line x1="79.9" y1="12" x2="79.9" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="97.0" y1="12" x2="97.0" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="127.1" y1="7" x2="127.1" y2="20" stroke="#1a1a1a" stroke-width="1.6"/><line x1="132.3" y1="12" x2="132.3" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="163.6" y1="7" x2="163.6" y2="20" stroke="#1a1a1a" stroke-width="1.6"/><line x1="165.3" y1="12" x2="165.3" y2="20" stroke="#1a1a1a" stroke-width="1"/>
+    <circle cx="296" cy="20" r="2.5" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    <text x="4" y="31" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">2017</text>
+    <text x="296" y="31" text-anchor="end" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">2026</text>
+  </svg>
+    <p>11 releases since 2017 &middot; stable since May 2022</p>
+  </div>
+</header>
+
+<svg id="stage"></svg>
+
+<main id="book">
+  <div class="book-body">
+<div class="book-module" id="mod-Control-Monad-Rec-Class" data-module="Control.Monad.Rec.Class" style="--accent: hsl(0, 58%, 43%)"><article class="specimen-doc"><header class="specimen-head"><div class="kicker">PureScript Module</div><h1>Control.Monad.Rec.Class</h1><div class="exports"><div class="export-cell exp-class"><span class="export-kind">Class</span><span class="export-name">Monad<wbr>Rec</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec2</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec3</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec<wbr>M</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec<wbr>M2</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">tail<wbr>Rec<wbr>M3</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">forever</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">while<wbr>Just</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">until<wbr>Just</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">loop2</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">loop3</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Step(..)</span></div><div class="export-cell exp-empty"></div><div class="export-cell exp-empty"></div><div class="export-cell exp-empty"></div></div></header><div class="specimen-stack"><section class="row kind-imports"><span class="label">Imports</span><div class="specimen-imports"><span class="kw">import</span><span class="mod">Prelude</span><span class="as"></span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Bifunctor</span><span class="as"></span><span class="list">(class Bifunctor)</span><span class="kw">import</span><span class="mod">Data.Either</span><span class="as"></span><span class="list">(Either(..))</span><span class="kw">import</span><span class="mod">Data.Identity</span><span class="as"></span><span class="list">(Identity(..))</span><span class="kw">import</span><span class="mod">Data.Maybe</span><span class="as"></span><span class="list">(Maybe(..))</span><span class="kw">import</span><span class="mod">Effect</span><span class="as"></span><span class="list">(Effect, untilE)</span><span class="kw">import</span><span class="mod">Effect.Ref</span><span class="as">as Ref</span><span class="list"></span><span class="kw">import</span><span class="mod">Partial.Unsafe</span><span class="as"></span><span class="list">(unsafePartial)</span></div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Step a b</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Loop</span> <span class="ctor-args">a</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Done</span> <span class="ctor-args">b</span></span></div><div class="marginalia"><p class="can-dropcap">The result of a computation: either <code>Loop</code> containing the updated accumulator, or <code>Done</code> containing the final result of the computation.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> functorStep</span><span class="sep">::</span><span class="type">Functor (Step a)</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> bifunctorStep</span><span class="sep">::</span><span class="type">Bifunctor Step<span class="inst-where"> where</span></span><pre class="defn-body">  bimap f _ (Loop a) = Loop (f a)
+  bimap _ g (Done b) = Done (g b)</pre></section><section class="row kind-class"><span class="label">Class</span><code class="class-head"><span class="kw">class</span> Monad m <span class="g">⇐</span> MonadRec m where</code><div class="class-method"><span class="name">tailRecM</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>. (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> m (Step <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>)) <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> m <var class="sig-var" style="--vc:#b35900">b</var></span></div><div class="marginalia"><p class="can-dropcap">This type class captures those monads which support tail recursion in constant stack space.</p><p>The <code>tailRecM</code> function takes a step function, and applies that step function recursively until a pure value of type <code>b</code> is found.</p><p>Instances are provided for standard monad transformers.</p><p>For example:</p><pre class="code-quote"><code>loopWriter :: Int → WriterT (Additive Int) Effect Unit
+loopWriter n = tailRecM go n
+  where
+  go 0 = do
+    traceM &quot;Done!&quot;
+    pure (Done unit)
+  go i = do
+    tell $ Additive i
+    pure (Loop (i - 1))</code></pre></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">tailRecM2</span><span class="sep">::</span><span class="type"><div class="sig-stack"><span class="sig-station-body"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">c</var><small class="sig-forall-dot"> .</small></span><span class="sig-station-op"></span><span class="sig-station-body">MonadRec <var class="sig-var" style="--vc:#1f5fa8">m</var></span><span class="sig-station-op sig-op-constraint"><span class="g">⇒</span></span><span class="sig-station-body sig-args-start">(<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> (Step { <var class="sig-var" style="--vc:#b35900">a</var> :: <var class="sig-var" style="--vc:#b35900">a</var>, <var class="sig-var" style="--vc:#2d7a3b">b</var> :: <var class="sig-var" style="--vc:#2d7a3b">b</var> } <var class="sig-var" style="--vc:#7e3aa3">c</var>))</span><span class="sig-station-op sig-op-arrow sig-args-start"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#b35900">a</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#2d7a3b">b</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#7e3aa3">c</var></span><span class="sig-station-op"></span></div></span><div class="value-body"><span class="name">tailRecM2 f a b</span><span class="sep">=</span><span class="type">tailRecM (\o <span class="g">→</span> f o.a o.b) { a, b }</span></div><div class="marginalia"><p class="can-dropcap">Create a tail-recursive function of two arguments which uses constant stack space.</p><p>The <code>loop2</code> helper function provides a curried alternative to the <code>Loop</code> constructor for this function.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">tailRecM3</span><span class="sep">::</span><span class="type"><div class="sig-stack"><span class="sig-station-body"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">c</var> <var class="sig-var" style="--vc:#0e7484">d</var><small class="sig-forall-dot"> .</small></span><span class="sig-station-op"></span><span class="sig-station-body">MonadRec <var class="sig-var" style="--vc:#1f5fa8">m</var></span><span class="sig-station-op sig-op-constraint"><span class="g">⇒</span></span><span class="sig-station-body sig-args-start">(<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">c</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> (Step { <var class="sig-var" style="--vc:#b35900">a</var> :: <var class="sig-var" style="--vc:#b35900">a</var>, <var class="sig-var" style="--vc:#2d7a3b">b</var> :: <var class="sig-var" style="--vc:#2d7a3b">b</var>, <var class="sig-var" style="--vc:#7e3aa3">c</var> :: <var class="sig-var" style="--vc:#7e3aa3">c</var> } <var class="sig-var" style="--vc:#0e7484">d</var>))</span><span class="sig-station-op sig-op-arrow sig-args-start"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#b35900">a</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#2d7a3b">b</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#7e3aa3">c</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#0e7484">d</var></span><span class="sig-station-op"></span></div></span><div class="value-body"><span class="name">tailRecM3 f a b c</span><span class="sep">=</span><span class="type">tailRecM (\o <span class="g">→</span> f o.a o.b o.c) { a, b, c }</span></div><div class="marginalia"><p class="can-dropcap">Create a tail-recursive function of three arguments which uses constant stack space.</p><p>The <code>loop3</code> helper function provides a curried alternative to the <code>Loop</code> constructor for this function.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">tailRec</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>. (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Step <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var></span><pre class="defn-body">tailRec f = go &lt;&lt;&lt; f
+  where
+  go (Loop a) = go (f a)
+  go (Done b) = b</pre><div class="marginalia"><p class="can-dropcap">Create a pure tail-recursive function of one argument</p><p>For example:</p><pre class="code-quote"><code>pow :: Int → Int → Int
+pow n p = tailRec go { accum: 1, power: p }
+  where
+  go :: _ → Step _ Int
+  go { accum: acc, power: 0 } = Done acc
+  go { accum: acc, power: p } = Loop { accum: acc * n, power: p - 1 }</code></pre></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">tailRec2</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>. (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> Step { <var class="sig-var" style="--vc:#1f5fa8">a</var> :: <var class="sig-var" style="--vc:#1f5fa8">a</var>, <var class="sig-var" style="--vc:#b35900">b</var> :: <var class="sig-var" style="--vc:#b35900">b</var> } <var class="sig-var" style="--vc:#2d7a3b">c</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">c</var></span><div class="value-body"><span class="name">tailRec2 f a b</span><span class="sep">=</span><span class="type">tailRec (\o <span class="g">→</span> f o.a o.b) { a, b }</span></div><div class="marginalia"><p class="can-dropcap">Create a pure tail-recursive function of two arguments</p><p>The <code>loop2</code> helper function provides a curried alternative to the <code>Loop</code> constructor for this function.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">tailRec3</span><span class="sep">::</span><span class="type"><div class="sig-stack"><span class="sig-station-body"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <var class="sig-var" style="--vc:#7e3aa3">d</var><small class="sig-forall-dot"> .</small></span><span class="sig-station-op"></span><span class="sig-station-body">(<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> Step { <var class="sig-var" style="--vc:#1f5fa8">a</var> :: <var class="sig-var" style="--vc:#1f5fa8">a</var>, <var class="sig-var" style="--vc:#b35900">b</var> :: <var class="sig-var" style="--vc:#b35900">b</var>, <var class="sig-var" style="--vc:#2d7a3b">c</var> :: <var class="sig-var" style="--vc:#2d7a3b">c</var> } <var class="sig-var" style="--vc:#7e3aa3">d</var>)</span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#1f5fa8">a</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#b35900">b</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#2d7a3b">c</var></span><span class="sig-station-op sig-op-arrow"><span class="g">→</span></span><span class="sig-station-body"><var class="sig-var" style="--vc:#7e3aa3">d</var></span><span class="sig-station-op"></span></div></span><div class="value-body"><span class="name">tailRec3 f a b c</span><span class="sep">=</span><span class="type">tailRec (\o <span class="g">→</span> f o.a o.b o.c) { a, b, c }</span></div><div class="marginalia"><p class="can-dropcap">Create a pure tail-recursive function of three arguments</p><p>The <code>loop3</code> helper function provides a curried alternative to the <code>Loop</code> constructor for this function.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> monadRecIdentity</span><span class="sep">::</span><span class="type">MonadRec Identity<span class="inst-where"> where</span></span><pre class="defn-body">  tailRecM f = Identity &lt;&lt;&lt; tailRec (runIdentity &lt;&lt;&lt; f)
+    where runIdentity (Identity x) = x</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> monadRecEffect</span><span class="sep">::</span><span class="type">MonadRec Effect<span class="inst-where"> where</span></span><pre class="defn-body">  tailRecM f a = do
+    r <span class="g">←</span> Ref.new =&lt;&lt; f a
+    untilE do
+      Ref.read r &gt;&gt;= case _ of
+        Loop a' <span class="g">→</span> do
+          e <span class="g">←</span> f a'
+          _ <span class="g">←</span> Ref.write e r
+          pure false
+        Done _ <span class="g">→</span> pure true
+    fromDone &lt;$&gt; Ref.read r
+    where
+    fromDone :: <span class="g">∀</span> a b. Step a b <span class="g">→</span> b
+    fromDone = unsafePartial \(Done b) <span class="g">→</span> b</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> monadRecFunction</span><span class="sep">::</span><span class="type">MonadRec ((<span class="g">→</span>) e)<span class="inst-where"> where</span></span><div class="value-body"><span class="name">tailRecM f a0 e</span><span class="sep">=</span><span class="type">tailRec (\a <span class="g">→</span> f a e) a0</span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> monadRecEither</span><span class="sep">::</span><span class="type">MonadRec (Either e)<span class="inst-where"> where</span></span><pre class="defn-body">  tailRecM f a0 =
+    let
+      g (Left e) = Done (Left e)
+      g (Right (Loop a)) = Loop (f a)
+      g (Right (Done b)) = Done (Right b)
+    in tailRec g (f a0)</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> monadRecMaybe</span><span class="sep">::</span><span class="type">MonadRec Maybe<span class="inst-where"> where</span></span><pre class="defn-body">  tailRecM f a0 =
+    let
+      g Nothing = Done Nothing
+      g (Just (Loop a)) = Loop (f a)
+      g (Just (Done b)) = Done (Just b)
+    in tailRec g (f a0)</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">forever</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>. MonadRec <var class="sig-var" style="--vc:#1f5fa8">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#2d7a3b">b</var></span><div class="value-body"><span class="name">forever ma</span><span class="sep">=</span><span class="type">tailRecM (\u <span class="g">→</span> Loop u &lt;$ ma) unit</span></div><div class="marginalia"><p class="code-led"><span class="code-cap">forever</span>runs an action indefinitely, using the <code>MonadRec</code> instance to ensure constant stack usage.</p><p>For example:</p><pre class="code-quote"><code>main = forever $ trace &quot;Hello, World!&quot;</code></pre></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">whileJust</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">m</var>. Monoid <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">⇒</span> MonadRec <var class="sig-var" style="--vc:#b35900">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#b35900">m</var> (Maybe <var class="sig-var" style="--vc:#1f5fa8">a</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">m</var> <var class="sig-var" style="--vc:#1f5fa8">a</var></span><pre class="defn-body">whileJust m = mempty # tailRecM \v <span class="g">→</span> m &lt;#&gt; case _ of
+  Nothing <span class="g">→</span> Done v
+  Just x <span class="g">→</span> Loop $ v &lt;&gt; x</pre><div class="marginalia"><p class="can-dropcap">While supplied computation evaluates to <code>Just _</code>, it will be executed repeatedly and results will be combined using monoid instance.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">untilJust</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">m</var>. MonadRec <var class="sig-var" style="--vc:#b35900">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#b35900">m</var> (Maybe <var class="sig-var" style="--vc:#1f5fa8">a</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">m</var> <var class="sig-var" style="--vc:#1f5fa8">a</var></span><pre class="defn-body">untilJust m = unit # tailRecM \_ <span class="g">→</span> m &lt;#&gt; case _ of
+  Nothing <span class="g">→</span> Loop unit
+  Just x <span class="g">→</span> Done x</pre><div class="marginalia"><p class="can-dropcap">Supplied computation will be executed repeatedly until it evaluates to <code>Just value</code> and then that <code>value</code> will be returned.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">loop2</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>. <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> Step { <var class="sig-var" style="--vc:#1f5fa8">a</var> :: <var class="sig-var" style="--vc:#1f5fa8">a</var>, <var class="sig-var" style="--vc:#b35900">b</var> :: <var class="sig-var" style="--vc:#b35900">b</var> } <var class="sig-var" style="--vc:#2d7a3b">c</var></span><div class="value-body"><span class="name">loop2 a b</span><span class="sep">=</span><span class="type">Loop { a, b }</span></div><div class="marginalia"><p class="can-dropcap">A curried version of the <code>Loop</code> constructor, provided as a convenience for use with <code>tailRec2</code> and <code>tailRecM2</code>.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">loop3</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <var class="sig-var" style="--vc:#7e3aa3">d</var>. <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> Step { <var class="sig-var" style="--vc:#1f5fa8">a</var> :: <var class="sig-var" style="--vc:#1f5fa8">a</var>, <var class="sig-var" style="--vc:#b35900">b</var> :: <var class="sig-var" style="--vc:#b35900">b</var>, <var class="sig-var" style="--vc:#2d7a3b">c</var> :: <var class="sig-var" style="--vc:#2d7a3b">c</var> } <var class="sig-var" style="--vc:#7e3aa3">d</var></span><div class="value-body"><span class="name">loop3 a b c</span><span class="sep">=</span><span class="type">Loop { a, b, c }</span></div><div class="marginalia"><p class="can-dropcap">A curried version of the <code>Loop</code> constructor, provided as a convenience for use with <code>tailRec3</code> and <code>tailRecM3</code>.</p></div></section></div><footer class="specimen-foot"><div class="field">module from tailrec v6.1.0</div></footer></article></div>
+  </div>
+  <footer class="book-colophon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; TAILREC</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.47619047619048" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="240" cy="240" r="180.95238095238096" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="240" cy="240" r="176.42857142857144" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="240" cy="240" r="171.9047619047619" fill="#111"/></g>
+</svg>
+    <div class="facts">
+      tailrec v6.1.0 &middot; stable since May 2022<br>
+      1 modules &middot; 19 declarations &middot; 170 lines<br>
+      typeset by specimen &middot; 2026-07-17
+    </div>
+  </footer>
+</main>
+
+<div id="ffi-modal" hidden>
+  <div class="ffi-backdrop"></div>
+  <div class="ffi-card">
+    <header>
+      <span class="ffi-title"></span>
+      <span class="ffi-sub">foreign implementation</span>
+      <nav></nav>
+      <button class="ffi-close" aria-label="close">&#10005;</button>
+    </header>
+    <pre></pre>
+  </div>
+</div>
+
+<script>
+const DATA = [{"name":"Control.Monad.Rec.Class","slug":"Control-Monad-Rec-Class","level":0,"loc":170,"accent":"hsl(0, 58%, 43%)","imports":[],"ax":0.3688,"ay":0.4946,"bx":88.1,"by":40,"rA":65.2,"rB":15,"pack":[{"dx":-18.8,"dy":0.7,"r":27.7},{"dx":30.7,"dy":0.7,"r":20.5},{"dx":12.6,"dy":37.4,"r":19.2},{"dx":11.9,"dy":-30.6,"r":14.7},{"dx":-15.1,"dy":-41.2,"r":12.9},{"dx":-18.6,"dy":40.6,"r":10.8},{"dx":38.8,"dy":-30.9,"r":10.8},{"dx":43.2,"dy":30.8,"r":10.8},{"dx":-39,"dy":-33.7,"r":10.8},{"dx":-38.6,"dy":33.3,"r":9.1},{"dx":4.1,"dy":-54.6,"r":9.1},{"dx":52.9,"dy":-17.8,"r":7.1},{"dx":-7.5,"dy":56.3,"r":7.1},{"dx":28.1,"dy":-45.3,"r":5.8},{"dx":53.5,"dy":16.2,"r":5.8}]}];
+const svg = document.getElementById('stage');
+const NS = 'http://www.w3.org/2000/svg';
+const MORPH = 700;
+const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+const edgeG = document.createElementNS(NS, 'g'); svg.appendChild(edgeG);
+const edges = [];
+for (const d of DATA) for (const i of d.imports) {
+  const e = document.createElementNS(NS, 'path');
+  e.setAttribute('fill', 'none'); e.setAttribute('stroke', '#111');
+  e.setAttribute('stroke-width', '0.6');
+  edgeG.appendChild(e); edges.push({ e, a: d.slug, b: i });
+}
+const gs = {};
+for (const d of DATA) {
+  const a = document.createElementNS(NS, 'a');
+  a.setAttribute('href', '#mod-' + d.slug);
+  const g = document.createElementNS(NS, 'g');
+  const bubble = document.createElementNS(NS, 'circle');   // rail identity (accent)
+  bubble.setAttribute('fill', d.accent); bubble.setAttribute('opacity', '0');
+  g.appendChild(bubble);
+  const ring = document.createElementNS(NS, 'circle');     // banner identity (ink plate)
+  ring.setAttribute('class', 'ring');
+  ring.setAttribute('fill', '#fff'); ring.setAttribute('stroke', '#111');
+  ring.setAttribute('stroke-width', '1.4'); g.appendChild(ring);
+  const inner = document.createElementNS(NS, 'g');
+  for (const p of d.pack) {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', p.dx); c.setAttribute('cy', p.dy); c.setAttribute('r', p.r);
+    c.setAttribute('fill', '#111'); inner.appendChild(c);
+  }
+  g.appendChild(inner);
+  const label = document.createElementNS(NS, 'text');
+  label.textContent = d.name;
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('y', -(d.rA + 9));
+  label.setAttribute('style', 'font-family: Inter, sans-serif; font-size: 10px; letter-spacing: 0.08em; fill: #777; stroke: rgba(250,250,247,0.88); stroke-width: 3px; paint-order: stroke; stroke-linejoin: round;');
+  g.appendChild(label);
+  const t = document.createElementNS(NS, 'title'); t.textContent = d.name; g.appendChild(t);
+  a.appendChild(g); svg.appendChild(a);
+  gs[d.slug] = { g, bubble, ring, inner, label, d };
+}
+
+let active = null;
+const heroEl = document.getElementById('hero-title');
+function layout() {
+  const W = innerWidth, H = innerHeight;
+  const p = ease(Math.min(1, Math.max(0, scrollY / MORPH)));
+  svg.classList.toggle('railed', p > 0.95);
+  const bannerH = H * 0.66;
+  // at rest the banner band sits below the hero block (tall left columns
+  // were overwriting the masthead); the band's top eases back toward the
+  // page top as the morph runs, since layout B's rail already lives there
+  const bandTop = Math.max(90, heroEl.getBoundingClientRect().bottom + 28) * (1 - p) + 90 * p;
+  heroEl.style.opacity = String(Math.max(0, 1 - p * 1.4));
+  // rail column: centred in the left margin, same slot as the-prelude's beeswarm
+  const railLeft = Math.max(12, 0.5 * W - 36 * 16 - 12 * 16);
+  for (const s of Object.values(gs)) {
+    const d = s.d;
+    const axp = d.ax * W, ayp = bandTop + d.ay * (bannerH - 90);
+    const bxp = railLeft + d.bx, byp = 60 + (d.by / 900) * (H - 120);
+    const x = axp + (bxp - axp) * p, y = ayp + (byp - ayp) * p;
+    const r = d.rA + (d.rB - d.rA) * p;
+    s.g.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+    s.ring.setAttribute('r', r);
+    s.inner.setAttribute('transform', 'scale(' + (r / d.rA) + ')');
+    s.inner.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
+    s.label.setAttribute('y', -(r + 9));
+    s.label.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
+    s.bubble.setAttribute('r', r);
+    s.x = x; s.y = y; s.r = r;
+    const isActive = s.d.slug === active;
+    // rail state: coloured bubbles, muted except the active one (the-prelude grammar)
+    const railOn = p > 0.5;
+    s.bubble.setAttribute('opacity', String(railOn ? (isActive || p < 0.95 ? p : 0.35) : 0));
+    s.ring.setAttribute('stroke-width', isActive ? '2.6' : '1.4');
+    s.ring.setAttribute('fill', railOn ? 'none' : '#fff');
+    s.ring.setAttribute('opacity', String(railOn && !isActive ? 0.35 : 1));
+  }
+  for (const { e, a, b } of edges) {
+    const A = gs[a], B = gs[b];
+    e.setAttribute('opacity', String(0.10 * (1 - p) + 0.05 * p));
+    e.setAttribute('d', 'M ' + A.x + ' ' + A.y + ' C ' + (A.x + B.x) / 2 + ' ' + A.y + ', ' + (A.x + B.x) / 2 + ' ' + B.y + ', ' + B.x + ' ' + B.y);
+  }
+}
+
+function spy() {
+  let best = null, bestD = 1e9;
+  for (const sec of document.querySelectorAll('.book-module')) {
+    const d = Math.abs(sec.getBoundingClientRect().top - innerHeight * 0.35);
+    if (d < bestD) { bestD = d; best = sec.id.replace(/^mod-/, ''); }
+  }
+  active = best;
+}
+addEventListener('scroll', () => { spy(); requestAnimationFrame(layout); }, { passive: true });
+addEventListener('resize', () => requestAnimationFrame(layout));
+spy(); layout();
+
+// ── FFI modal ──
+const FFI = {};
+const LANG_NAMES = { javascript: 'JavaScript', erlang: 'Erlang', julia: 'Julia', python: 'Python', go: 'Go' };
+const modal = document.getElementById('ffi-modal');
+const mTitle = modal.querySelector('.ffi-title');
+const mTabs = modal.querySelector('nav');
+const mPre = modal.querySelector('pre');
+function openFfi(slug) {
+  const entry = FFI[slug];
+  if (!entry) return;
+  mTitle.textContent = entry.name;
+  mTabs.innerHTML = '';
+  const langs = Object.keys(entry.langs);
+  const show = lang => {
+    mPre.textContent = entry.langs[lang];
+    for (const b of mTabs.children) b.classList.toggle('on', b.dataset.lang === lang);
+  };
+  for (const lang of langs) {
+    const b = document.createElement('button');
+    b.textContent = LANG_NAMES[lang] ?? lang;
+    b.dataset.lang = lang;
+    b.addEventListener('click', () => show(lang));
+    mTabs.appendChild(b);
+  }
+  show(langs[0]);
+  modal.hidden = false;
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest('.row.kind-foreign[data-ffi]');
+  if (row) { openFfi(row.dataset.ffi); return; }
+  if (e.target.closest('.ffi-close') || e.target.classList.contains('ffi-backdrop')) modal.hidden = true;
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') modal.hidden = true; });
+</script>
+</body>
+</html>
