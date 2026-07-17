@@ -689,6 +689,13 @@ main#specimen {
 .row > .type .sig-stack .sig-station-body {
   white-space: pre-wrap;
 }
+
+/* A station carrying a string literal (Warn/Text compiler messages) is
+ * prose — cap its width so pre-wrap engages and it wraps like a
+ * sentence. Type-geometry stations are never capped; they extend. */
+.sig-station-body.sig-station-prose {
+  max-width: 48ch;
+}
 .row > .type .sig-stack .sig-station-op {
   font-weight: 500;
   letter-spacing: 0.02em;

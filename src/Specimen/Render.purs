@@ -759,8 +759,11 @@ renderStation colors argsStart { body, connector } =
       ConArrow      -> " sig-op-arrow"
       _             -> ""
     boundaryClass = if argsStart then " sig-args-start" else ""
+    -- a station carrying a string literal (Warn/Text messages, Fail
+    -- constraints) is prose, and prose wraps; type geometry never does
+    proseClass = if String.contains (Pattern "\"") body then " sig-station-prose" else ""
   in
-    "<span class=\"sig-station-body" <> boundaryClass <> "\">"
+    "<span class=\"sig-station-body" <> boundaryClass <> proseClass <> "\">"
       <> bodyHtml
       <> "</span>"
       <> "<span class=\"sig-station-op" <> opClass <> boundaryClass <> "\">"
