@@ -1,6 +1,6 @@
 workspace:
   packageSet:
-    registry: 63.2.0
+    registry: 77.13.1
   extraPackages:
     sigil:
       path: /Users/afc/work/afc-work/purescript-hylograph-libs/purescript-sigil
