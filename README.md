@@ -137,7 +137,8 @@ The viewer takes a `?module=` query parameter naming any module under
 ## Making a book
 
 ```bash
-node cli/specimen-site.mjs <package-name | workspace-dir> [-o dir]
+spago bundle -p specimen-site                     # builds cli/specimen-site.js
+node cli/specimen-site.js <package-name | workspace-dir> [-o dir]
 node cli/specimen-shelf.mjs cli/shelf.config.json --sites docs
 ```
 
@@ -145,6 +146,13 @@ node cli/specimen-shelf.mjs cli/shelf.config.json --sites docs
 every module through the pipeline, and writes a self-contained static
 site — plus `banner.svg`, `waxseal.svg` and `book.json` for the shelf
 page to draw from. `docs/` in this repo is the generated shelf.
+
+A registry package is vendored into a throwaway workspace under the temp
+directory and kept between runs. The cache is only trusted when it
+actually carries sources: a `spago fetch` that dies partway leaves an
+empty directory behind, and believing it produces an empty book. If one
+is found, it is cleared and refetched — clearing first, because spago
+consults its own lockfile and will otherwise no-op straight over it.
 
 ## The book's geometry
 
@@ -158,6 +166,11 @@ Everything the identity kit is built from lives in `site/` as the
 | `Site.Pack` | the plates and the waxseal, via Hylograph's circle-pack |
 | `Site.Beeswarm` | the force settle, run once at build time |
 | `Site.Layout` | assembles the above into a laid-out book |
+| `Site.Sources` | resolving a target to source files, and the fetch cache |
+| `Site.Registry` | release history, for the masthead's timeline |
+| `Site.Svg` | the seal, the banner and the sparkline |
+| `Site.Book` | the book page |
+| `Site.Main` | the `specimen-site` command |
 
 **Specimen has no npm dependencies.** The circle-packing comes from
 `DataViz.Layout.Hierarchy.Pack` in `hylograph-layout`, which reproduces
@@ -173,12 +186,19 @@ Specimen-specific idea.
 
 ## Known debt
 
-- `cli/specimen-site.mjs` and `cli/specimen-shelf.mjs` are still
-  JavaScript. They no longer compute anything — layout and typesetting
-  are both PureScript calls now — but page assembly, SVG emission and
-  the filesystem walk still live in JS, and the generated page still
-  carries ~130 lines of inline vanilla JS for the scroll morph and the
-  FFI modal.
+- **`cli/specimen-shelf.mjs` is the last JavaScript** — 229 lines, and
+  the only thing left that assembles markup by concatenation. It ports
+  the way the book generator did: the covers and book cards want the
+  typed-HTML treatment, and the page assembly mirrors `Site.Book`.
+  Everything it needs already exists.
+- **`docs/` is behind the generator.** The published shelf still has the
+  older self-contained pages; regenerating now also emits `book.css` and
+  `book.js` beside each book. Worth doing as one republish once the
+  shelf generator is ported, rather than twice.
+- `cli/assets/book.js` and `shelf.js` are the two browser scripts. The
+  shelf's is compiled from Halogen (`shelf-ui/`); the book's — the
+  scroll morph, the scroll-spy, the FFI modal — is still hand-written
+  JavaScript, and is the obvious next thing to build with Hylograph.
 - Commentary panels are emitted with the `data-panel` wiring but nothing
   toggles them yet; `renderDocument` is deliberately action-free
   (`forall w i`), so opening them needs an action type threaded through.
