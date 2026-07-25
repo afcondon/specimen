@@ -1,0 +1,50 @@
+/* Book-page chrome: the morph banner/rail layer, the colophon, and the
+   FFI modal. Loaded alongside style.css (the typography) and sigil.css.
+
+   Extracted from specimen-site's page template — a generator emitting a
+   stylesheet as a string is a stylesheet nobody can lint, diff or edit. */
+
+/* Long code lines must never widen the page (the specimen grid sizes
+   shared tracks to min-content), but they are also never clipped behind
+   a scrollbar — a line that outruns the measure simply extends into the
+   right margin, visible for close reading. Only the page edge cuts it. */
+body { overflow-x: hidden; }
+.specimen-stack > .row > * { min-width: 0; }
+/* morph banner-nav layer (specimen-site) */
+#stage { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: visible; z-index: 5; pointer-events: none; }
+#stage a { pointer-events: auto; cursor: pointer; }
+#stage circle.ring { transition: stroke-width .2s ease; }
+#hero-title { position: fixed; top: 34px; left: 60px; z-index: 6; pointer-events: none; }
+#hero-title .book-kicker { margin-bottom: 0.5rem; }
+#hero-title .book-title { font-size: 1.9rem; margin: 0 0 0.5rem; }
+#hero-title .book-deck { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); max-width: none; }
+.book-versions { margin-top: 1.1rem; }
+.book-versions .version-spark { display: block; }
+.book-versions p { margin: 0.15rem 0 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); }
+main#book { padding-top: calc(66vh + 220px); }
+.book-colophon { margin: 8rem 0 4rem; text-align: center; }
+.book-colophon svg { width: 300px; height: 300px; }
+.book-colophon .facts { margin-top: 1.4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); line-height: 2; }
+@media (max-width: 1320px) { #stage.railed { opacity: 0; pointer-events: none; } }
+#stage { transition: opacity .3s ease; }
+/* FFI modal: foreign rows with a sidecar implementation are clickable */
+.row.kind-foreign[data-ffi] { cursor: pointer; }
+.row.kind-foreign[data-ffi] > .label::after { content: " · js"; color: var(--accent); }
+.row.kind-foreign[data-ffi]:hover > .label { color: var(--ink); }
+#ffi-modal[hidden] { display: none; }
+#ffi-modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+#ffi-modal .ffi-backdrop { position: absolute; inset: 0; background: rgba(26,26,26,0.35); }
+#ffi-modal .ffi-card { position: relative; background: var(--paper); border: 1px solid var(--ink);
+  width: min(60rem, 92vw); max-height: 82vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+#ffi-modal header { display: flex; align-items: baseline; gap: 1.4rem;
+  padding: 1rem 1.4rem; border-bottom: 1px solid var(--ink); }
+#ffi-modal .ffi-title { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 1rem; }
+#ffi-modal .ffi-sub { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--margin); }
+#ffi-modal nav { margin-left: auto; display: flex; gap: 1rem; }
+#ffi-modal nav button { font: inherit; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em;
+  background: none; border: none; padding: 0; color: var(--margin); cursor: pointer; }
+#ffi-modal nav button.on { color: var(--accent); border-bottom: 1px solid var(--accent); }
+#ffi-modal .ffi-close { font: inherit; background: none; border: none; cursor: pointer; color: var(--margin); font-size: 1rem; }
+#ffi-modal pre { margin: 0; padding: 1.2rem 1.4rem; overflow: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.55; color: var(--ink); }

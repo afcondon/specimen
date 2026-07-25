@@ -75,6 +75,8 @@ render { moduleName, sourceLabel, status } = case status of
       , source: sourceLabel
       , blocks
       , notes: Map.empty
+      -- the viewer has no sidecars to offer
+      , foreignSidecar: Nothing
       }
   where
   notice kind msg =

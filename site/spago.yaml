@@ -2,6 +2,8 @@ package:
   name: specimen-site
   description: "Builds a typeset specimen book for a PureScript package: harvest, layout, and page assembly, all as pure PureScript."
   dependencies:
+    - aff
+    - aff-promise
     - arrays
     - console
     - effect
@@ -22,3 +24,12 @@ package:
     - st
     - strings
     - tuples
+  bundle:
+    module: Specimen.Site.Main
+    outfile: ../cli/specimen-site.js
+    platform: node
+  test:
+    main: Test.Site.Main
+    dependencies:
+      - spec
+      - spec-node

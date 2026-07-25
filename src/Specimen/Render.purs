@@ -21,6 +21,7 @@ module Specimen.Render
 import Prelude
 
 import Data.Array as Array
+import Data.Foldable (foldMap)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -65,17 +66,21 @@ type DocOpts =
   , source :: String
   , blocks :: Array Block
   , notes :: Notes
+  -- | When the module has a foreign implementation alongside it, the key
+  -- | the page's script looks it up by. Foreign rows carry it as
+  -- | `data-ffi`, which is what makes them clickable.
+  , foreignSidecar :: Maybe String
   }
 
 -- | Render the full document.
 renderDocument :: forall w i. DocOpts -> HH.HTML w i
-renderDocument { moduleSlug, source, blocks, notes } =
+renderDocument { moduleSlug, source, blocks, notes, foreignSidecar } =
   HH.article [ cls "specimen-doc" ]
     [ case Array.find isHeader blocks of
         Just (BHeader h) -> renderHeader h
         _ -> renderHeaderFallback moduleSlug
     , HH.div [ cls "specimen-stack" ]
-        (Array.concatMap (renderBlock moduleSlug notes)
+        (Array.concatMap (renderBlock moduleSlug notes foreignSidecar)
           (Array.filter (not <<< isHeader) blocks))
     , renderFoot source
     ]
@@ -190,13 +195,13 @@ startsUpper s = case SCU.charAt 0 s of
 -- ----------------------------------------------------------------------------
 -- Block dispatch
 
-renderBlock :: forall w i. String -> Notes -> Block -> Array (HH.HTML w i)
-renderBlock moduleSlug notes = case _ of
+renderBlock :: forall w i. String -> Notes -> Maybe String -> Block -> Array (HH.HTML w i)
+renderBlock moduleSlug notes sidecar = case _ of
   BHeader _ -> [] -- already rendered above the stack
   BImports is -> [ renderImports is ]
   BClass c -> [ renderClass (note (classKey c.head)) c ]
   BInstance i -> [ renderInstance (note (instanceKey i.head)) i ]
-  BForeign f -> [ renderForeign (note (foreignKey f)) f ]
+  BForeign f -> [ renderForeign sidecar (note (foreignKey f)) f ]
   BValue v -> [ renderValue (note v.name) v ]
   BData d -> [ renderData (note (dataKey d)) d ]
   BTypeAlias t -> [ renderTypeAlias (note ("type " <> t.name)) t ]
@@ -317,9 +322,9 @@ sanitizeId =
 -- ----------------------------------------------------------------------------
 -- Foreign
 
-renderForeign :: forall w i. Array (HH.HTML w i) -> ForeignBlock -> HH.HTML w i
-renderForeign note f =
-  row [ "kind-foreign" ]
+renderForeign :: forall w i. Maybe String -> Array (HH.HTML w i) -> ForeignBlock -> HH.HTML w i
+renderForeign sidecar note f =
+  rowWith [ "kind-foreign" ] (foldMap (\key -> [ HP.attr (HH.AttrName "data-ffi") key ]) sidecar)
     ( [ label (if f.isType then "Foreign Type" else "Foreign")
       , cell "name" [ HH.text f.name ]
       ]
@@ -840,7 +845,16 @@ renderFoot source =
 
 -- | A top-level declaration row in the stack.
 row :: forall w i. Array String -> Array (HH.HTML w i) -> HH.HTML w i
-row kinds = HH.section [ clsx ([ "row" ] <> kinds) ]
+row kinds = rowWith kinds []
+
+-- | A row carrying extra attributes.
+rowWith
+  :: forall r w i
+   . Array String
+  -> Array (HP.IProp (class :: String | r) i)
+  -> Array (HH.HTML w i)
+  -> HH.HTML w i
+rowWith kinds extra = HH.element (HH.ElemName "section") ([ clsx ([ "row" ] <> kinds) ] <> extra)
 
 -- | One of the shared column tracks: `name`, `sep`, `type`, `label`.
 cell :: forall w i. String -> Array (HH.HTML w i) -> HH.HTML w i

@@ -82,6 +82,7 @@ typeset name = do
     , source: "test-fixture"
     , blocks: extractBlocks (glyphify src)
     , notes: Map.empty
+    , foreignSidecar: Nothing
     }
 
 goldenPath :: String -> String
