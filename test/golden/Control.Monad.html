@@ -1,0 +1,210 @@
+<article class="specimen-doc">
+<header class="specimen-head">
+<div class="kicker">PureScript Module</div>
+<h1>Control.Monad</h1>
+<div class="exports">
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Monad</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">lift<wbr/>M1</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">when<wbr/>M</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">unless<wbr/>M</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">ap</span>
+</div>
+<div class="export-cell exp-module">
+<span class="export-kind">Module</span>
+<span class="export-name">Data.Functor</span>
+</div>
+<div class="export-cell exp-module">
+<span class="export-kind">Module</span>
+<span class="export-name">Control.Apply</span>
+</div>
+<div class="export-cell exp-module">
+<span class="export-kind">Module</span>
+<span class="export-name">Control.Applicative</span>
+</div>
+<div class="export-cell exp-module">
+<span class="export-kind">Module</span>
+<span class="export-name">Control.Bind</span>
+</div>
+<div class="export-cell exp-empty">
+</div>
+<div class="export-cell exp-empty">
+</div>
+<div class="export-cell exp-empty">
+</div>
+</div>
+</header>
+<div class="specimen-stack">
+<section class="row kind-imports">
+<span class="label">Imports</span>
+<div class="specimen-imports">
+<span class="kw">import</span>
+<span class="mod">Control.Applicative</span>
+<span class="as">
+</span>
+<span class="list">(class Applicative, liftA1, pure, unless, when)</span>
+<span class="kw">import</span>
+<span class="mod">Control.Apply</span>
+<span class="as">
+</span>
+<span class="list">(class Apply, apply, (*&gt;), (&lt;*), (&lt;*&gt;))</span>
+<span class="kw">import</span>
+<span class="mod">Control.Bind</span>
+<span class="as">
+</span>
+<span class="list">(class Bind, bind, ifM, join, (&lt;=&lt;), (=&lt;&lt;), (&gt;=&gt;), (&gt;&gt;=))</span>
+<span class="kw">import</span>
+<span class="mod">Data.Functor</span>
+<span class="as">
+</span>
+<span class="list">(class Functor, map, void, ($&gt;), (&lt;#&gt;), (&lt;$), (&lt;$&gt;))</span>
+<span class="kw">import</span>
+<span class="mod">Data.Unit</span>
+<span class="as">
+</span>
+<span class="list">(Unit)</span>
+<span class="kw">import</span>
+<span class="mod">Type.Proxy</span>
+<span class="as">
+</span>
+<span class="list">(Proxy)</span>
+</div>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> (Applicative m, Bind m) <span class="g">⇐</span> Monad m</code>
+<div class="marginalia">
+<p class="can-dropcap">The <code>Monad</code> type class combines the operations of the <code>Bind</code> and <code>Applicative</code> type classes. Therefore, <code>Monad</code> instances represent type constructors which support sequential composition, and also lifting of functions of arbitrary arity.</p>
+<p>Instances must satisfy the following laws in addition to the <code>Applicative</code> and <code>Bind</code> laws:</p>
+<div class="laws">
+<div class="law-name">Left Identity</div>
+<div class="law-sep">:</div>
+<div class="law-code">
+<code>`pure x &gt;&gt;= f = f x`</code>
+</div>
+<div class="law-name">Right Identity</div>
+<div class="law-sep">:</div>
+<div class="law-code">
+<code>`x &gt;&gt;= pure = x`</code>
+</div>
+</div>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> monadFn</span>
+<span class="sep">::</span>
+<span class="type">Monad ((<span class="g">→</span>) r)</span>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> monadArray</span>
+<span class="sep">::</span>
+<span class="type">Monad Array</span>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> monadProxy</span>
+<span class="sep">::</span>
+<span class="type">Monad Proxy</span>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">liftM1</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>. Monad <var class="sig-var" style="--vc:#1f5fa8">m</var> <span class="g">⇒</span> (<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>
+</span>
+<pre class="defn-body">liftM1 f a = do
+  a&#39; <span class="g">←</span> a
+  pure (f a&#39;)</pre>
+<div class="marginalia">
+<p class="code-led">
+<span class="code-cap">liftM1</span> provides a default implementation of <code>(&lt;$&gt;)</code> for any <strong>
+<code>Monad</code>
+</strong>, without using <code>(&lt;$&gt;)</code> as provided by the <strong>
+<code>Functor</code>
+</strong>-<strong>
+<code>Monad</code>
+</strong> superclass relationship.</p>
+<p>
+<code>liftM1</code> can therefore be used to write <strong>
+<code>Functor</code>
+</strong> instances as follows:</p>
+<pre class="code-quote">
+<code>instance functorF :: Functor F where
+  map = liftM1</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">whenM</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var>. Monad <var class="sig-var" style="--vc:#1f5fa8">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Boolean <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Unit <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Unit</span>
+<pre class="defn-body">whenM mb m = do
+  b <span class="g">←</span> mb
+  when b m</pre>
+<div class="marginalia">
+<p class="can-dropcap">Perform a monadic action when a condition is true, where the conditional value is also in a monadic context.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">unlessM</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var>. Monad <var class="sig-var" style="--vc:#1f5fa8">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Boolean <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Unit <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> Unit</span>
+<pre class="defn-body">unlessM mb m = do
+  b <span class="g">←</span> mb
+  unless b m</pre>
+<div class="marginalia">
+<p class="can-dropcap">Perform a monadic action unless a condition is true, where the conditional value is also in a monadic context.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">ap</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>. Monad <var class="sig-var" style="--vc:#1f5fa8">m</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> (<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>
+</span>
+<pre class="defn-body">ap f a = do
+  f&#39; <span class="g">←</span> f
+  a&#39; <span class="g">←</span> a
+  pure (f&#39; a&#39;)</pre>
+<div class="marginalia">
+<p class="code-led">
+<span class="code-cap">ap</span> provides a default implementation of <code>(&lt;*&gt;)</code> for any <code>Monad</code>, without using <code>(&lt;*&gt;)</code> as provided by the <code>Apply</code>-<code>Monad</code> superclass relationship.</p>
+<p>
+<code>ap</code> can therefore be used to write <code>Apply</code> instances as follows:</p>
+<pre class="code-quote">
+<code>instance applyF :: Apply F where
+  apply = ap</code>
+</pre>
+<p>Note: Only a <code>Bind</code> constraint is needed, but this can produce loops when used with other default implementations (i.e. <code>liftA1</code>). See https:&#x2F;&#x2F;github.com&#x2F;purescript&#x2F;purescript-prelude&#x2F;issues&#x2F;232</p>
+</div>
+</section>
+</div>
+<footer class="specimen-foot">
+<div class="field">module from test-fixture</div>
+</footer>
+</article>

@@ -1,0 +1,204 @@
+<article class="specimen-doc">
+<header class="specimen-head">
+<div class="kicker">PureScript Module</div>
+<h1>Data.Profunctor.Strong</h1>
+</header>
+<div class="specimen-stack">
+<section class="row kind-imports">
+<span class="label">Imports</span>
+<div class="specimen-imports">
+<span class="kw">import</span>
+<span class="mod">Prelude</span>
+<span class="as">
+</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Data.Profunctor</span>
+<span class="as">
+</span>
+<span class="list">(class Profunctor, lcmap)</span>
+<span class="kw">import</span>
+<span class="mod">Data.Tuple</span>
+<span class="as">
+</span>
+<span class="list">(Tuple(..))</span>
+</div>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> Profunctor p <span class="g">⇐</span> Strong p where</code>
+<div class="class-method">
+<span class="name">first</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>. p <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> p (Tuple <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>) (Tuple <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>)</span>
+</div>
+<div class="class-method">
+<span class="name">second</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>. p <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> p (Tuple <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>) (Tuple <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>)</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">The <code>Strong</code> class extends <code>Profunctor</code> with combinators for working with product types.</p>
+<p>
+<code>first</code> and <code>second</code> lift values in a <code>Profunctor</code> to act on the first and second components of a <code>Tuple</code>, respectively.</p>
+<p>Another way to think about Strong is to piggyback on the intuition of inputs and outputs.  Rewriting the type signature in this light then yields:</p>
+<pre class="code-quote">
+<code>first ::  ∀ input output a. p input output → p (Tuple input a) (Tuple output a)
+second :: ∀ input output a. p input output → p (Tuple a input) (Tuple a output)</code>
+</pre>
+<p>If we specialize the profunctor p to the function arrow, we get the following type signatures, which may look a bit more familiar:</p>
+<pre class="code-quote">
+<code>first ::  ∀ input output a. (input → output) → (Tuple input a) → (Tuple output a)
+second :: ∀ input output a. (input → output) → (Tuple a input) → (Tuple a output)</code>
+</pre>
+<p>So, when the <code>profunctor</code> is <code>Function</code> application, <code>first</code> essentially applies your function to the first element of a <code>Tuple</code>, and <code>second</code> applies it to the second element (same as <code>map</code> would do).</p>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> strongFn</span>
+<span class="sep">::</span>
+<span class="type">Strong (<span class="g">→</span>)<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  first a2b (Tuple a c) = Tuple (a2b a) c
+  second = (&lt;$&gt;)</pre>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">splitStrong</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">c</var> <var class="sig-var" style="--vc:#0e7484">d</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">Semigroupoid <var class="sig-var" style="--vc:#1f5fa8">p</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Strong <var class="sig-var" style="--vc:#1f5fa8">p</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#7e3aa3">c</var> <var class="sig-var" style="--vc:#0e7484">d</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> (Tuple <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#7e3aa3">c</var>) (Tuple <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#0e7484">d</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">splitStrong l r</span>
+<span class="sep">=</span>
+<span class="type">first l &gt;&gt;&gt; second r</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Compose a value acting on a <code>Tuple</code> from two values, each acting on one of the components of the <code>Tuple</code>.</p>
+<p>Specializing <code>(***)</code> to function application would look like this:</p>
+<pre class="code-quote">
+<code>(***) :: ∀ a b c d. (a → b) → (c → d) → (Tuple a c) → (Tuple b d)</code>
+</pre>
+<p>We take two functions, <code>f</code> and <code>g</code>, and we transform them into a single function which takes a <code>Tuple</code> and maps <code>f</code> over the first element and <code>g</code> over the second.  Just like <code>bi-map</code> would do for the <code>bi-functor</code> instance of <code>Tuple</code>.</p>
+</div>
+</section>
+<section class="row kind-operator">
+<span class="label">Operator</span>
+<div class="fixity-line">
+<span class="name">***</span>
+<span class="sep">
+</span>
+<span class="type">
+<span class="kw">infixr 3 </span>splitStrong<span class="kw"> as </span>***</span>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">fanout</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">c</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">Semigroupoid <var class="sig-var" style="--vc:#1f5fa8">p</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Strong <var class="sig-var" style="--vc:#1f5fa8">p</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#7e3aa3">c</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">a</var> (Tuple <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">c</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">fanout l r</span>
+<span class="sep">=</span>
+<span class="type">lcmap (\a <span class="g">→</span> Tuple a a) (l *** r)</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Compose a value which introduces a <code>Tuple</code> from two values, each introducing one side of the <code>Tuple</code>.</p>
+<p>This combinator is useful when assembling values from smaller components, because it provides a way to support two different types of output.</p>
+<p>Specializing <code>(&amp;&amp;&amp;)</code> to function application would look like this:</p>
+<pre class="code-quote">
+<code>(&amp;&amp;&amp;) :: ∀ a b c. (a → b) → (a → c) → (a → (Tuple b c))</code>
+</pre>
+<p>We take two functions, <code>f</code> and <code>g</code>, with the same parameter type and we transform them into a single function which takes one parameter and returns a <code>Tuple</code> of the results of running <code>f</code> and <code>g</code> on the parameter, respectively.  This allows us to run two parallel computations on the same input and return both results in a <code>Tuple</code>.</p>
+</div>
+</section>
+<section class="row kind-operator">
+<span class="label">Operator</span>
+<div class="fixity-line">
+<span class="name">&amp;&amp;&amp;</span>
+<span class="sep">
+</span>
+<span class="type">
+<span class="kw">infixr 3 </span>fanout<span class="kw"> as </span>&amp;&amp;&amp;</span>
+</div>
+</section>
+</div>
+<footer class="specimen-foot">
+<div class="field">module from test-fixture</div>
+</footer>
+</article>

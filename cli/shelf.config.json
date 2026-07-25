@@ -48,12 +48,13 @@
       ]
     },
     {
-      "title": "The Casebook",
+      "title": "House Libraries",
       "color": "#3d3a6e",
-      "blurb": "House libraries, Holmes-themed: Baskerville records why every conclusion holds — facts as proof terms, the derivation DAG as the deliverable — and Mycroft sits sedentary behind an SMT solver, pronouncing on what the observations force. The seam between them (derived versus entailed, and the honest gap between) is the point.",
+      "blurb": "Written here, for work going on here, and published because they turned out to be worth reading. Baskerville records why every conclusion holds — facts as proof terms, the derivation DAG as the deliverable — and Mycroft sits sedentary behind an SMT solver, pronouncing on what the observations force; the seam between them (derived versus entailed, and the honest gap between) is the point. Harmonia works a different bench entirely: functional harmony as a library, where the rules are centuries old and almost never machine-checked.",
       "books": [
         "baskerville",
-        "mycroft"
+        "mycroft",
+        "harmonia"
       ]
     }
   ],
@@ -75,7 +76,8 @@
     "heterogeneous": "Nathan Faubion",
     "yoga-sql-types": "Rowtype Yoga",
     "baskerville": "Andrew Condon",
-    "mycroft": "Andrew Condon"
+    "mycroft": "Andrew Condon",
+    "harmonia": "Andrew Condon"
   },
   "quotes": {
     "prelude": {
@@ -141,6 +143,18 @@
     "yoga-sql-types": {
       "text": "SELECT, well-typed.",
       "source": "The Query Quarterly"
+    },
+    "baskerville": {
+      "text": "Changes its mind, and shows you exactly why.",
+      "source": "The Retraction"
+    },
+    "mycroft": {
+      "text": "Unsatisfiable, and quite content.",
+      "source": "The Diogenes Club Bulletin"
+    },
+    "harmonia": {
+      "text": "Every voice knows where to go.",
+      "source": "The Leading Tone"
     }
   },
   "footnote": "Release timelines show the PureScript registry's record, which begins with the registry itself (2017–18); several of these libraries are older, and legacy re-imports can carry recent timestamps. The quiet stretches are the point — in this ecosystem a library that hasn't changed in years is usually finished, not abandoned."

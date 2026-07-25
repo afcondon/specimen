@@ -5,12 +5,9 @@
   "private": true,
   "scripts": {
     "build": "spago build",
+    "test": "spago test",
     "bundle": "spago bundle",
     "serve": "npx http-server public -p 3007 -c-1 --cors",
     "site": "node cli/specimen-site.mjs"
-  },
-  "dependencies": {
-    "d3-force": "^3.0.0",
-    "d3-hierarchy": "^3.1.2"
   }
 }

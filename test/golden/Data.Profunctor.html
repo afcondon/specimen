@@ -1,0 +1,177 @@
+<article class="specimen-doc">
+<header class="specimen-head">
+<div class="kicker">PureScript Module</div>
+<h1>Data.Profunctor</h1>
+</header>
+<div class="specimen-stack">
+<section class="row kind-imports">
+<span class="label">Imports</span>
+<div class="specimen-imports">
+<span class="kw">import</span>
+<span class="mod">Prelude</span>
+<span class="as">
+</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Data.Newtype</span>
+<span class="as">
+</span>
+<span class="list">(class Newtype, wrap, unwrap)</span>
+</div>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> Profunctor p where</code>
+<div class="class-method">
+<span class="name">dimap</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <var class="sig-var" style="--vc:#7e3aa3">d</var>. (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var>) <span class="g">→</span> (<var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">d</var>) <span class="g">→</span> p <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> p <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#7e3aa3">d</var>
+</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">A <code>Profunctor</code> is a <code>Functor</code> from the pair category <code>(Type^op, Type)</code> to <code>Type</code>.</p>
+<p>In other words, a <code>Profunctor</code> is a type constructor of two type arguments, which is contravariant in its first argument and covariant in its second argument.</p>
+<p>The <code>dimap</code> function can be used to map functions over both arguments simultaneously.</p>
+<p>A straightforward example of a profunctor is the function arrow <code>(→)</code>.</p>
+<p>Laws:</p>
+<div class="laws">
+<div class="law-name">Identity</div>
+<div class="law-sep">:</div>
+<div class="law-code">
+<code>`dimap identity identity = identity`</code>
+</div>
+<div class="law-name">Composition</div>
+<div class="law-sep">:</div>
+<div class="law-code">
+<code>`dimap f1 g1 &lt;&lt;&lt; dimap f2 g2 = dimap (f1 &gt;&gt;&gt; f2) (g1 &lt;&lt;&lt; g2)`</code>
+</div>
+</div>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">lcmap</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <var class="sig-var" style="--vc:#7e3aa3">p</var>. Profunctor <var class="sig-var" style="--vc:#7e3aa3">p</var> <span class="g">⇒</span> (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">p</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">p</var> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>
+</span>
+<div class="value-body">
+<span class="name">lcmap a2b</span>
+<span class="sep">=</span>
+<span class="type">dimap a2b identity</span>
+</div>
+<div class="marginalia marginalia-compact">
+<p class="can-dropcap">Map a function over the (contravariant) first type argument only.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">rmap</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">c</var> <var class="sig-var" style="--vc:#7e3aa3">p</var>. Profunctor <var class="sig-var" style="--vc:#7e3aa3">p</var> <span class="g">⇒</span> (<var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">c</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">p</var> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7e3aa3">p</var> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#2d7a3b">c</var>
+</span>
+<div class="value-body">
+<span class="name">rmap b2c</span>
+<span class="sep">=</span>
+<span class="type">dimap identity b2c</span>
+</div>
+<div class="marginalia marginalia-compact">
+<p class="can-dropcap">Map a function over the (covariant) second type argument only.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">arr</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var> <var class="sig-var" style="--vc:#2d7a3b">p</var>. Category <var class="sig-var" style="--vc:#2d7a3b">p</var> <span class="g">⇒</span> Profunctor <var class="sig-var" style="--vc:#2d7a3b">p</var> <span class="g">⇒</span> (<var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">b</var>) <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">p</var> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">b</var>
+</span>
+<div class="value-body">
+<span class="name">arr f</span>
+<span class="sep">=</span>
+<span class="type">rmap f identity</span>
+</div>
+<div class="marginalia marginalia-compact">
+<p class="can-dropcap">Lift a pure function into any <code>Profunctor</code> which is also a <code>Category</code>.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">unwrapIso</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#2d7a3b">a</var>. Profunctor <var class="sig-var" style="--vc:#1f5fa8">p</var> <span class="g">⇒</span> Newtype <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#2d7a3b">a</var> <span class="g">⇒</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#b35900">t</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#2d7a3b">a</var> <var class="sig-var" style="--vc:#2d7a3b">a</var>
+</span>
+<div class="value-body">
+<span class="name">unwrapIso</span>
+<span class="sep">=</span>
+<span class="type">dimap wrap unwrap</span>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">wrapIso</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#2d7a3b">a</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">Profunctor <var class="sig-var" style="--vc:#1f5fa8">p</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Newtype <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#2d7a3b">a</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">(<var class="sig-var" style="--vc:#2d7a3b">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#b35900">t</var>)</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#2d7a3b">a</var> <var class="sig-var" style="--vc:#2d7a3b">a</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">p</var> <var class="sig-var" style="--vc:#b35900">t</var> <var class="sig-var" style="--vc:#b35900">t</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">wrapIso _</span>
+<span class="sep">=</span>
+<span class="type">dimap unwrap wrap</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> profunctorFn</span>
+<span class="sep">::</span>
+<span class="type">Profunctor (<span class="g">→</span>)<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">dimap a2b c2d b2c</span>
+<span class="sep">=</span>
+<span class="type">a2b &gt;&gt;&gt; b2c &gt;&gt;&gt; c2d</span>
+</div>
+</section>
+</div>
+<footer class="specimen-foot">
+<div class="field">module from test-fixture</div>
+</footer>
+</article>

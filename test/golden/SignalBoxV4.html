@@ -1,0 +1,80 @@
+<article class="specimen-doc">
+<header class="specimen-head">
+<div class="kicker">PureScript Module</div>
+<h1>SignalBoxV4</h1>
+<div class="exports">
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">make</span>
+</div>
+<div class="export-cell exp-type">
+<span class="export-kind">Type</span>
+<span class="export-name">State</span>
+</div>
+<div class="export-cell exp-empty">
+</div>
+<div class="export-cell exp-empty">
+</div>
+</div>
+</header>
+<div class="specimen-stack">
+<section class="row kind-data kind-newtype">
+<span class="label">Newtype</span>
+<span class="name">
+<span class="kw">newtype </span>State</span>
+<div class="ctor-line">
+<span class="ctor-sep">=</span>
+<span class="ctor-body">
+<span class="ctor-name">State</span>
+</span>
+</div>
+<pre class="defn-body">  { locked :: Locked
+  , p1 :: PointsPos, p2 :: PointsPos
+  , t1 :: Maybe SegmentId, t2 :: Maybe SegmentId
+  }</pre>
+<div class="marginalia">
+<p class="can-dropcap">v4: parse, don&#39;t validate. The remaining failure families tie routes to occupancy. So the type is opaque and the only door is total.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">make</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">Locked</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">PointsPos</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">PointsPos</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Maybe SegmentId</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Maybe SegmentId</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Either (Array Violation) State</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">make locked p1 p2 t1 t2</span>
+<span class="sep">=</span>
+<span class="type">validate (State { locked, p1, p2, t1, t2 })</span>
+</div>
+</section>
+</div>
+<footer class="specimen-foot">
+<div class="field">module from test-fixture</div>
+</footer>
+</article>

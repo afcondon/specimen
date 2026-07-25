@@ -1,27 +1,28 @@
+-- | Signature analysis: where a type breaks, which variables it binds,
+-- | and what colour each of those gets. Purely structural — nothing
+-- | here knows about HTML. `Specimen.Html` turns the results into
+-- | markup.
 module Specimen.Sig
   ( Station
   , Connector(..)
   , segmentSig
   , forallVars
   , assignColors
-  , colorize
   , shouldStack
   , palette
+  , isIdentChar
   ) where
 
 import Prelude
 
 import Data.Array as Array
 import Data.Char as Char
-import Data.Either (Either(..))
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String as String
 import Data.String.CodeUnits as SCU
 import Data.String.Pattern (Pattern(..))
-import Data.String.Regex (regex, replace')
-import Data.String.Regex.Flags (global)
 import Data.Tuple (Tuple(..))
 
 data Connector
@@ -191,33 +192,3 @@ walkSegments input = go [] [] 0 (SCU.toCharArray input)
   flush acc cur conn tail depth =
     let body = String.trim (SCU.fromCharArray cur)
     in go (Array.snoc acc { body, connector: conn }) [] depth tail
-
--- ----------------------------------------------------------------------------
--- Colorizer
-
--- | Wrap each occurrence of a known type variable in `<var class="sig-var"
--- | style="--vc:COLOR">…</var>`. Uses a single pass over the input via
--- | `replace'` with an alternation regex so we never match inside our
--- | own emitted markup.
--- |
--- | Boundary uses lookbehind/lookahead on `[A-Za-z0-9_']` so type-vars
--- | with apostrophes (`r'`) round-trip correctly; vanilla `\b` would
--- | break them apart.
-colorize :: Map String String -> String -> String
-colorize colors str
-  | Map.isEmpty colors = str
-  | otherwise =
-      let
-        names = Array.fromFoldable (Map.keys colors)
-        alts = String.joinWith "|" names
-        pat = "(?<![A-Za-z0-9_'])(" <> alts <> ")(?![A-Za-z0-9_'])"
-      in case regex pat global of
-        Left _ -> str
-        Right r -> replace' r wrap str
-  where
-  wrap matched _ = case Map.lookup matched colors of
-    Just color ->
-      "<var class=\"sig-var\" style=\"--vc:"
-        <> color
-        <> "\">" <> matched <> "</var>"
-    Nothing -> matched

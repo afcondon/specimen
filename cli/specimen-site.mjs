@@ -28,8 +28,6 @@ import { join, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { hierarchy, pack } from 'd3-hierarchy';
-import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SPECIMEN = resolve(HERE, '..');
@@ -38,7 +36,9 @@ const ASSETS = join(HERE, 'assets');   // vendored book stylesheet (canonical co
 
 const { glyphify } = await import(OUTPUT + '/Specimen.Preprocess/index.js');
 const { extractBlocks } = await import(OUTPUT + '/Specimen.Block/index.js');
-const { renderDocument } = await import(OUTPUT + '/Specimen.Render/index.js');
+const { renderDocumentHtml: renderDocument } = await import(OUTPUT + '/Specimen.Render/index.js');
+const { moduleName } = await import(OUTPUT + '/Specimen.Site.Harvest/index.js');
+const { fromSources } = await import(OUTPUT + '/Specimen.Site.Layout/index.js');
 const M = await import(OUTPUT + '/Data.Map.Internal/index.js');
 
 // ── args ──────────────────────────────────────────────────────────────────
@@ -162,105 +162,27 @@ const versionsBlock = releases ? `
 const title = opt('--title') ?? pkg.name;
 const outDir = resolve(opt('--out', '-o') ?? join('site', pkg.name));
 
-// ── harvest ───────────────────────────────────────────────────────────────
-const mods = pkg.files.map(p => {
-  const src = readFileSync(p, 'utf8');
-  const lines = src.split('\n');
-  const nameM = src.match(/^module\s+([\w.]+)/m);
-  if (!nameM) return null;
-  const name = nameM[1];
-  // top-level anchors for the mini-packs: col-0 code lines, sig+equations merged
-  const anchors = [];
-  lines.forEach((l, i) => {
-    if (/^[a-zA-Z(]/.test(l) && !/^(module|import)\b/.test(l)) {
-      const id = (l.match(/^\(?([\w']+)/) || [, l.slice(0, 8)])[1];
-      anchors.push({ id, line: i });
-    }
-  });
-  const decls = [];
-  for (const a of anchors) {
-    const last = decls[decls.length - 1];
-    if (last && last.id === a.id) continue;
-    decls.push({ id: a.id, line: a.line });
-  }
-  decls.forEach((d, i) => {
-    const end = i + 1 < decls.length ? decls[i + 1].line : lines.length;
-    d.span = Math.max(1, end - d.line);
-  });
-  const imports = [...src.matchAll(/^import\s+([\w.]+)/gm)].map(m => m[1]);
-  const loc = lines.filter(l => l.trim() !== '').length;
-  // FFI sidecars, keyed by language; only JavaScript ships in registry
-  // tarballs today — erlang/julia/python/go slots await the polyglot backends
+// ── harvest + layout ────────────────────────────────────────────────────
+// Everything from here to the positions on the page is PureScript:
+// Specimen.Site.Harvest reads each module's shape, Specimen.Site.Layout
+// layers the import graph, packs the plates (Hylograph's circle-pack),
+// and settles the two swarm arrangements. See site/src/Specimen/Site/.
+const sources = pkg.files.map(p => readFileSync(p, 'utf8'));
+const book = fromSources(sources);
+const maxLevel = book.maxLevel;
+
+// FFI sidecars, keyed by module; only JavaScript ships in registry
+// tarballs today — erlang/julia/python/go slots await the polyglot backends
+const ffiByModule = new Map();
+for (const p of pkg.files) {
   const jsPath = p.replace(/\.purs$/, '.js');
-  const ffi = existsSync(jsPath) ? { javascript: readFileSync(jsPath, 'utf8') } : null;
-  return { name, src, loc, decls, imports, ffi };
-}).filter(Boolean);
-
-const known = new Set(mods.map(m => m.name));
-// in-scope edges only; edges into a bare re-export module named `Prelude`
-// are dropped (they invert the layering — the umbrella belongs at the top)
-mods.forEach(m => {
-  m.imports = m.imports.filter(i => known.has(i) && i !== m.name && i !== 'Prelude');
-});
-
-// ── topological layers (longest path from the leaves) ────────────────────
-const byName = new Map(mods.map(m => [m.name, m]));
-const level = new Map();
-const depth = m => {
-  if (level.has(m.name)) return level.get(m.name);
-  level.set(m.name, 0); // cycle guard
-  const d = m.imports.length ? 1 + Math.max(...m.imports.map(i => depth(byName.get(i)))) : 0;
-  level.set(m.name, d);
-  return d;
-};
-mods.forEach(depth);
-// umbrella module named exactly like a re-export target sits last anyway via layers
-const maxLevel = Math.max(...level.values());
-mods.forEach(m => { m.level = level.get(m.name); });
-mods.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-
-// accents: hue spread 0–300°, same grammar as the-prelude
-const accentFor = i => `hsl(${mods.length <= 1 ? 0 : Math.round(i * 300 / (mods.length - 1))}, 58%, 43%)`;
-mods.forEach((m, i) => { m.accent = accentFor(i); });
-
-// ── mini-packs + two layouts ──────────────────────────────────────────────
-const KA = mods.length < 12 ? 5.0 : 3.4;   // small books get bigger plates
-for (const m of mods) {
-  m.rA = Math.max(6, KA * Math.sqrt(m.loc));
-  m.rB = Math.max(3.5, 1.15 * Math.sqrt(m.loc));
-  const h = hierarchy({ children: m.decls }).sum(d => d.span ?? 0).sort((a, b) => b.value - a.value);
-  pack().size([2 * m.rA, 2 * m.rA]).padding(1.4)(h);
-  m.pack = h.leaves().map(l => ({
-    dx: +(l.x - m.rA).toFixed(1), dy: +(l.y - m.rA).toFixed(1), r: +l.r.toFixed(1) }));
+  if (!existsSync(jsPath)) continue;
+  const name = moduleName(readFileSync(p, 'utf8'));
+  if (name) ffiByModule.set(name, { javascript: readFileSync(jsPath, 'utf8') });
 }
 
-// layout A: horizontal banner, normalised 0..1
-{
-  // small books don't get the full spread — clamp the band and centre it,
-  // so a 3-module package reads as a group, not three lonely islands
-  const AW = 1600, AH = 560;
-  const span = Math.min(AW - 180, Math.max(420, maxLevel * 300, Math.sqrt(mods.length) * 340));
-  const AM = (AW - span) / 2, ADX = maxLevel ? span / maxLevel : 0;
-  const nodes = mods.map(m => ({ m, x: AM + m.level * ADX, y: AH / 2 + Math.sin(m.name.length * 7.3) * 150 }));
-  forceSimulation(nodes)
-    .force('x', forceX(n => AM + n.m.level * ADX).strength(0.7))
-    .force('y', forceY(AH / 2).strength(0.055))
-    .force('c', forceCollide(n => n.m.rA + 7).iterations(4))
-    .stop().tick(600);
-  for (const n of nodes) { n.m.ax = +(n.x / AW).toFixed(4); n.m.ay = +(n.y / AH).toFixed(4); }
-}
-
-// layout B: vertical rail, px within a 176px (11rem) column
-{
-  const BW = 176, BH = 900, BM = 40, BDY = maxLevel ? (BH - 2 * BM) / maxLevel : 0;
-  const nodes = mods.map(m => ({ m, x: BW / 2 + Math.sin(m.name.length * 3.1) * 30, y: BM + m.level * BDY }));
-  forceSimulation(nodes)
-    .force('y', forceY(n => BM + n.m.level * BDY).strength(0.85))
-    .force('x', forceX(BW / 2).strength(0.08))
-    .force('c', forceCollide(n => n.m.rB + 2.5).iterations(4))
-    .stop().tick(600);
-  for (const n of nodes) { n.m.bx = +n.x.toFixed(1); n.m.by = +n.y.toFixed(1); }
-}
+const mods = book.modules.map(m => ({ ...m, src: m.source, ffi: ffiByModule.get(m.name) ?? null }));
+const bySlug = new Map(mods.map(m => [m.slug, m]));
 
 // ── render articles ───────────────────────────────────────────────────────
 const slug = s => s.replace(/\./g, '-');
@@ -284,39 +206,15 @@ const ffiPayload = Object.fromEntries(
   mods.filter(m => m.ffi).map(m => [slug(m.name), { name: m.name, langs: m.ffi }]));
 
 // ── waxseal (B-ink) ───────────────────────────────────────────────────────
+// The namespace pack comes from Specimen.Site.Pack (Hylograph's
+// circle-pack); this only draws it.
 function waxseal() {
-  const root = { name: pkg.name, children: [] };
-  for (const m of mods) {
-    let node = root;
-    for (const part of m.name.split('.')) {
-      let child = (node.children ??= []).find(c => c.name === part);
-      if (!child) { child = { name: part }; node.children.push(child); }
-      node = child;
-    }
-    node.loc = m.loc;
-  }
-  // a module that is also a namespace parent (Effect.Aff with Effect.Aff.*
-  // children) must contribute a drawable leaf, not just weight on a container
-  const hoist = node => {
-    if (node.children) {
-      if (node.loc != null) {
-        node.children.push({ name: node.name + ' (self)', loc: node.loc });
-        delete node.loc;
-      }
-      node.children.forEach(hoist);
-    }
-  };
-  hoist(root);
-  const R = 240, PACK_R = 190;
-  const h = hierarchy(root).sum(d => d.loc ?? 0).sort((a, b) => b.value - a.value);
-  pack().size([PACK_R * 2, PACK_R * 2]).padding(5)(h);
-  const off = R - PACK_R;
+  const R = 240, PACK_R = 190, off = R - PACK_R;
   let body = '';
-  for (const n of h.descendants()) {
-    if (n.depth === 0) continue;
-    body += n.children
-      ? `<circle cx="${n.x + off}" cy="${n.y + off}" r="${n.r}" fill="none" stroke="#111" stroke-width="1.3"/>`
-      : `<circle cx="${n.x + off}" cy="${n.y + off}" r="${n.r}" fill="#111"/>`;
+  for (const c of book.seal) {
+    body += c.container
+      ? `<circle cx="${c.x + off}" cy="${c.y + off}" r="${c.r}" fill="none" stroke="#111" stroke-width="1.3"/>`
+      : `<circle cx="${c.x + off}" cy="${c.y + off}" r="${c.r}" fill="#111"/>`;
   }
   const inscription = `PURESCRIPT &#183; ${pkg.name.toUpperCase().replace(/-/g, ' ')}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${2 * R} ${2 * R}" width="${2 * R}" height="${2 * R}">
@@ -335,10 +233,10 @@ const sealSvg = waxseal();
 
 // ── payload for the morph ─────────────────────────────────────────────────
 const data = mods.map(m => ({
-  name: m.name, slug: slug(m.name), level: m.level, loc: m.loc, accent: m.accent,
-  imports: m.imports.map(slug),
+  name: m.name, slug: m.slug, level: m.level, loc: m.loc, accent: m.accent,
+  imports: m.imports,
   ax: m.ax, ay: m.ay, bx: m.bx, by: m.by, rA: +m.rA.toFixed(1), rB: +m.rB.toFixed(1),
-  pack: m.pack,
+  pack: m.plate,
 }));
 
 // ── assemble page ─────────────────────────────────────────────────────────
@@ -592,7 +490,8 @@ for (const f of ['style.css', 'sigil.css']) cpSync(join(ASSETS, f), join(outDir,
   const px = m => ({ x: m.ax * BW, y: TOP + m.ay * (BH - 2 * TOP) });
   let svgEdges = '';
   for (const m of mods) for (const i of m.imports) {
-    const a = px(m), b = px(byName.get(i));
+    const target = bySlug.get(i); if (!target) continue;
+    const a = px(m), b = px(target);
     svgEdges += `<path d="M ${a.x.toFixed(1)} ${a.y.toFixed(1)} C ${((a.x + b.x) / 2).toFixed(1)} ${a.y.toFixed(1)}, ${((a.x + b.x) / 2).toFixed(1)} ${b.y.toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}" fill="none" stroke="#111" stroke-width="0.6" opacity="0.10"/>`;
   }
   let svgNodes = '';
@@ -601,7 +500,7 @@ for (const f of ['style.css', 'sigil.css']) cpSync(join(ASSETS, f), join(outDir,
     const { x, y } = px(m);
     svgNodes += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})">
       <circle r="${m.rA.toFixed(1)}" fill="#fff" stroke="#111" stroke-width="1.5"/>
-      ${m.pack.map(p => `<circle cx="${p.dx}" cy="${p.dy}" r="${p.r}" fill="#111"/>`).join('')}
+      ${m.plate.map(p => `<circle cx="${p.dx}" cy="${p.dy}" r="${p.r}" fill="#111"/>`).join('')}
       <text y="${-(m.rA + 10).toFixed(1)}" text-anchor="middle" font-family="Inter, sans-serif" font-size="${labelFs}" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${m.name}</text>
     </g>`;
   }

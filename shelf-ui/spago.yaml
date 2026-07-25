@@ -1,0 +1,18 @@
+package:
+  name: specimen-shelf-ui
+  description: "Progressive enhancement for the shelf index: a Halogen island that turns the server-rendered shelf sections into tabs."
+  dependencies:
+    - aff
+    - arrays
+    - console
+    - effect
+    - halogen
+    - hylograph-halogen-ui
+    - maybe
+    - prelude
+    - web-dom
+    - web-html
+  bundle:
+    module: Specimen.Shelf.Main
+    outfile: ../cli/assets/shelf.js
+    platform: browser

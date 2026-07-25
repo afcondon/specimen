@@ -16,3 +16,6 @@ spago.lock
 # OS
 .DS_Store
 .direnv/
+
+# spec-node run cache
+.spec-results

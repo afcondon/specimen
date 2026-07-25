@@ -1,0 +1,24 @@
+package:
+  name: specimen-site
+  description: "Builds a typeset specimen book for a PureScript package: harvest, layout, and page assembly, all as pure PureScript."
+  dependencies:
+    - arrays
+    - console
+    - effect
+    - foldable-traversable
+    - halogen
+    - halogen-vdom-string-renderer
+    - hylograph-layout
+    - integers
+    - maybe
+    - node-buffer
+    - node-fs
+    - node-path
+    - node-process
+    - numbers
+    - ordered-collections
+    - prelude
+    - specimen
+    - st
+    - strings
+    - tuples

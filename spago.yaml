@@ -2,29 +2,40 @@ workspace:
   packageSet:
     registry: 77.13.1
   extraPackages:
-    sigil:
-      path: /Users/afc/work/afc-work/purescript-hylograph-libs/purescript-sigil
+    hylograph-layout: "0.3.0"
+    hylograph-halogen-ui:
+      path: /Users/afc/work/afc-work/purescript-hylograph-halogen-ui
 
 package:
   name: specimen
-  description: "Typesets a single PureScript module as a Swiss-poster-quality printed specimen via Sigil — alignment passes, ornament layer."
+  description: "Typesets a PureScript module as a printed-quality specimen — block classification, alignment passes, ornament layer, rendered as Halogen HTML."
   dependencies:
     - aff
     - aff-promise
     - arrays
     - console
     - effect
+    - either
+    - exceptions
     - foldable-traversable
+    - halogen
+    - halogen-vdom-string-renderer
     - language-cst-parser
     - maybe
     - nullable
     - ordered-collections
     - prelude
-    - sigil
     - strings
     - tuples
     - web-dom
     - web-html
+  test:
+    main: Test.Main
+    dependencies:
+      - node-fs
+      - node-process
+      - spec
+      - spec-node
   bundle:
     module: Specimen.Main
     outfile: public/bundle.js

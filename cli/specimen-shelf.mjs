@@ -10,8 +10,11 @@
 // in for the bird — a review pullquote, and its Minard banner plate.
 // All release timelines are drawn on ONE shared time scale.
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { readFileSync, writeFileSync, existsSync, cpSync } from 'node:fs';
+import { join, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ASSETS = join(dirname(fileURLToPath(import.meta.url)), 'assets');
 
 const argv = process.argv.slice(2);
 if (argv.length === 0) {
@@ -71,7 +74,10 @@ const sealDevice = svg => svg
 // up top, title + author on the cream, the seal in the publisher's oval
 const cover = (name, color) => {
   const { meta, seal } = books.get(name);
-  const t = meta.name;
+  // The cover shows the book's title, which is only the package name
+  // when nothing better was given: a book built with --title (a house
+  // library, say, whose repo name isn't its name) carries that instead.
+  const t = meta.title ?? meta.name;
   const fs = t.length <= 8 ? '1.32rem' : t.length <= 15 ? '1.02rem' : '0.82rem';
   return `
     <div class="cover" style="--band: ${color}">
@@ -100,7 +106,7 @@ const bookCard = (name, color) => {
           ${q ? `<blockquote>&ldquo;${esc(q.text)}&rdquo;</blockquote>
           <div class="pullsrc">&mdash; <em>${esc(q.source)}</em></div>` : ''}
           <div class="meta">
-            <span class="bfacts">v${esc(meta.version)} &middot; ${meta.modules} modules &middot; ${meta.decls} declarations &middot; ${meta.loc} lines</span>
+            <span class="bfacts">${meta.version === 'local' ? '' : 'v' + esc(meta.version) + ' &middot; '}${meta.modules} modules &middot; ${meta.decls} declarations &middot; ${meta.loc} lines</span>
             <span class="bspark">${sparkline(meta.releases)}<span class="bstab">${stability}</span></span>
           </div>
         </div>
@@ -109,8 +115,12 @@ const bookCard = (name, color) => {
     </div>`;
 };
 
+// A shelf's key ties its <section> to its tab. Derived from the title so
+// the config doesn't have to carry one.
+const shelfKey = shelf => shelf.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 const shelfSection = shelf => `
-  <section class="shelf">
+  <section class="shelf" data-shelf="${shelfKey(shelf)}">
     <h2>${esc(shelf.title)}</h2>
     <p class="blurb">${esc(shelf.blurb)}</p>
     ${shelf.books.map(b => bookCard(b, shelf.color ?? '#1a1a1a')).join('\n')}
@@ -199,13 +209,21 @@ const page = `<!DOCTYPE html>
   <h1>${esc(config.title)}</h1>
   <p class="deck">${esc(config.deck)}</p>
   <p class="scale-note">All release timelines drawn to one scale &middot; ${y0} &ndash; today</p>
+  <div id="shelf-tabs" class="shelf-tabs"></div>
   ${config.shelves.map(shelfSection).join('\n')}
   <p class="footnote">${esc(config.footnote)}</p>
   <p class="colophon">Typeset by <a href="https://github.com/afcondon/specimen" style="color:inherit">specimen</a> &middot; ${new Date().toISOString().slice(0, 10)}</p>
 </main>
+<script type="application/json" id="shelf-index">${JSON.stringify(
+  config.shelves.map(sh => ({ key: shelfKey(sh), label: sh.title, color: sh.color ?? '#1a1a1a' }))
+).replace(/</g, '\\u003c')}</script>
+<script type="module" src="shelf.js"></script>
 </body>
 </html>
 `;
 
 writeFileSync(outFile, page);
+// The tab bar is progressive enhancement: without this bundle every
+// shelf simply stays visible, which is how the document is served.
+cpSync(join(ASSETS, 'shelf.js'), join(dirname(outFile), 'shelf.js'));
 console.log(`${books.size} books on ${config.shelves.length} shelves → ${outFile}`);

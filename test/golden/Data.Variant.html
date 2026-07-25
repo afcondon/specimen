@@ -1,0 +1,1554 @@
+<article class="specimen-doc">
+<header class="specimen-head">
+<div class="kicker">PureScript Module</div>
+<h1>Data.Variant</h1>
+<div class="exports">
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Variant<wbr/>Eqs</span>
+</div>
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Variant<wbr/>Ords</span>
+</div>
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Variant<wbr/>Shows</span>
+</div>
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Variant<wbr/>Bounded</span>
+</div>
+<div class="export-cell exp-class">
+<span class="export-kind">Class</span>
+<span class="export-name">Variant<wbr/>Bounded<wbr/>Enums</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">inj</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">prj</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">on</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">on<wbr/>Match</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">over</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">over<wbr/>One</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">over<wbr/>Some</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">case_<wbr/>
+</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">match</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">default</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">traverse</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">traverse<wbr/>One</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">traverse<wbr/>Some</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">expand</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">contract</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">unvariant</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">revariant</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">variant<wbr/>Eqs</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">variant<wbr/>Ords</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">variant<wbr/>Shows</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">variant<wbr/>Bounded</span>
+</div>
+<div class="export-cell exp-value">
+<span class="export-kind">Function</span>
+<span class="export-name">variant<wbr/>Bounded<wbr/>Enums</span>
+</div>
+<div class="export-cell exp-module">
+<span class="export-kind">Module</span>
+<span class="export-name">Exports</span>
+</div>
+<div class="export-cell exp-type">
+<span class="export-kind">Type</span>
+<span class="export-name">Variant</span>
+</div>
+<div class="export-cell exp-type">
+<span class="export-kind">Type</span>
+<span class="export-name">Unvariant(..)</span>
+</div>
+<div class="export-cell exp-type">
+<span class="export-kind">Type</span>
+<span class="export-name">Unvariant&#39;</span>
+</div>
+<div class="export-cell exp-empty">
+</div>
+</div>
+</header>
+<div class="specimen-stack">
+<section class="row kind-imports">
+<span class="label">Imports</span>
+<div class="specimen-imports">
+<span class="kw">import</span>
+<span class="mod">Prelude</span>
+<span class="as">
+</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Control.Alternative</span>
+<span class="as">
+</span>
+<span class="list">(empty, class Alternative)</span>
+<span class="kw">import</span>
+<span class="mod">Data.Enum</span>
+<span class="as">
+</span>
+<span class="list">(class Enum, pred, succ, class BoundedEnum, Cardinality(..), fromEnum, toEnum, cardinality)</span>
+<span class="kw">import</span>
+<span class="mod">Data.List</span>
+<span class="as">as L</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Data.Maybe</span>
+<span class="as">
+</span>
+<span class="list">(Maybe)</span>
+<span class="kw">import</span>
+<span class="mod">Data.Symbol</span>
+<span class="as">
+</span>
+<span class="list">(class IsSymbol, reflectSymbol)</span>
+<span class="kw">import</span>
+<span class="mod">Data.Variant.Internal</span>
+<span class="as">as Exports</span>
+<span class="list">(class Contractable, class VariantMapCases, class VariantMatchCases, class VariantTraverseCases)</span>
+<span class="kw">import</span>
+<span class="mod">Data.Variant.Internal</span>
+<span class="as">
+</span>
+<span class="list">(class Contractable, class VariantMapCases, class VariantMatchCases, class VariantTags, class VariantTraverseCases, BoundedDict, BoundedEnumDict, VariantCase, VariantRep(..), contractWith, lookup, lookupCardinality, lookupEq, lookupFirst, lookupFromEnum, lookupLast, lookupOrd, lookupPred, lookupSucc, lookupToEnum, unsafeGet, unsafeHas, variantTags)</span>
+<span class="kw">import</span>
+<span class="mod">Partial.Unsafe</span>
+<span class="as">
+</span>
+<span class="list">(unsafeCrashWith)</span>
+<span class="kw">import</span>
+<span class="mod">Prim.Row</span>
+<span class="as">as R</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Prim.RowList</span>
+<span class="as">as RL</span>
+<span class="list">
+</span>
+<span class="kw">import</span>
+<span class="mod">Type.Proxy</span>
+<span class="as">
+</span>
+<span class="list">(Proxy(..))</span>
+<span class="kw">import</span>
+<span class="mod">Unsafe.Coerce</span>
+<span class="as">
+</span>
+<span class="list">(unsafeCoerce)</span>
+</div>
+</section>
+<section class="row kind-foreign">
+<span class="label">Foreign Type</span>
+<span class="name">Variant</span>
+<span class="sep">::</span>
+<span class="type">Row Type <span class="g">→</span> Type</span>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">inj</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">IsSymbol <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Proxy <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#b35900">a</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">inj p value = coerceV $ VariantRep { type: reflectSymbol p, value }
+  where
+  coerceV :: VariantRep a <span class="g">→</span> Variant r2
+  coerceV = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">Inject into the variant at a given label.</p>
+<pre class="code-quote">
+<code>intAtFoo :: ∀ r. Variant (foo :: Int | r)
+intAtFoo = inj (Proxy :: Proxy &quot;foo&quot;) 42</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">prj</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var> <var class="sig-var" style="--vc:#0e7484">f</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">IsSymbol <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Alternative <var class="sig-var" style="--vc:#0e7484">f</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Proxy <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#0e7484">f</var> <var class="sig-var" style="--vc:#b35900">a</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">prj p</span>
+<span class="sep">=</span>
+<span class="type">on p pure (const empty)</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Attempt to read a variant at a given label.</p>
+<pre class="code-quote">
+<code>case prj (Proxy :: Proxy &quot;foo&quot;) intAtFoo of
+  Just i  → i + 1
+  Nothing → 0</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">on</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">IsSymbol <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Proxy <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#7e3aa3">r1</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#2d7a3b">b</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">on p f g r =
+  case coerceV r of
+    VariantRep v | v.type == reflectSymbol p <span class="g">→</span> f v.value
+    _ <span class="g">→</span> g (coerceR r)
+  where
+  coerceV :: Variant r2 <span class="g">→</span> VariantRep a
+  coerceV = unsafeCoerce
+
+  coerceR :: Variant r2 <span class="g">→</span> Variant r1
+  coerceR = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">Attempt to read a variant at a given label by providing branches. The failure branch receives the provided variant, but with the label removed.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">onMatch</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">rl</var> <var class="sig-var" style="--vc:#b35900">r</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var> <var class="sig-var" style="--vc:#0e7484">r3</var> <var class="sig-var" style="--vc:#5757a6">b</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#b35900">r</var> <var class="sig-var" style="--vc:#1f5fa8">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantMatchCases <var class="sig-var" style="--vc:#1f5fa8">rl</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#5757a6">b</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var> <var class="sig-var" style="--vc:#0e7484">r3</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#b35900">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#7e3aa3">r2</var> <span class="g">→</span> <var class="sig-var" style="--vc:#5757a6">b</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r3</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#5757a6">b</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">onMatch r k v =
+  case coerceV v of
+    VariantRep v&#39; | unsafeHas v&#39;.type r <span class="g">→</span> unsafeGet v&#39;.type r v&#39;.value
+    _ <span class="g">→</span> k (coerceR v)
+
+  where
+  coerceV :: <span class="g">∀</span> a. Variant r3 <span class="g">→</span> VariantRep a
+  coerceV = unsafeCoerce
+
+  coerceR :: Variant r3 <span class="g">→</span> Variant r2
+  coerceR = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">Match a <code>Variant</code> with a <code>Record</code> containing functions for handling cases. This is similar to <code>on</code>, except instead of providing a single label and handler, you can provide a record where each field maps to a particular <code>Variant</code> case.</p>
+<pre class="code-quote">
+<code>onMatch
+  { foo: \foo → &quot;Foo: &quot; &lt;&gt; foo
+  , bar: \bar → &quot;Bar: &quot; &lt;&gt; bar
+  }</code>
+</pre>
+<p>Polymorphic functions in records (such as <code>show</code> or <code>id</code>) can lead to inference issues if not all polymorphic variables are specified in usage. When in doubt, label methods with specific types, such as <code>show :: Int → String</code>, or give the whole record an appropriate type.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">overOne</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var> <var class="sig-var" style="--vc:#5757a6">r3</var> <var class="sig-var" style="--vc:#9c3d5e">r4</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">IsSymbol <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#9c3d5e">r4</var> <var class="sig-var" style="--vc:#5757a6">r3</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Proxy <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#2d7a3b">b</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#7e3aa3">r1</var> <span class="g">→</span> Variant <var class="sig-var" style="--vc:#5757a6">r3</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#5757a6">r3</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">overOne p f</span>
+<span class="sep">=</span>
+<span class="type">on p (inj p &lt;&lt;&lt; f)</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Map over one case of a variant, putting the result back at the same label, with a fallback function to handle the remaining cases.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">overSome</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#0e7484">r1</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var> <var class="sig-var" style="--vc:#7a6017">r4</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantMapCases <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#7a6017">r4</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#5757a6">r2</var> <span class="g">→</span> Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">overSome r k v =
+  case coerceV v of
+    VariantRep v&#39; | unsafeHas v&#39;.type r <span class="g">→</span>
+      coerceV&#39; (VariantRep { type: v&#39;.type, value: unsafeGet v&#39;.type r v&#39;.value })
+    _ <span class="g">→</span> k (coerceR v)
+
+  where
+  coerceV :: <span class="g">∀</span> a. Variant r1 <span class="g">→</span> VariantRep a
+  coerceV = unsafeCoerce
+
+  coerceV&#39; :: <span class="g">∀</span> a. VariantRep a <span class="g">→</span> Variant r3
+  coerceV&#39; = unsafeCoerce
+
+  coerceR :: Variant r1 <span class="g">→</span> Variant r2
+  coerceR = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">Map over several cases of a variant using a <code>Record</code> containing functions for each case. Each case gets put back at the same label it was matched at, i.e. its label in the record. Labels not found in the record are handled using the fallback function.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">over</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#0e7484">r1</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantMapCases <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-station-prose">R.Union <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var> -- this is &quot;backwards&quot; for `expand`, but still safe</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">over r = overSome r unsafeExpand where
+  unsafeExpand = unsafeCoerce :: Variant r2 <span class="g">→</span> Variant r3</pre>
+<div class="marginalia">
+<p class="can-dropcap">Map over some labels and leave the rest unchanged. For example:</p>
+<pre class="code-quote">
+<code>over { label: show :: Int → String }
+  :: ∀ r. Variant ( label :: Int | r ) → Variant ( label :: String | r )</code>
+</pre>
+<p>
+<code>over r</code> is like <code>expand # overSome r</code> but with a more easily solved constraint (i.e. it can be solved once the type of <code>r</code> is known).</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">traverseOne</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var> <var class="sig-var" style="--vc:#5757a6">r3</var> <var class="sig-var" style="--vc:#9c3d5e">r4</var> <var class="sig-var" style="--vc:#7a6017">m</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">IsSymbol <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#7e3aa3">r1</var> <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Cons <var class="sig-var" style="--vc:#1f5fa8">sym</var> <var class="sig-var" style="--vc:#2d7a3b">b</var> <var class="sig-var" style="--vc:#9c3d5e">r4</var> <var class="sig-var" style="--vc:#5757a6">r3</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Functor <var class="sig-var" style="--vc:#7a6017">m</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Proxy <var class="sig-var" style="--vc:#1f5fa8">sym</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(<var class="sig-var" style="--vc:#b35900">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7a6017">m</var> <var class="sig-var" style="--vc:#2d7a3b">b</var>)</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#7e3aa3">r1</var> <span class="g">→</span> <var class="sig-var" style="--vc:#7a6017">m</var> (Variant <var class="sig-var" style="--vc:#5757a6">r3</var>))</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r2</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#7a6017">m</var> (Variant <var class="sig-var" style="--vc:#5757a6">r3</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">traverseOne p f</span>
+<span class="sep">=</span>
+<span class="type">on p (map (inj p) &lt;&lt;&lt; f)</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Traverse over one case of a variant (in a functorial&#x2F;monadic context <code>m</code>), putting the result back at the same label, with a fallback function.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">traverseSome</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#0e7484">r1</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var> <var class="sig-var" style="--vc:#7a6017">r4</var> <var class="sig-var" style="--vc:#1f5fa8">m</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantTraverseCases <var class="sig-var" style="--vc:#1f5fa8">m</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#7a6017">r4</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Functor <var class="sig-var" style="--vc:#1f5fa8">m</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">(Variant <var class="sig-var" style="--vc:#5757a6">r2</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">m</var> (Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>))</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#1f5fa8">m</var> (Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">traverseSome r k v =
+  case coerceV v of
+    VariantRep v&#39; | unsafeHas v&#39;.type r <span class="g">→</span>
+      unsafeGet v&#39;.type r v&#39;.value &lt;#&gt; \value <span class="g">→</span>
+        coerceV&#39; (VariantRep { type: v&#39;.type, value })
+    _ <span class="g">→</span> k (coerceR v)
+
+  where
+  coerceV :: <span class="g">∀</span> a. Variant r1 <span class="g">→</span> VariantRep a
+  coerceV = unsafeCoerce
+
+  coerceV&#39; :: <span class="g">∀</span> a. VariantRep a <span class="g">→</span> Variant r3
+  coerceV&#39; = unsafeCoerce
+
+  coerceR :: Variant r1 <span class="g">→</span> Variant r2
+  coerceR = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">Traverse over several cases of a variant using a <code>Record</code> containing traversals. Each case gets put back at the same label it was matched at, i.e. its label in the record. Labels not found in the record are handled using the fallback function.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">traverse</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#0e7484">r1</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var> <var class="sig-var" style="--vc:#7a6017">m</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#1f5fa8">r</var> <var class="sig-var" style="--vc:#b35900">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantTraverseCases <var class="sig-var" style="--vc:#7a6017">m</var> <var class="sig-var" style="--vc:#b35900">rl</var> <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#7e3aa3">ro</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">ri</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-station-prose">R.Union <var class="sig-var" style="--vc:#7e3aa3">ro</var> <var class="sig-var" style="--vc:#5757a6">r2</var> <var class="sig-var" style="--vc:#9c3d5e">r3</var> -- this is &quot;backwards&quot; for `expand`, but still safe</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Applicative <var class="sig-var" style="--vc:#7a6017">m</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#0e7484">r1</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#7a6017">m</var> (Variant <var class="sig-var" style="--vc:#9c3d5e">r3</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">traverse r = traverseSome r (pure &lt;&lt;&lt; unsafeExpand) where
+  unsafeExpand = unsafeCoerce :: Variant r2 <span class="g">→</span> Variant r3</pre>
+<div class="marginalia">
+<p class="can-dropcap">Traverse over some labels and leave the rest unchanged. (Implemented by expanding after <code>traverseSome</code>.)</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">case_</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Variant () <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>
+</span>
+<pre class="defn-body">case_ r = unsafeCrashWith case unsafeCoerce r of
+  VariantRep v <span class="g">→</span> &quot;Data.Variant: pattern match failure [&quot; &lt;&gt; v.type &lt;&gt; &quot;]&quot;</pre>
+<div class="marginalia">
+<p class="can-dropcap">Combinator for exhaustive pattern matching.</p>
+<pre class="code-quote">
+<code>caseFn :: Variant (foo :: Int, bar :: String, baz :: Boolean) → String
+caseFn = case_
+ # on (Proxy :: Proxy &quot;foo&quot;) (\foo → &quot;Foo: &quot; &lt;&gt; show foo)
+ # on (Proxy :: Proxy &quot;bar&quot;) (\bar → &quot;Bar: &quot; &lt;&gt; bar)
+ # on (Proxy :: Proxy &quot;baz&quot;) (\baz → &quot;Baz: &quot; &lt;&gt; show baz)</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">match</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">rl</var> <var class="sig-var" style="--vc:#b35900">r</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#7e3aa3">r2</var> <var class="sig-var" style="--vc:#0e7484">b</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">RL.RowToList <var class="sig-var" style="--vc:#b35900">r</var> <var class="sig-var" style="--vc:#1f5fa8">rl</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">VariantMatchCases <var class="sig-var" style="--vc:#1f5fa8">rl</var> <var class="sig-var" style="--vc:#2d7a3b">r1</var> <var class="sig-var" style="--vc:#0e7484">b</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">R.Union <var class="sig-var" style="--vc:#2d7a3b">r1</var> () <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Record <var class="sig-var" style="--vc:#b35900">r</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">Variant <var class="sig-var" style="--vc:#7e3aa3">r2</var>
+</span>
+<span class="sig-station-op sig-op-arrow">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#0e7484">b</var>
+</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<div class="value-body">
+<span class="name">match r</span>
+<span class="sep">=</span>
+<span class="type">case_ # onMatch r</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Combinator for exhaustive pattern matching using an <code>onMatch</code> case record.</p>
+<pre class="code-quote">
+<code>matchFn :: Variant (foo :: Int, bar :: String, baz :: Boolean) → String
+matchFn = match
+  { foo: \foo → &quot;Foo: &quot; &lt;&gt; show foo
+  , bar: \bar → &quot;Bar: &quot; &lt;&gt; bar
+  , baz: \baz → &quot;Baz: &quot; &lt;&gt; show baz
+  }</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">default</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <var class="sig-var" style="--vc:#b35900">r</var>. <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Variant <var class="sig-var" style="--vc:#b35900">r</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>
+</span>
+<div class="value-body">
+<span class="name">default a _</span>
+<span class="sep">=</span>
+<span class="type">a</span>
+</div>
+<div class="marginalia">
+<p class="can-dropcap">Combinator for partial matching with a default value in case of failure.</p>
+<pre class="code-quote">
+<code>caseFn :: ∀ r. Variant (foo :: Int, bar :: String | r) → String
+caseFn = default &quot;No match&quot;
+ # on (Proxy :: Proxy &quot;foo&quot;) (\foo → &quot;Foo: &quot; &lt;&gt; show foo)
+ # on (Proxy :: Proxy &quot;bar&quot;) (\bar → &quot;Bar: &quot; &lt;&gt; bar)</code>
+</pre>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">expand</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">lt</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">gt</var> . R.Union <var class="sig-var" style="--vc:#1f5fa8">lt</var> <var class="sig-var" style="--vc:#b35900">a</var> <var class="sig-var" style="--vc:#2d7a3b">gt</var> <span class="g">⇒</span> Variant <var class="sig-var" style="--vc:#1f5fa8">lt</var> <span class="g">→</span> Variant <var class="sig-var" style="--vc:#2d7a3b">gt</var>
+</span>
+<div class="value-body">
+<span class="name">expand</span>
+<span class="sep">=</span>
+<span class="type">unsafeCoerce</span>
+</div>
+<div class="marginalia marginalia-compact">
+<p class="can-dropcap">Every <code>Variant lt</code> can be cast to some <code>Variant gt</code> as long as <code>lt</code> is a subset of <code>gt</code>.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">contract</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">lt</var> <var class="sig-var" style="--vc:#b35900">gt</var> <var class="sig-var" style="--vc:#2d7a3b">f</var>
+<small class="sig-forall-dot"> .</small>
+</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">Alternative <var class="sig-var" style="--vc:#2d7a3b">f</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body">Contractable <var class="sig-var" style="--vc:#b35900">gt</var> <var class="sig-var" style="--vc:#1f5fa8">lt</var>
+</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Variant <var class="sig-var" style="--vc:#b35900">gt</var>
+</span>
+<span class="sig-station-op sig-op-arrow sig-args-start">
+<span class="g">→</span>
+</span>
+<span class="sig-station-body">
+<var class="sig-var" style="--vc:#2d7a3b">f</var> (Variant <var class="sig-var" style="--vc:#1f5fa8">lt</var>)</span>
+<span class="sig-station-op">
+</span>
+</div>
+</span>
+<pre class="defn-body">contract v =
+  contractWith
+    (Proxy :: Proxy gt)
+    (Proxy :: Proxy lt)
+    (case coerceV v of VariantRep v&#39; <span class="g">→</span> v&#39;.type)
+    (coerceR v)
+  where
+  coerceV :: <span class="g">∀</span> a. Variant gt <span class="g">→</span> VariantRep a
+  coerceV = unsafeCoerce
+
+  coerceR :: Variant gt <span class="g">→</span> Variant lt
+  coerceR = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">A <code>Variant gt</code> can be cast to some <code>Variant lt</code>, where <code>lt</code> is is a subset of <code>gt</code>, as long as there is proof that the <code>Variant</code>&#39;s runtime tag is within the subset of <code>lt</code>.</p>
+</div>
+</section>
+<section class="row kind-type">
+<span class="label">Type</span>
+<span class="name">
+<span class="kw">type </span>Unvariant&#39; r x</span>
+<span class="sep">=</span>
+<span class="type">
+</span>
+<pre class="defn-body">  <span class="g">∀</span> s t o
+  . IsSymbol s
+  <span class="g">⇒</span> R.Cons s t o r
+  <span class="g">⇒</span> Proxy s
+  <span class="g">→</span> t
+  <span class="g">→</span> x</pre>
+</section>
+<section class="row kind-data kind-newtype">
+<span class="label">Newtype</span>
+<span class="name">
+<span class="kw">newtype </span>Unvariant r</span>
+<div class="ctor-line">
+<span class="ctor-sep">=</span>
+<span class="ctor-body">
+<span class="ctor-name">Unvariant</span>
+</span>
+</div>
+<div class="ctor-line">
+<span class="ctor-sep">|</span>
+<span class="ctor-body">
+<span class="ctor-name">(∀</span> <span class="ctor-args">x. Unvariant&#39; r x <span class="g">→</span> x)</span>
+</span>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">unvariant</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var> . Variant <var class="sig-var" style="--vc:#1f5fa8">r</var> <span class="g">→</span> Unvariant <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<pre class="defn-body">unvariant v = case (unsafeCoerce v :: VariantRep Unit) of
+  VariantRep o <span class="g">→</span>
+    Unvariant \f <span class="g">→</span>
+      coerce f { reflectSymbol: const o.type } {} Proxy o.value
+  where
+  coerce
+    :: <span class="g">∀</span> x
+    . Unvariant&#39; r x
+    <span class="g">→</span> { reflectSymbol :: Proxy &quot;&quot; <span class="g">→</span> String }
+    <span class="g">→</span> {}
+    <span class="g">→</span> Proxy &quot;&quot;
+    <span class="g">→</span> Unit
+    <span class="g">→</span> x
+  coerce = unsafeCoerce</pre>
+<div class="marginalia">
+<p class="can-dropcap">A low-level eliminator which reifies the <code>IsSymbol</code> and <code>Cons</code> constraints required to reconstruct the Variant. This lets you work generically with some Variant at runtime.</p>
+</div>
+</section>
+<section class="row kind-value">
+<span class="label">Function</span>
+<span class="name">revariant</span>
+<span class="sep">::</span>
+<span class="type">
+<span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">r</var>. Unvariant <var class="sig-var" style="--vc:#1f5fa8">r</var> <span class="g">→</span> Variant <var class="sig-var" style="--vc:#1f5fa8">r</var>
+</span>
+<div class="value-body">
+<span class="name">revariant (Unvariant f)</span>
+<span class="sep">=</span>
+<span class="type">f inj</span>
+</div>
+<div class="marginalia marginalia-compact">
+<p class="can-dropcap">Reconstructs a Variant given an Unvariant eliminator.</p>
+</div>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> VariantEqs :: RL.RowList Type <span class="g">→</span> Constraint</code>
+<pre class="defn-body">class VariantEqs rl where</pre>
+<div class="class-method">
+<span class="name">variantEqs</span>
+<span class="sep">::</span>
+<span class="type">Proxy rl <span class="g">→</span> L.List (VariantCase <span class="g">→</span> VariantCase <span class="g">→</span> Boolean)</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> eqVariantNil</span>
+<span class="sep">::</span>
+<span class="type">VariantEqs RL.Nil<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">variantEqs _</span>
+<span class="sep">=</span>
+<span class="type">L.Nil</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> eqVariantCons</span>
+<span class="sep">::</span>
+<span class="type">(VariantEqs rs, Eq a) <span class="g">⇒</span> VariantEqs (RL.Cons sym a rs)<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  variantEqs _ =
+    L.Cons (coerceEq eq) (variantEqs (Proxy :: Proxy rs))
+    where
+    coerceEq :: (a <span class="g">→</span> a <span class="g">→</span> Boolean) <span class="g">→</span> VariantCase <span class="g">→</span> VariantCase <span class="g">→</span> Boolean
+    coerceEq = unsafeCoerce</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> eqVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">(RL.RowToList r rl, VariantTags rl, VariantEqs rl)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Eq (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  eq v1 v2 =
+    let
+      c1 = unsafeCoerce v1 :: VariantRep VariantCase
+      c2 = unsafeCoerce v2 :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      eqs = variantEqs (Proxy :: Proxy rl)
+    in
+      lookupEq tags eqs c1 c2</pre>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> VariantBounded :: RL.RowList Type <span class="g">→</span> Constraint</code>
+<pre class="defn-body">class VariantBounded rl where</pre>
+<div class="class-method">
+<span class="name">variantBounded</span>
+<span class="sep">::</span>
+<span class="type">Proxy rl <span class="g">→</span> L.List (BoundedDict VariantCase)</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> boundedVariantNil</span>
+<span class="sep">::</span>
+<span class="type">VariantBounded RL.Nil<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">variantBounded _</span>
+<span class="sep">=</span>
+<span class="type">L.Nil</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> boundedVariantCons</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">(VariantBounded rs, Bounded a)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">VariantBounded (RL.Cons sym a rs)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  variantBounded _ = L.Cons dict (variantBounded (Proxy :: Proxy rs))
+    where
+    dict :: BoundedDict VariantCase
+    dict =
+      { top: coerce top
+      , bottom: coerce bottom
+      }
+
+    coerce :: a <span class="g">→</span> VariantCase
+    coerce = unsafeCoerce</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> boundedVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">( RL.RowToList r rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantTags rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantEqs rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantOrds rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantBounded rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Bounded (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  top =
+    let
+      tags = variantTags (Proxy :: Proxy rl)
+      dicts = variantBounded (Proxy :: Proxy rl)
+      coerce = unsafeCoerce :: VariantRep VariantCase <span class="g">→</span> Variant r
+    in
+      coerce $ VariantRep $ lookupLast &quot;top&quot; _.top tags dicts
+
+  bottom =
+    let
+      tags = variantTags (Proxy :: Proxy rl)
+      dicts = variantBounded (Proxy :: Proxy rl)
+      coerce = unsafeCoerce :: VariantRep VariantCase <span class="g">→</span> Variant r
+    in
+      coerce $ VariantRep $ lookupFirst &quot;bottom&quot; _.bottom tags dicts</pre>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> VariantBoundedEnums :: RL.RowList Type <span class="g">→</span> Constraint</code>
+<pre class="defn-body">class VariantBounded rl <span class="g">⇐</span> VariantBoundedEnums rl where</pre>
+<div class="class-method">
+<span class="name">variantBoundedEnums</span>
+<span class="sep">::</span>
+<span class="type">Proxy rl <span class="g">→</span> L.List (BoundedEnumDict VariantCase)</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> enumVariantNil</span>
+<span class="sep">::</span>
+<span class="type">VariantBoundedEnums RL.Nil<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">variantBoundedEnums _</span>
+<span class="sep">=</span>
+<span class="type">L.Nil</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> enumVariantCons</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">(VariantBoundedEnums rs, BoundedEnum a)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">VariantBoundedEnums (RL.Cons sym a rs)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  variantBoundedEnums _ = L.Cons dict (variantBoundedEnums (Proxy :: Proxy rs))
+    where
+    dict :: BoundedEnumDict VariantCase
+    dict =
+      { pred: coerceAToMbA pred
+      , succ: coerceAToMbA succ
+      , fromEnum: coerceFromEnum fromEnum
+      , toEnum: coerceToEnum toEnum
+      , cardinality: coerceCardinality cardinality
+      }
+
+    coerceAToMbA :: (a <span class="g">→</span> Maybe a) <span class="g">→</span> VariantCase <span class="g">→</span> Maybe VariantCase
+    coerceAToMbA = unsafeCoerce
+
+    coerceFromEnum :: (a <span class="g">→</span> Int) <span class="g">→</span> VariantCase <span class="g">→</span> Int
+    coerceFromEnum = unsafeCoerce
+
+    coerceToEnum :: (Int <span class="g">→</span> Maybe a) <span class="g">→</span> Int <span class="g">→</span> Maybe VariantCase
+    coerceToEnum = unsafeCoerce
+
+    coerceCardinality :: Cardinality a <span class="g">→</span> Int
+    coerceCardinality = unsafeCoerce</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> enumVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">( RL.RowToList r rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantTags rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantEqs rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantOrds rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantBoundedEnums rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Enum (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  pred a =
+    let
+      rep = unsafeCoerce a :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      bounds = variantBounded (Proxy :: Proxy rl)
+      dicts = variantBoundedEnums (Proxy :: Proxy rl)
+      coerce = unsafeCoerce :: Maybe (VariantRep VariantCase) <span class="g">→</span> Maybe (Variant r)
+    in
+      coerce $ lookupPred rep tags bounds dicts
+
+  succ a =
+    let
+      rep = unsafeCoerce a :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      bounds = variantBounded (Proxy :: Proxy rl)
+      dicts = variantBoundedEnums (Proxy :: Proxy rl)
+      coerce = unsafeCoerce :: Maybe (VariantRep VariantCase) <span class="g">→</span> Maybe (Variant r)
+    in
+      coerce $ lookupSucc rep tags bounds dicts</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> boundedEnumVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">( RL.RowToList r rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantTags rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantEqs rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantOrds rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantBoundedEnums rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">BoundedEnum (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  cardinality =
+    Cardinality $ lookupCardinality $ variantBoundedEnums (Proxy :: Proxy rl)
+
+  fromEnum a =
+    let
+      rep = unsafeCoerce a :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      dicts = variantBoundedEnums (Proxy :: Proxy rl)
+    in
+      lookupFromEnum rep tags dicts
+
+  toEnum n =
+    let
+      tags = variantTags (Proxy :: Proxy rl)
+      dicts = variantBoundedEnums (Proxy :: Proxy rl)
+      coerceV = unsafeCoerce :: Maybe (VariantRep VariantCase) <span class="g">→</span> Maybe (Variant r)
+    in
+      coerceV $ lookupToEnum n tags dicts</pre>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> VariantOrds :: RL.RowList Type <span class="g">→</span> Constraint</code>
+<pre class="defn-body">class VariantOrds rl where</pre>
+<div class="class-method">
+<span class="name">variantOrds</span>
+<span class="sep">::</span>
+<span class="type">Proxy rl <span class="g">→</span> L.List (VariantCase <span class="g">→</span> VariantCase <span class="g">→</span> Ordering)</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> ordVariantNil</span>
+<span class="sep">::</span>
+<span class="type">VariantOrds RL.Nil<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">variantOrds _</span>
+<span class="sep">=</span>
+<span class="type">L.Nil</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> ordVariantCons</span>
+<span class="sep">::</span>
+<span class="type">(VariantOrds rs, Ord a) <span class="g">⇒</span> VariantOrds (RL.Cons sym a rs)<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  variantOrds _ =
+    L.Cons (coerceOrd compare) (variantOrds (Proxy :: Proxy rs))
+    where
+    coerceOrd :: (a <span class="g">→</span> a <span class="g">→</span> Ordering) <span class="g">→</span> VariantCase <span class="g">→</span> VariantCase <span class="g">→</span> Ordering
+    coerceOrd = unsafeCoerce</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> ordVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">( RL.RowToList r rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantTags rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantEqs rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">, VariantOrds rl</span>
+<span class="sig-station-op">
+</span>
+<span class="sig-station-body">)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Ord (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  compare v1 v2 =
+    let
+      c1 = unsafeCoerce v1 :: VariantRep VariantCase
+      c2 = unsafeCoerce v2 :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      ords = variantOrds (Proxy :: Proxy rl)
+    in
+      lookupOrd tags ords c1 c2</pre>
+</section>
+<section class="row kind-class">
+<span class="label">Class</span>
+<code class="class-head">
+<span class="kw">class</span> VariantShows :: RL.RowList Type <span class="g">→</span> Constraint</code>
+<pre class="defn-body">class VariantShows rl where</pre>
+<div class="class-method">
+<span class="name">variantShows</span>
+<span class="sep">::</span>
+<span class="type">Proxy rl <span class="g">→</span> L.List (VariantCase <span class="g">→</span> String)</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> showVariantNil</span>
+<span class="sep">::</span>
+<span class="type">VariantShows RL.Nil<span class="inst-where"> where</span>
+</span>
+<div class="value-body">
+<span class="name">variantShows _</span>
+<span class="sep">=</span>
+<span class="type">L.Nil</span>
+</div>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> showVariantCons</span>
+<span class="sep">::</span>
+<span class="type">(VariantShows rs, Show a) <span class="g">⇒</span> VariantShows (RL.Cons sym a rs)<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  variantShows _ =
+    L.Cons (coerceShow show) (variantShows (Proxy :: Proxy rs))
+    where
+    coerceShow :: (a <span class="g">→</span> String) <span class="g">→</span> VariantCase <span class="g">→</span> String
+    coerceShow = unsafeCoerce</pre>
+</section>
+<section class="row kind-instance">
+<span class="label">Instance</span>
+<span class="name">
+<span class="kw">instance</span> showVariant</span>
+<span class="sep">::</span>
+<span class="type">
+<div class="sig-stack">
+<span class="sig-station-body">(RL.RowToList r rl, VariantTags rl, VariantShows rl)</span>
+<span class="sig-station-op sig-op-constraint">
+<span class="g">⇒</span>
+</span>
+<span class="sig-station-body sig-args-start">Show (Variant r)</span>
+<span class="sig-station-op sig-args-start">
+</span>
+</div>
+<span class="inst-where"> where</span>
+</span>
+<pre class="defn-body">  show v1 =
+    let
+      VariantRep v = unsafeCoerce v1 :: VariantRep VariantCase
+      tags = variantTags (Proxy :: Proxy rl)
+      shows = variantShows (Proxy :: Proxy rl)
+      body = lookup &quot;show&quot; v.type tags shows v.value
+    in
+      &quot;(inj @&quot; &lt;&gt; show v.type &lt;&gt; &quot; &quot; &lt;&gt; body &lt;&gt; &quot;)&quot;</pre>
+</section>
+</div>
+<footer class="specimen-foot">
+<div class="field">module from test-fixture</div>
+</footer>
+</article>

@@ -26,28 +26,49 @@ until it stabilises.
 .purs file
    │
    ▼
-[1] preprocess        regex passes — glyph subs, comment extraction, long-line tagging
+[1] preprocess        Specimen.Preprocess — glyph substitution, comment extraction
    │
    ▼
-[2] CST parse         purescript-language-cst-parser, tokens & whitespace retained
+[2] block classify    Specimen.Block — partition into typed regions (see taxonomy)
    │
    ▼
-[3] block classify    partition into typed regions (see taxonomy)
+[3] signature analysis Specimen.Sig — where a type breaks, what it binds, ∀-var colours
    │
    ▼
-[4] alignment passes  one per alignment family, each operates on a region type
-                      and emits shared column anchors
+[4] typeset           Specimen.Render — blocks → Halogen HTML
+      └ decoration    Specimen.Html — composable token passes over code fragments
    │
-   ▼
-[5] ornament layer    decorate the block stream — rules, marginalia, drop caps,
-                      running heads, gutter glyphs
-   │
-   ▼
-[6] Sigil render      whole document → HATS → SVG/HTML
+   ├──────────────► Specimen.Component   live, in the browser
+   └──────────────► renderDocumentHtml   serialised, for static sites
 ```
 
-Stages 1, 3, 4, 5 are independent small modules over the same block
-data. Only stage 2 has heavy dependencies.
+Every stage is a pure function over data. Nothing before the last step
+touches the DOM, which is why `test/Test/Main.purs` can be a golden test
+over the whole pipeline.
+
+### One tree, two backends
+
+`Specimen.Render.renderDocument` produces `HH.HTML w i` — the same value
+a Halogen component renders. `renderDocumentHtml` serialises that value
+through `halogen-vdom-string-renderer` for the static-site generator.
+There is one description of the document, and both consumers agree by
+construction.
+
+Source text becomes markup only in `Specimen.Html.toHtml`, so escaping
+happens exactly once. Decorations (glyph emphasis, type-variable
+colour, quieted keywords, soft-break opportunities) are passes over an
+`Array Token` that rewrite only the undecorated `Plain` runs — they
+compose in any order and cannot corrupt each other's output.
+
+## Sigil
+
+Specimen is a sibling of
+[`purescript-sigil`](../../purescript-hylograph-libs/purescript-sigil/),
+not yet a consumer of it. Sigil typesets from a parsed `RenderType`
+AST; `Specimen.Sig` works structurally over signature *text*, which is
+what lets Specimen typeset a module without a full CST round-trip.
+Routing Specimen's declarations through Sigil's AST — so signature
+layout is shared rather than reimplemented — is the open piece of work.
 
 ## Block taxonomy
 
@@ -99,27 +120,67 @@ Things easier as text than as CST surgery:
 figures, hung in the outer margin so they don't compete with the code's
 left edge.
 
-## Sigil's job
+## Building
 
-Everything past stage 5 is Sigil. Each block is a Sigil layout (or
-composition). Cross-block alignment is realized by passing **shared
-column anchors** into the tree. If Sigil doesn't yet support that exact
-shape, treat it as a small upstream addition rather than working around it.
+```bash
+spago build
+spago test                       # golden tests over the pure pipeline
+SPECIMEN_ACCEPT=1 spago test     # re-record goldens after an intended change
 
-## First milestone — "hello, module"
+spago bundle                     # public/bundle.js
+npm run serve                    # the viewer on :3007
+```
 
-Pick one short, charismatic module and render it with:
+The viewer takes a `?module=` query parameter naming any module under
+`public/examples/`, e.g. `localhost:3007/?module=Data.Variant`.
 
-- Module header ornament
-- `::` column alignment within signature groups
-- Hairline rule between decls
-- Sans-serif body, monospace code, restrained two-color palette
-- Static SVG/HTML, no interactivity
+## Making a book
 
-The first artifact should be screenshotable as-is, and worth printing.
+```bash
+node cli/specimen-site.mjs <package-name | workspace-dir> [-o dir]
+node cli/specimen-shelf.mjs cli/shelf.config.json --sites docs
+```
 
-Candidate first targets (TBD):
+`specimen-site` resolves a registry package with `spago fetch`, renders
+every module through the pipeline, and writes a self-contained static
+site — plus `banner.svg`, `waxseal.svg` and `book.json` for the shelf
+page to draw from. `docs/` in this repo is the generated shelf.
 
-- **`Control.Monad`** — small, classic, well-known shape; safest engineering target
-- **a slice of `purerl-tidal`** — personal, charismatic; better "show off" piece
-- **`purescript-language-cst-parser`** — meta: typesetting the code that parses code
+## The book's geometry
+
+Everything the identity kit is built from lives in `site/` as the
+`specimen-site` package, and it is all pure PureScript:
+
+| Module | |
+|---|---|
+| `Site.Harvest` | module name, imports, LOC, declaration spans |
+| `Site.Topo` | import-graph pruning, longest-path layering, accent hues |
+| `Site.Pack` | the plates and the waxseal, via Hylograph's circle-pack |
+| `Site.Beeswarm` | the force settle, run once at build time |
+| `Site.Layout` | assembles the above into a laid-out book |
+
+**Specimen has no npm dependencies.** The circle-packing comes from
+`DataViz.Layout.Hierarchy.Pack` in `hylograph-layout`, which reproduces
+d3's front-chain algorithm exactly — verified circle-for-circle against
+`d3-hierarchy` on a 50-module book, and rather more robustly (d3 emitted
+one non-finite radius on that data; the port emitted none).
+
+The force settle is hand-written, and deliberately so: Hylograph's
+`hylograph-simulation` is an FFI wrapper over `d3-force`, so adopting it
+would have renamed the dependency rather than removed it. It belongs in
+`hylograph-layout` eventually — a pure, deterministic settle is not a
+Specimen-specific idea.
+
+## Known debt
+
+- `cli/specimen-site.mjs` and `cli/specimen-shelf.mjs` are still
+  JavaScript. They no longer compute anything — layout and typesetting
+  are both PureScript calls now — but page assembly, SVG emission and
+  the filesystem walk still live in JS, and the generated page still
+  carries ~130 lines of inline vanilla JS for the scroll morph and the
+  FFI modal.
+- Commentary panels are emitted with the `data-panel` wiring but nothing
+  toggles them yet; `renderDocument` is deliberately action-free
+  (`forall w i`), so opening them needs an action type threaded through.
+- The book stylesheet exists in more than one copy
+  (`public/style.css`, `cli/assets/style.css`) and they have drifted.

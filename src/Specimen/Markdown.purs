@@ -1,29 +1,53 @@
+-- | The little markdown Specimen understands, as found in PureScript
+-- | doc comments: paragraphs, fenced code, `- Name: law` lists, inline
+-- | code and Pursuit links.
+-- |
+-- | Both the block grammar and the inline grammar are parsed to values
+-- | (`MdNode`, `Inline`) and rendered from those. The inline parser in
+-- | particular used to be two regex substitutions over escaped HTML,
+-- | which meant `renderCodeLed` had to go looking for a literal
+-- | `"<code>"` in its own output to decide the opening treatment; it
+-- | now just asks what the first inline node is.
 module Specimen.Markdown
-  ( docLinesToHtml
+  ( docLines
   , isCompactMarginalia
   ) where
 
 import Prelude
 
 import Data.Array as Array
-import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String as String
-import Data.String.Common (replaceAll)
-import Data.String.Pattern (Pattern(..), Replacement(..))
-import Data.String.Regex (regex, replace, test)
-import Data.String.Regex.Flags (global, noFlags)
+import Data.String.CodeUnits as SCU
+import Data.String.Pattern (Pattern(..))
+
+import Halogen.HTML as HH
+import Halogen.HTML.Core (ClassName(..))
+import Halogen.HTML.Properties as HP
 
 -- | A parsed marginalia node — either prose, a "law list" (consecutive
 -- | `- name: code` items rendered as a 3-column aligned-colon grid), or
 -- | a fenced code block (markdown ``` … ``` lifted out as a quoted code
 -- | excerpt).
 data MdNode
-  = Para  String
-  | LawList (Array { name :: String, code :: String })
+  = Para String
+  | LawList (Array Law)
   | Code (Array String)
 
--- | Render an array of stripped doc-comment lines as HTML.
+type Law = { name :: String, code :: String }
+
+-- | A span of prose: plain text, `inline code`, or the text of a
+-- | `[link](url)` (Specimen keeps the words, drops the destination —
+-- | a printed specimen has nowhere to click to). Link text is itself
+-- | prose: Pursuit links are routinely written ``[`Monad`](…)``, and
+-- | the backticks inside have to become code, not literal backticks.
+data Inline
+  = InText String
+  | InCode String
+  | InStrong (Array Inline)
+
+-- | Render an array of stripped doc-comment lines.
+-- |
 -- | Pipeline:
 -- |   1. split on fence markers — prose runs go through the paragraph
 -- |      pipeline; fenced runs become Code nodes verbatim
@@ -33,22 +57,20 @@ data MdNode
 -- |   5. render — the first node gets headline treatment (drop cap for
 -- |      prose-led; pulled-out code subhead for code-led), the rest stay
 -- |      as plain paragraphs.
-docLinesToHtml :: Array String -> String
-docLinesToHtml lines =
-  let
-    chunks = splitOnFences lines
-    nodes = consolidateNodes (Array.concatMap chunkToNodes chunks)
-  in
-    case Array.uncons nodes of
-      Nothing -> ""
-      Just { head, tail } ->
-        renderNode true head
-          <> String.joinWith "" (map (renderNode false) tail)
+docLines :: forall w i. Array String -> Array (HH.HTML w i)
+docLines lines =
+  case Array.uncons (parseNodes lines) of
+    Nothing -> []
+    Just { head, tail } ->
+      renderNode true head <> Array.concatMap (renderNode false) tail
+
+parseNodes :: Array String -> Array MdNode
+parseNodes =
+  splitOnFences >>> Array.concatMap chunkToNodes >>> consolidateNodes
 
 -- | A chunk is either a run of prose lines or a run of fenced-code lines.
--- | We tag with a Boolean: true = code, false = prose.
 splitOnFences :: Array String -> Array { isCode :: Boolean, lines :: Array String }
-splitOnFences lines = go [] [] false lines
+splitOnFences = go [] [] false
   where
   flush acc cur isCode =
     if Array.null cur then acc
@@ -58,41 +80,35 @@ splitOnFences lines = go [] [] false lines
     Nothing -> flush acc cur isCode
     Just { head, tail }
       | isFenceMarker head -> go (flush acc cur isCode) [] (not isCode) tail
-      | otherwise          -> go acc (Array.snoc cur head) isCode tail
+      | otherwise -> go acc (Array.snoc cur head) isCode tail
 
 chunkToNodes :: { isCode :: Boolean, lines :: Array String } -> Array MdNode
-chunkToNodes { isCode: true,  lines } = [ Code lines ]
-chunkToNodes { isCode: false, lines } = map paraToNode (groupParagraphs lines)
+chunkToNodes { isCode, lines } =
+  if isCode then [ Code lines ]
+  else map paraToNode (groupParagraphs lines)
 
 isFenceMarker :: String -> Boolean
-isFenceMarker line =
-  case String.stripPrefix (Pattern "```") (String.trim line) of
-    Just _  -> true
-    Nothing -> false
+isFenceMarker line = hasPrefix "```" (String.trim line)
 
 -- | Group lines into paragraphs. Blank lines AND lines starting with
 -- | `- ` both break the current paragraph — a list item is its own
 -- | one-line paragraph so the law-grouping pass can pick it up.
 groupParagraphs :: Array String -> Array (Array String)
-groupParagraphs lines = go [] [] lines
+groupParagraphs = go [] []
   where
   go acc cur xs = case Array.uncons xs of
     Nothing -> if Array.null cur then acc else Array.snoc acc cur
     Just { head, tail }
       | String.trim head == "" ->
-          if Array.null cur
-            then go acc [] tail
-            else go (Array.snoc acc cur) [] tail
+          if Array.null cur then go acc [] tail
+          else go (Array.snoc acc cur) [] tail
       | startsWithListMarker head ->
           let acc' = if Array.null cur then acc else Array.snoc acc cur
-          in go acc' [head] tail
-      | otherwise ->
-          go acc (Array.snoc cur head) tail
+          in go acc' [ head ] tail
+      | otherwise -> go acc (Array.snoc cur head) tail
 
 startsWithListMarker :: String -> Boolean
-startsWithListMarker s = case String.stripPrefix (Pattern "- ") (String.trim s) of
-  Just _  -> true
-  Nothing -> false
+startsWithListMarker s = hasPrefix "- " (String.trim s)
 
 -- | A marginalia block is "compact" when it parses to a single short
 -- | prose paragraph that would also receive a drop cap — i.e. starts
@@ -101,17 +117,13 @@ startsWithListMarker s = case String.stripPrefix (Pattern "- ") (String.trim s) 
 -- | switches to a flatter, in-flow rendering when this returns true.
 -- | Threshold of 100 chars ≈ one line at 1.05rem inside the 58rem block.
 isCompactMarginalia :: Array String -> Boolean
-isCompactMarginalia lines =
-  let
-    chunks = splitOnFences lines
-    nodes  = consolidateNodes (Array.concatMap chunkToNodes chunks)
-  in case nodes of
-    [ Para s ] ->
-      let trimmed = String.trim s
-      in String.length trimmed > 0
-         && String.length trimmed < 100
-         && startsWithLetter trimmed
-    _ -> false
+isCompactMarginalia lines = case parseNodes lines of
+  [ Para s ] ->
+    let trimmed = String.trim s
+    in String.length trimmed > 0
+       && String.length trimmed < 100
+       && startsWithLetter trimmed
+  _ -> false
 
 -- ----------------------------------------------------------------------------
 -- Paragraph → node classification
@@ -120,12 +132,12 @@ paraToNode :: Array String -> MdNode
 paraToNode ls =
   let joined = String.joinWith " " ls
   in case parseLawItem joined of
-    Just law -> LawList [law]
-    Nothing  -> Para joined
+    Just law -> LawList [ law ]
+    Nothing -> Para joined
 
 -- | A "law" item is any list item with a `:` separator, like
 -- | `- Left Identity: pure x >>= f = f x`.
-parseLawItem :: String -> Maybe { name :: String, code :: String }
+parseLawItem :: String -> Maybe Law
 parseLawItem raw = do
   rest <- String.stripPrefix (Pattern "- ") (String.trim raw)
   i <- String.indexOf (Pattern ": ") rest
@@ -139,113 +151,124 @@ parseLawItem raw = do
 consolidateNodes :: Array MdNode -> Array MdNode
 consolidateNodes = Array.foldl step []
   where
-  step acc node = case Array.unsnoc acc of
-    Just { init, last: LawList items } -> case node of
-      LawList more -> Array.snoc init (LawList (items <> more))
-      _            -> Array.snoc acc node
-    _ -> Array.snoc acc node
+  step acc node = case Array.unsnoc acc, node of
+    Just { init, last: LawList items }, LawList more ->
+      Array.snoc init (LawList (items <> more))
+    _, _ -> Array.snoc acc node
+
+-- ----------------------------------------------------------------------------
+-- Inline grammar
+
+-- | Scan prose for the two inline forms Specimen recognises. Anything
+-- | unterminated (a lone backtick, a `[` with no closing `](…)`) stays
+-- | literal text, which is what a doc comment discussing syntax wants.
+parseInline :: String -> Array Inline
+parseInline = go [] []
+  where
+  go acc cur s = case SCU.uncons s of
+    Nothing -> flush acc cur
+    Just { head: '`', tail }
+      | Just { inner, rest } <- delimited "`" tail ->
+          go (Array.snoc (flush acc cur) (InCode inner)) [] rest
+    Just { head: '[', tail }
+      | Just { inner, rest } <- linkText tail ->
+          go (Array.snoc (flush acc cur) (InStrong (parseInline inner))) [] rest
+    Just { head: c, tail } -> go acc (Array.snoc cur c) tail
+
+  flush acc cur =
+    if Array.null cur then acc
+    else Array.snoc acc (InText (SCU.fromCharArray cur))
+
+-- | Content up to the next `close`, plus what follows it.
+delimited :: String -> String -> Maybe { inner :: String, rest :: String }
+delimited close s = do
+  i <- String.indexOf (Pattern close) s
+  pure
+    { inner: String.take i s
+    , rest: String.drop (i + String.length close) s
+    }
+
+-- | `text](url)` → the text, with the destination discarded.
+linkText :: String -> Maybe { inner :: String, rest :: String }
+linkText s = do
+  { inner, rest } <- delimited "](" s
+  { rest: after } <- delimited ")" rest
+  pure { inner, rest: after }
+
+renderInline :: forall w i. Array Inline -> Array (HH.HTML w i)
+renderInline = map case _ of
+  InText s -> HH.text s
+  InCode s -> HH.code_ [ HH.text s ]
+  InStrong inner -> HH.strong_ (renderInline inner)
 
 -- ----------------------------------------------------------------------------
 -- Rendering
 
-renderNode :: Boolean -> MdNode -> String
+renderNode :: forall w i. Boolean -> MdNode -> Array (HH.HTML w i)
 renderNode isFirst = case _ of
-  Para s         -> renderParagraph isFirst s
-  LawList items  -> renderLawList items
-  Code lines     -> renderCodeBlock lines
+  Para s -> renderParagraph isFirst s
+  LawList items -> [ HH.div [ cls "laws" ] (Array.concatMap renderLaw items) ]
+  Code lines -> renderCodeBlock lines
 
 -- | Render a fenced code block as a quoted excerpt — pre-formatted,
 -- | monospace, anchored by a left rule (see .marginalia pre.code-quote
 -- | in style.css). Empty blocks are dropped.
-renderCodeBlock :: Array String -> String
+renderCodeBlock :: forall w i. Array String -> Array (HH.HTML w i)
 renderCodeBlock lines =
-  let nonEmpty = Array.dropWhile isAllBlank (Array.reverse (Array.dropWhile isAllBlank (Array.reverse lines)))
-  in if Array.null nonEmpty then ""
-     else
-       "<pre class=\"code-quote\"><code>"
-         <> String.joinWith "\n" (map escape nonEmpty)
-         <> "</code></pre>"
+  case trimBlank lines of
+    [] -> []
+    kept ->
+      [ HH.pre [ cls "code-quote" ]
+          [ HH.code_ [ HH.text (String.joinWith "\n" kept) ] ]
+      ]
+
+trimBlank :: Array String -> Array String
+trimBlank =
+  Array.dropWhile isBlank
+    >>> Array.reverse
+    >>> Array.dropWhile isBlank
+    >>> Array.reverse
   where
-  isAllBlank l = String.trim l == ""
+  isBlank l = String.trim l == ""
 
-renderParagraph :: Boolean -> String -> String
+renderParagraph :: forall w i. Boolean -> String -> Array (HH.HTML w i)
 renderParagraph isFirst s =
-  let
-    trimmed = String.trim s
-    body    = escape trimmed # stripPursuitLinks # renderInlineCode
-  in
-    if body == "" then ""
-    else if isFirst && startsWithBacktick trimmed then
-      renderCodeLed body
-    else if isFirst && startsWithLetter trimmed then
-      "<p class=\"can-dropcap\">" <> body <> "</p>"
-    else
-      "<p>" <> body <> "</p>"
+  let trimmed = String.trim s in
+  case parseInline trimmed of
+    [] -> []
+    -- A doc comment opening on the function's own identifier gets that
+    -- identifier pulled out as a block-level subhead, so the block still
+    -- has a strong typographic opening.
+    inlines | isFirst, Just { head: InCode code, tail } <- Array.uncons inlines ->
+      [ codeLed code (renderInline tail) ]
+    inlines
+      | isFirst && startsWithLetter trimmed ->
+          [ HH.p [ cls "can-dropcap" ] (renderInline inlines) ]
+      | otherwise -> [ HH.p_ (renderInline inlines) ]
 
--- | Pull the leading <code>X</code> out as a block-level subhead so the
--- | comment block has a strong typographic opening even when the doc
--- | starts with the function's own identifier (e.g. ``liftM1``).
-renderCodeLed :: String -> String
-renderCodeLed body = case extractLeadingCode body of
-  Just { code, rest } ->
-    "<p class=\"code-led\">"
-      <> "<span class=\"code-cap\">" <> code <> "</span>"
-      <> String.trim rest
-      <> "</p>"
-  Nothing ->
-    "<p>" <> body <> "</p>"
+codeLed :: forall w i. String -> Array (HH.HTML w i) -> HH.HTML w i
+codeLed code rest =
+  HH.p [ cls "code-led" ] ([ HH.span [ cls "code-cap" ] [ HH.text code ] ] <> rest)
 
-extractLeadingCode :: String -> Maybe { code :: String, rest :: String }
-extractLeadingCode body = do
-  rest1 <- String.stripPrefix (Pattern "<code>") body
-  i <- String.indexOf (Pattern "</code>") rest1
-  pure
-    { code: String.take i rest1
-    , rest: String.drop (i + 7) rest1   -- 7 = length of "</code>"
-    }
+renderLaw :: forall w i. Law -> Array (HH.HTML w i)
+renderLaw { name, code } =
+  [ HH.div [ cls "law-name" ] [ HH.text name ]
+  , HH.div [ cls "law-sep" ] [ HH.text ":" ]
+  , HH.div [ cls "law-code" ] [ HH.code_ [ HH.text code ] ]
+  ]
+
+-- ----------------------------------------------------------------------------
+-- Helpers
 
 startsWithLetter :: String -> Boolean
-startsWithLetter s = case regex "^[A-Za-z]" noFlags of
-  Right r -> test r s
-  Left _  -> false
-
-startsWithBacktick :: String -> Boolean
-startsWithBacktick s = case String.stripPrefix (Pattern "`") s of
-  Just _  -> true
+startsWithLetter s = case SCU.charAt 0 s of
+  Just c -> (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
   Nothing -> false
 
-renderLawList :: Array { name :: String, code :: String } -> String
-renderLawList items =
-  "<div class=\"laws\">"
-    <> String.joinWith "" (map renderLaw items)
-    <> "</div>"
+hasPrefix :: String -> String -> Boolean
+hasPrefix p s = case String.stripPrefix (Pattern p) s of
+  Just _ -> true
+  Nothing -> false
 
-renderLaw :: { name :: String, code :: String } -> String
-renderLaw { name, code } =
-  "<div class=\"law-name\">" <> escape name <> "</div>"
-    <> "<div class=\"law-sep\">:</div>"
-    <> "<div class=\"law-code\"><code>" <> escape code <> "</code></div>"
-
--- ----------------------------------------------------------------------------
--- Inline markdown
-
--- | `[text](url-or-anchor)` → `<strong>text</strong>`.
-stripPursuitLinks :: String -> String
-stripPursuitLinks s = case regex "\\[([^\\]]+)\\]\\([^)]*\\)" global of
-  Right r -> replace r "<strong>$1</strong>" s
-  Left _  -> s
-
--- | `` `code` `` → `<code>code</code>`.
-renderInlineCode :: String -> String
-renderInlineCode s = case regex "`([^`]+)`" global of
-  Right r -> replace r "<code>$1</code>" s
-  Left _  -> s
-
--- ----------------------------------------------------------------------------
--- HTML escape
-
-escape :: String -> String
-escape = replaceAll (Pattern "&")  (Replacement "&amp;")
-     >>> replaceAll (Pattern "<")  (Replacement "&lt;")
-     >>> replaceAll (Pattern ">")  (Replacement "&gt;")
-     >>> replaceAll (Pattern "\"") (Replacement "&quot;")
+cls :: forall r i. String -> HP.IProp (class :: String | r) i
+cls = HP.class_ <<< ClassName
