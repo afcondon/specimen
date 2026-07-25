@@ -1,0 +1,11 @@
+{
+  "name": "purescript-mycroft",
+  "version": "local",
+  "title": "Mycroft",
+  "modules": 5,
+  "decls": 79,
+  "loc": 641,
+  "layers": 3,
+  "stableSince": null,
+  "releases": []
+}

@@ -61,7 +61,7 @@ const findPurs = (dir, acc = []) => {
   for (const e of readdirSync(dir)) {
     const p = join(dir, e);
     if (statSync(p).isDirectory()) {
-      if (['.spago', 'output', 'node_modules', '.git'].includes(e)) continue;
+      if (e.startsWith('.') || ['output', 'node_modules'].includes(e)) continue;
       if (!includeTests && e === 'test') continue;
       findPurs(p, acc);
     } else if (e.endsWith('.purs')) acc.push(p);

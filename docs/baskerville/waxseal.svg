@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <rect width="100%" height="100%" fill="#fff"/>
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; PURESCRIPT JTMS</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="151.65206026175468" cy="240" r="97.3212246238675" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="339.4866424428111" cy="240" r="86.1825219193017" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="253.22571800776976" cy="328.43993798237983" r="33.028415599566074" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="118.25896381834073" cy="241.1459294309831" r="34.71205995612221" fill="#111"/><circle cx="189.6227294209869" cy="241.1459294309831" r="32.320870008636795" fill="#111"/><circle cx="156.2421229281269" cy="299.7968132565505" r="30.83304124750661" fill="#111"/><circle cx="155.99279981534545" cy="191.40369553716332" r="23.392128325232633" fill="#111"/><circle cx="108.39597365706399" cy="182.15847337649103" r="20.76344643342173" fill="#111"/><circle cx="202.7343231325575" cy="186.81005493085306" r="19.243742713348585" fill="#111"/><circle cx="102.82197576097302" cy="296.43613868200896" r="18.361876327021164" fill="#111"/><circle cx="203.99822932582777" cy="289.41082973160354" r="13.708552479729812" fill="#111"/><circle cx="326.69517886317016" cy="245.3774124304562" r="32.82989140225617" fill="#111"/><circle cx="390.86680907429616" cy="245.3774124304562" r="27.01090317098266" fill="#111"/><circle cx="364.0080084550369" cy="293.0680932889684" r="23.392128325232633" fill="#111"/><circle cx="363.9972683176958" cy="197.82877994580858" r="23.273686408102495" fill="#111"/><circle cx="314.76500984935296" cy="186.49849832708585" r="22.914687720724597" fill="#111"/><circle cx="253.22571800776976" cy="328.43993798237983" r="28.6975799616789" fill="#111"/></g>
+</svg>
