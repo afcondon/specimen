@@ -1,0 +1,27 @@
+{
+  "name": "harmonia",
+  "version": "0.2.0",
+  "title": "harmonia",
+  "modules": 4,
+  "decls": 112,
+  "loc": 1164,
+  "layers": 2,
+  "stableSince": "July 2026",
+  "releases": [
+    {
+      "v": "0.1.0",
+      "t": 1782803114968,
+      "major": false
+    },
+    {
+      "v": "0.1.1",
+      "t": 1782816071585,
+      "major": false
+    },
+    {
+      "v": "0.2.0",
+      "t": 1783325223010,
+      "major": false
+    }
+  ]
+}

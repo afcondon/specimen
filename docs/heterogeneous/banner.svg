@@ -8,6 +8,6 @@
       <text y="-75.6" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Heterogeneous.Mapping</text>
     </g><g transform="translate(1094.4,189.4)">
       <circle r="33.2" fill="#fff" stroke="#111" stroke-width="1.5"/>
-      <circle cx="-9.5" cy="0" r="9.8" fill="#111"/><circle cx="10.8" cy="0" r="9.2" fill="#111"/><circle cx="1.2" cy="15.7" r="8" fill="#111"/><circle cx="1.2" cy="-15.7" r="8" fill="#111"/><circle cx="-15.9" cy="-17.9" r="8" fill="#111"/><circle cx="-15.9" cy="17.9" r="8" fill="#111"/><circle cx="16" cy="-15.2" r="5.6" fill="#111"/><circle cx="16" cy="15.2" r="5.6" fill="#111"/><circle cx="25.4" cy="6.8" r="5.6" fill="#111"/>
+      <circle cx="-9.5" cy="0" r="9.8" fill="#111"/><circle cx="10.8" cy="0" r="9.2" fill="#111"/><circle cx="1.2" cy="15.7" r="8" fill="#111"/><circle cx="1.2" cy="-15.7" r="8" fill="#111"/><circle cx="-15.9" cy="-17.9" r="8" fill="#111"/><circle cx="-15.9" cy="17.9" r="8" fill="#111"/><circle cx="16" cy="-15.2" r="5.6" fill="#111"/><circle cx="16" cy="15.2" r="5.6" fill="#111"/><circle cx="25.4" cy="-6.8" r="5.6" fill="#111"/>
       <text y="-43.2" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" letter-spacing="0.08em" fill="#777" stroke="rgba(250,250,247,0.88)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Heterogeneous.Variadic</text>
     </g></svg>

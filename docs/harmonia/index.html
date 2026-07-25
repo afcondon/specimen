@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>harmonia &mdash; a specimen book</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0ODAgNDgwIiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjI0MCIgcj0iMjM0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjI0MCIgcj0iMTk0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPGRlZnM+PHBhdGggaWQ9InJpbSIgZD0iTSAyNSAyNDAgYSAyMTUgMjE1IDAgMSAxIDQzMCAwIi8+PC9kZWZzPgogIDx0ZXh0IGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjciIGZpbGw9IiMxMTEiPgogICAgPHRleHRQYXRoIGhyZWY9IiNyaW0iIHN0YXJ0T2Zmc2V0PSI1MCUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBVUkVTQ1JJUFQgJiMxODM7IEhBUk1PTklBPC90ZXh0UGF0aD4KICA8L3RleHQ+CiAgPHRleHQgeD0iMjQwIiB5PSI0NTgiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCBzZXJpZiIgZm9udC1zaXplPSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzExMSI+zrs8L3RleHQ+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+PGNpcmNsZSBjeD0iMjQwIiBjeT0iMjQwIiByPSIxODUuMzUwMDc4MjI5NjEwNDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzExMSIgc3Ryb2tlLXdpZHRoPSIxLjMiLz48Y2lyY2xlIGN4PSIxNDguODM4Mjc4ODY0NDMzNyIgY3k9IjIzNy43MDYxOTc1ODE0NjgxMyIgcj0iODkuNTA5NTgxNjcyNDkxOTIiIGZpbGw9IiMxMTEiLz48Y2lyY2xlIGN4PSIzMjUuMTg1NDg0ODI0MzM4NjMiIGN5PSIyMzcuNzA2MTk3NTgxNDY4MTMiIHI9IjgyLjE4NzcwMjUxNzAyMzQ3IiBmaWxsPSIjMTExIi8+PGNpcmNsZSBjeD0iMjQzLjI4MDgxNjUzOTg5NzI3IiBjeT0iMzYwLjE2Njg2Njg2MDU1MzMiIHI9IjYwLjQ4ODUxMTIzMTkzNjg3NiIgZmlsbD0iIzExMSIvPjxjaXJjbGUgY3g9IjI0My4xOTU2NTcyOTEwNTA5NiIgY3k9IjExNy43NzkwNjc4MDIwMTE1IiByPSI1OC40Mzc0NTM2NzE4NzM5MiIgZmlsbD0iIzExMSIvPjwvZz4KPC9zdmc+">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigil.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Long code lines must never widen the page (the specimen grid sizes
+     shared tracks to min-content), but they are also never clipped behind
+     a scrollbar — a line that outruns the measure simply extends into the
+     right margin, visible for close reading. Only the page edge cuts it. */
+  body { overflow-x: hidden; }
+  .specimen-stack > .row > * { min-width: 0; }
+  /* morph banner-nav layer (specimen-site) */
+  #stage { position: fixed; inset: 0; width: 100vw; height: 100vh; overflow: visible; z-index: 5; pointer-events: none; }
+  #stage a { pointer-events: auto; cursor: pointer; }
+  #stage circle.ring { transition: stroke-width .2s ease; }
+  #hero-title { position: fixed; top: 34px; left: 60px; z-index: 6; pointer-events: none; }
+  #hero-title .book-kicker { margin-bottom: 0.5rem; }
+  #hero-title .book-title { font-size: 1.9rem; margin: 0 0 0.5rem; }
+  #hero-title .book-deck { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); max-width: none; }
+  .book-versions { margin-top: 1.1rem; }
+  .book-versions .version-spark { display: block; }
+  .book-versions p { margin: 0.15rem 0 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); }
+  main#book { padding-top: calc(66vh + 220px); }
+  .book-colophon { margin: 8rem 0 4rem; text-align: center; }
+  .book-colophon svg { width: 300px; height: 300px; }
+  .book-colophon .facts { margin-top: 1.4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--margin); line-height: 2; }
+  @media (max-width: 1320px) { #stage.railed { opacity: 0; pointer-events: none; } }
+  #stage { transition: opacity .3s ease; }
+  /* FFI modal: foreign rows with a sidecar implementation are clickable */
+  .row.kind-foreign[data-ffi] { cursor: pointer; }
+  .row.kind-foreign[data-ffi] > .label::after { content: " · js"; color: var(--accent); }
+  .row.kind-foreign[data-ffi]:hover > .label { color: var(--ink); }
+  #ffi-modal[hidden] { display: none; }
+  #ffi-modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+  #ffi-modal .ffi-backdrop { position: absolute; inset: 0; background: rgba(26,26,26,0.35); }
+  #ffi-modal .ffi-card { position: relative; background: var(--paper); border: 1px solid var(--ink);
+    width: min(60rem, 92vw); max-height: 82vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+  #ffi-modal header { display: flex; align-items: baseline; gap: 1.4rem;
+    padding: 1rem 1.4rem; border-bottom: 1px solid var(--ink); }
+  #ffi-modal .ffi-title { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 1rem; }
+  #ffi-modal .ffi-sub { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--margin); }
+  #ffi-modal nav { margin-left: auto; display: flex; gap: 1rem; }
+  #ffi-modal nav button { font: inherit; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em;
+    background: none; border: none; padding: 0; color: var(--margin); cursor: pointer; }
+  #ffi-modal nav button.on { color: var(--accent); border-bottom: 1px solid var(--accent); }
+  #ffi-modal .ffi-close { font: inherit; background: none; border: none; cursor: pointer; color: var(--margin); font-size: 1rem; }
+  #ffi-modal pre { margin: 0; padding: 1.2rem 1.4rem; overflow: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.55; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header id="hero-title" class="book-head">
+  <div class="book-kicker">PureScript &middot; specimen book</div>
+  <h1 class="book-title">harmonia</h1>
+  <p class="book-deck">4 modules &middot; 112 declarations &middot; import order left to right &middot; the swarm is the nav</p>
+  <div class="book-versions">
+    <svg class="version-spark" viewBox="0 0 300 32" width="300" height="32" role="img" aria-label="release timeline">
+    <line x1="4" y1="20" x2="296" y2="20" stroke="#d8d6cf" stroke-width="1"/>
+    <line x1="4.0" y1="12" x2="4.0" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="5.7" y1="12" x2="5.7" y2="20" stroke="#1a1a1a" stroke-width="1"/><line x1="73.1" y1="12" x2="73.1" y2="20" stroke="#1a1a1a" stroke-width="1"/>
+    <circle cx="296" cy="20" r="2.5" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    <text x="4" y="31" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">2026</text>
+    <text x="296" y="31" text-anchor="end" font-family="Inter, sans-serif" font-size="8" letter-spacing="0.1em" fill="#8a877e">today</text>
+  </svg>
+    <p>3 releases since 2026 &middot; stable since July 2026</p>
+  </div>
+</header>
+
+<svg id="stage"></svg>
+
+<main id="book">
+  <div class="book-body">
+<div class="book-module" id="mod-Harmonia-Chord" data-module="Harmonia.Chord" style="--accent: hsl(0, 58%, 43%)"><article class="specimen-doc"><header class="specimen-head"><div class="kicker">PureScript Module</div><h1>Harmonia.Chord</h1><div class="exports"><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">numeral<wbr/>Index</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">quality<wbr/>Intervals</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">mode<wbr/>Intervals</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">default<wbr/>Interval<wbr/>For</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">realize</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">chord<wbr/>Root</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">chord<wbr/>Bass</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">deg</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">slashed</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">borrow</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">c<wbr/>Major<wbr/>Key</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">a<wbr/>Minor<wbr/>Key</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">mcmullen<wbr/>Yellow</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">mcmullen<wbr/>Yellow<wbr/>Names</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Numeral(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Quality(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Tension(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Degree<wbr/>Chord(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Mode(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Key</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Chord(..)</span></div><div class="export-cell exp-empty"></div><div class="export-cell exp-empty"></div><div class="export-cell exp-empty"></div></div></header><div class="specimen-stack"><section class="row kind-imports"><span class="label">Imports</span><div class="specimen-imports"><span class="kw">import</span><span class="mod">Prelude</span><span class="as"></span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Array</span><span class="as"></span><span class="list">(cons, filter, nub, sort, (!!))</span><span class="kw">import</span><span class="mod">Data.Foldable</span><span class="as"></span><span class="list">(elem, foldl)</span><span class="kw">import</span><span class="mod">Data.Maybe</span><span class="as"></span><span class="list">(Maybe(..), fromMaybe)</span></div></section><section class="row kind-section"><div class="section-title">Numeral — scale-degree position (I..VII)</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Numeral</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">I</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">II</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">III</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">IV</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">V</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">VI</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">VII</span></span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqNumeral</span><span class="sep">::</span><span class="type">Eq Numeral</span><pre class="defn-body">derive instance ordNumeral :: Ord Numeral</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showNumeral</span><span class="sep">::</span><span class="type">Show Numeral<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    I   <span class="g">→</span> &quot;I&quot;
+    II  <span class="g">→</span> &quot;II&quot;
+    III <span class="g">→</span> &quot;III&quot;
+    IV  <span class="g">→</span> &quot;IV&quot;
+    V   <span class="g">→</span> &quot;V&quot;
+    VI  <span class="g">→</span> &quot;VI&quot;
+    VII <span class="g">→</span> &quot;VII&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">numeralIndex</span><span class="sep">::</span><span class="type">Numeral <span class="g">→</span> Int</span><pre class="defn-body">numeralIndex = case _ of
+  I   <span class="g">→</span> 0
+  II  <span class="g">→</span> 1
+  III <span class="g">→</span> 2
+  IV  <span class="g">→</span> 3
+  V   <span class="g">→</span> 4
+  VI  <span class="g">→</span> 5
+  VII <span class="g">→</span> 6</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Zero-based index into the mode&#39;s interval array.</p></div></section><section class="row kind-section"><div class="section-title">Quality — the triad or seventh-chord type</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Quality</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Maj</span><span class="ctor-comment">major triad           [0, 4, 7]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Min</span><span class="ctor-comment">minor triad           [0, 3, 7]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Dim</span><span class="ctor-comment">diminished triad      [0, 3, 6]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Aug</span><span class="ctor-comment">augmented triad       [0, 4, 8]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Maj7</span><span class="ctor-comment">major 7th             [0, 4, 7, 11]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Min7</span><span class="ctor-comment">minor 7th             [0, 3, 7, 10]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Dom7</span><span class="ctor-comment">dominant 7th          [0, 4, 7, 10]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">HalfDim</span><span class="ctor-comment">minor 7 b5            [0, 3, 6, 10]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">FullyDim</span><span class="ctor-comment">diminished 7          [0, 3, 6, 9]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">MinMaj7</span><span class="ctor-comment">minor major 7         [0, 3, 7, 11]</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">AugMaj7</span><span class="ctor-comment">augmented major 7     [0, 4, 8, 11]</span></span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqQuality</span><span class="sep">::</span><span class="type">Eq Quality</span><pre class="defn-body">derive instance ordQuality :: Ord Quality</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showQuality</span><span class="sep">::</span><span class="type">Show Quality<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    Maj       <span class="g">→</span> &quot;Maj&quot;
+    Min       <span class="g">→</span> &quot;Min&quot;
+    Dim       <span class="g">→</span> &quot;Dim&quot;
+    Aug       <span class="g">→</span> &quot;Aug&quot;
+    Maj7      <span class="g">→</span> &quot;Maj7&quot;
+    Min7      <span class="g">→</span> &quot;Min7&quot;
+    Dom7      <span class="g">→</span> &quot;Dom7&quot;
+    HalfDim   <span class="g">→</span> &quot;HalfDim&quot;
+    FullyDim  <span class="g">→</span> &quot;FullyDim&quot;
+    MinMaj7   <span class="g">→</span> &quot;MinMaj7&quot;
+    AugMaj7   <span class="g">→</span> &quot;AugMaj7&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">qualityIntervals</span><span class="sep">::</span><span class="type">Quality <span class="g">→</span> Array Int</span><pre class="defn-body">qualityIntervals = case _ of
+  Maj      <span class="g">→</span> [0, 4, 7]
+  Min      <span class="g">→</span> [0, 3, 7]
+  Dim      <span class="g">→</span> [0, 3, 6]
+  Aug      <span class="g">→</span> [0, 4, 8]
+  Maj7     <span class="g">→</span> [0, 4, 7, 11]
+  Min7     <span class="g">→</span> [0, 3, 7, 10]
+  Dom7     <span class="g">→</span> [0, 4, 7, 10]
+  HalfDim  <span class="g">→</span> [0, 3, 6, 10]
+  FullyDim <span class="g">→</span> [0, 3, 6, 9]
+  MinMaj7  <span class="g">→</span> [0, 3, 7, 11]
+  AugMaj7  <span class="g">→</span> [0, 4, 8, 11]</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Interval set of a chord quality, in semitones from the root.</p></div></section><section class="row kind-section"><div class="section-title">Tension — additions, alterations, suspensions</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Tension</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Add</span> <span class="ctor-args">Int</span><span class="ctor-comment">add the n-th degree (major&#x2F;perfect interval)</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Sharp</span> <span class="ctor-args">Int</span><span class="ctor-comment">raise the n-th degree by 1 semitone</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Flat</span> <span class="ctor-args">Int</span><span class="ctor-comment">lower the n-th degree by 1 semitone</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Sus</span> <span class="ctor-args">Int</span><span class="ctor-comment">replace the 3rd with the n-th</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">NoFifth</span><span class="ctor-comment">omit the 5th</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">NoThird</span><span class="ctor-comment">omit the 3rd</span></span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqTension</span><span class="sep">::</span><span class="type">Eq Tension</span><pre class="defn-body">derive instance ordTension :: Ord Tension</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showTension</span><span class="sep">::</span><span class="type">Show Tension<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    Add   n  <span class="g">→</span> &quot;Add &quot;   &lt;&gt; show n
+    Sharp n  <span class="g">→</span> &quot;Sharp &quot; &lt;&gt; show n
+    Flat  n  <span class="g">→</span> &quot;Flat &quot;  &lt;&gt; show n
+    Sus   n  <span class="g">→</span> &quot;Sus &quot;   &lt;&gt; show n
+    NoFifth  <span class="g">→</span> &quot;NoFifth&quot;
+    NoThird  <span class="g">→</span> &quot;NoThird&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">defaultIntervalFor</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Maybe Int</span><pre class="defn-body">defaultIntervalFor = case _ of
+  1  <span class="g">→</span> Just 0     -- root
+  2  <span class="g">→</span> Just 2     -- Major 2nd
+  3  <span class="g">→</span> Just 4     -- Major 3rd
+  4  <span class="g">→</span> Just 5     -- Perfect 4th
+  5  <span class="g">→</span> Just 7     -- Perfect 5th
+  6  <span class="g">→</span> Just 9     -- Major 6th
+  7  <span class="g">→</span> Just 11    -- Major 7th
+  9  <span class="g">→</span> Just 14    -- Major 9th
+  11 <span class="g">→</span> Just 17    -- Perfect 11th
+  13 <span class="g">→</span> Just 21    -- Major 13th
+  _  <span class="g">→</span> Nothing</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Default semitone offset for a numbered degree, measured from the chord root.</p></div></section><section class="row kind-section"><div class="section-title">DegreeChord — the scale-degree-relative recipe</div></section><section class="row kind-data kind-newtype"><span class="label">Newtype</span><span class="name"><span class="kw">newtype </span>DegreeChord</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">DegreeChord</span></span></div><pre class="defn-body">  { numeral  :: Numeral
+  , quality  :: Quality
+  , tensions :: Array Tension
+  , slash    :: Maybe Numeral   -- bass note as a scale degree
+  , mode     :: Maybe Mode      -- modal-interchange override
+  }</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqDegreeChord</span><span class="sep">::</span><span class="type">Eq DegreeChord</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showDegreeChord</span><span class="sep">::</span><span class="type">Show DegreeChord<span class="inst-where"> where</span></span><pre class="defn-body">  show (DegreeChord r) =
+    &quot;DegreeChord { numeral: &quot; &lt;&gt; show r.numeral
+      &lt;&gt; &quot;, quality: &quot; &lt;&gt; show r.quality
+      &lt;&gt; &quot;, tensions: &quot; &lt;&gt; show r.tensions
+      &lt;&gt; &quot;, slash: &quot; &lt;&gt; show r.slash
+      &lt;&gt; &quot;, mode: &quot; &lt;&gt; show r.mode &lt;&gt; &quot; }&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">deg</span><span class="sep">::</span><span class="type">Numeral <span class="g">→</span> Quality <span class="g">→</span> Array Tension <span class="g">→</span> DegreeChord</span><pre class="defn-body">deg n q ts = DegreeChord
+  { numeral: n, quality: q, tensions: ts, slash: Nothing, mode: Nothing }</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Convenience constructor: numeral + quality + tensions, default slash&#x2F;mode to Nothing.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">slashed</span><span class="sep">::</span><span class="type">DegreeChord <span class="g">→</span> Numeral <span class="g">→</span> DegreeChord</span><div class="value-body"><span class="name">slashed (DegreeChord r) b</span><span class="sep">=</span><span class="type">DegreeChord (r { slash = Just b })</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Apply a slash bass to a chord recipe.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">borrow</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> DegreeChord <span class="g">→</span> DegreeChord</span><div class="value-body"><span class="name">borrow m (DegreeChord r)</span><span class="sep">=</span><span class="type">DegreeChord (r { mode = Just m })</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Borrow this chord&#39;s root lookup from a parallel mode.</p></div></section><section class="row kind-section"><div class="section-title">Mode — interval template</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Mode</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Ionian</span> <span class="ctor-args">| Dorian | Phrygian | Lydian | Mixolydian</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Aeolian</span> <span class="ctor-args">| Locrian</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">HarmonicMinor</span> <span class="ctor-args">| MelodicMinor</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">LocrianNat6</span> <span class="ctor-args">| IonianSharp5 | DorianSharp4</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">PhrygianDominant</span> <span class="ctor-args">| LydianSharp2 | Ultralocrian</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">DorianFlat2</span> <span class="ctor-args">| LydianAugmented | LydianDominant</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">MixolydianFlat6</span> <span class="ctor-args">| LocrianNat2 | Altered</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Custom</span> <span class="ctor-args">(Array Int)</span></span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqMode</span><span class="sep">::</span><span class="type">Eq Mode</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showMode</span><span class="sep">::</span><span class="type">Show Mode<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    Ionian        <span class="g">→</span> &quot;Ionian&quot;
+    Dorian        <span class="g">→</span> &quot;Dorian&quot;
+    Phrygian      <span class="g">→</span> &quot;Phrygian&quot;
+    Lydian        <span class="g">→</span> &quot;Lydian&quot;
+    Mixolydian    <span class="g">→</span> &quot;Mixolydian&quot;
+    Aeolian       <span class="g">→</span> &quot;Aeolian&quot;
+    Locrian       <span class="g">→</span> &quot;Locrian&quot;
+    HarmonicMinor <span class="g">→</span> &quot;HarmonicMinor&quot;
+    MelodicMinor  <span class="g">→</span> &quot;MelodicMinor&quot;
+    LocrianNat6      <span class="g">→</span> &quot;LocrianNat6&quot;
+    IonianSharp5     <span class="g">→</span> &quot;IonianSharp5&quot;
+    DorianSharp4     <span class="g">→</span> &quot;DorianSharp4&quot;
+    PhrygianDominant <span class="g">→</span> &quot;PhrygianDominant&quot;
+    LydianSharp2     <span class="g">→</span> &quot;LydianSharp2&quot;
+    Ultralocrian     <span class="g">→</span> &quot;Ultralocrian&quot;
+    DorianFlat2      <span class="g">→</span> &quot;DorianFlat2&quot;
+    LydianAugmented  <span class="g">→</span> &quot;LydianAugmented&quot;
+    LydianDominant   <span class="g">→</span> &quot;LydianDominant&quot;
+    MixolydianFlat6  <span class="g">→</span> &quot;MixolydianFlat6&quot;
+    LocrianNat2      <span class="g">→</span> &quot;LocrianNat2&quot;
+    Altered          <span class="g">→</span> &quot;Altered&quot;
+    Custom xs     <span class="g">→</span> &quot;Custom &quot; &lt;&gt; show xs</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">modeIntervals</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> Array Int</span><pre class="defn-body">modeIntervals = case _ of
+  Ionian        <span class="g">→</span> [0, 2, 4, 5, 7, 9, 11]
+  Dorian        <span class="g">→</span> [0, 2, 3, 5, 7, 9, 10]
+  Phrygian      <span class="g">→</span> [0, 1, 3, 5, 7, 8, 10]
+  Lydian        <span class="g">→</span> [0, 2, 4, 6, 7, 9, 11]
+  Mixolydian    <span class="g">→</span> [0, 2, 4, 5, 7, 9, 10]
+  Aeolian       <span class="g">→</span> [0, 2, 3, 5, 7, 8, 10]
+  Locrian       <span class="g">→</span> [0, 1, 3, 5, 6, 8, 10]
+  HarmonicMinor <span class="g">→</span> [0, 2, 3, 5, 7, 8, 11]
+  MelodicMinor  <span class="g">→</span> [0, 2, 3, 5, 7, 9, 11]
+  -- modes of harmonic minor
+  LocrianNat6      <span class="g">→</span> [0, 1, 3, 5, 6, 9, 10]
+  IonianSharp5     <span class="g">→</span> [0, 2, 4, 5, 8, 9, 11]
+  DorianSharp4     <span class="g">→</span> [0, 2, 3, 6, 7, 9, 10]
+  PhrygianDominant <span class="g">→</span> [0, 1, 4, 5, 7, 8, 10]
+  LydianSharp2     <span class="g">→</span> [0, 3, 4, 6, 7, 9, 11]
+  Ultralocrian     <span class="g">→</span> [0, 1, 3, 4, 6, 8, 9]
+  -- modes of melodic minor
+  DorianFlat2      <span class="g">→</span> [0, 1, 3, 5, 7, 9, 10]
+  LydianAugmented  <span class="g">→</span> [0, 2, 4, 6, 8, 9, 11]
+  LydianDominant   <span class="g">→</span> [0, 2, 4, 6, 7, 9, 10]
+  MixolydianFlat6  <span class="g">→</span> [0, 2, 4, 5, 7, 8, 10]
+  LocrianNat2      <span class="g">→</span> [0, 2, 3, 5, 6, 8, 10]
+  Altered          <span class="g">→</span> [0, 1, 3, 4, 6, 8, 10]
+  Custom xs     <span class="g">→</span> xs</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Semitone offsets from the tonic for each scale degree.</p></div></section><section class="row kind-section"><div class="section-title">Key — tonic + mode.  Tonic is a pitch class (0..11).</div></section><section class="row kind-type"><span class="label">Type</span><span class="name"><span class="kw">type </span>Key</span><span class="sep">=</span><span class="type">{ tonic :: Int, mode :: Mode }</span></section><section class="row kind-value"><span class="label">Function</span><span class="name">cMajorKey</span><span class="sep">::</span><span class="type">Key</span><div class="value-body"><span class="name">cMajorKey</span><span class="sep">=</span><span class="type">{ tonic: 0, mode: Ionian }</span></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">aMinorKey</span><span class="sep">::</span><span class="type">Key</span><div class="value-body"><span class="name">aMinorKey</span><span class="sep">=</span><span class="type">{ tonic: 9, mode: Aeolian }</span></div></section><section class="row kind-section"><div class="section-title">Chord — unordered set of pitch classes (0..11)</div></section><section class="row kind-data kind-newtype"><span class="label">Newtype</span><span class="name"><span class="kw">newtype </span>Chord</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Chord</span> <span class="ctor-args">(Array Int)</span></span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqChord</span><span class="sep">::</span><span class="type">Eq Chord</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showChord</span><span class="sep">::</span><span class="type">Show Chord<span class="inst-where"> where</span></span><div class="value-body"><span class="name">show (Chord xs)</span><span class="sep">=</span><span class="type">&quot;Chord &quot; &lt;&gt; show xs</span></div></section><section class="row kind-section"><div class="section-title">realize — recipe → pitch-class set</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">realize</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> DegreeChord <span class="g">→</span> Chord</span><pre class="defn-body">realize key (DegreeChord r) =
+  let
+    effectiveMode = fromMaybe key.mode r.mode
+
+    rootPC = (key.tonic + modeAt effectiveMode (numeralIndex r.numeral)) `mod` 12
+
+    baseIntervals = qualityIntervals r.quality
+
+    tensioned = foldl applyTension baseIntervals r.tensions
+
+    withSlash = case r.slash of
+      Nothing <span class="g">→</span> tensioned
+      Just bassNumeral <span class="g">→</span>
+        let
+          bassPC = (key.tonic + modeAt effectiveMode (numeralIndex bassNumeral)) `mod` 12
+          bassOffset = (bassPC - rootPC + 12) `mod` 12
+        in
+          if bassOffset `elem` tensioned
+            then tensioned
+            else cons bassOffset tensioned
+
+    pcs = map (\iv <span class="g">→</span> (rootPC + iv) `mod` 12) withSlash
+  in
+    Chord (nub (sort pcs))</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Resolve a DegreeChord against a Key.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">chordRoot</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> DegreeChord <span class="g">→</span> Int</span><pre class="defn-body">chordRoot key (DegreeChord r) =
+  let effectiveMode = fromMaybe key.mode r.mode
+  in (key.tonic + modeAt effectiveMode (numeralIndex r.numeral)) `mod` 12</pre><div class="marginalia"><p class="can-dropcap">The chord&#39;s ROOT pitch class against a Key — <code>(tonic + mode-interval at numeral) mod 12</code>, honouring a borrowed-mode override. Same arithmetic <code>realize</code> uses for the root; exposed so callers can GROUND a chord (put its root in the bass) and LABEL it by its root rather than by the lowest pitch-class of a sorted voicing.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">chordBass</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> DegreeChord <span class="g">→</span> Int</span><pre class="defn-body">chordBass key dc@(DegreeChord r) = case r.slash of
+  Just bassNumeral <span class="g">→</span>
+    let effectiveMode = fromMaybe key.mode r.mode
+    in (key.tonic + modeAt effectiveMode (numeralIndex bassNumeral)) `mod` 12
+  Nothing <span class="g">→</span> chordRoot key dc</pre><div class="marginalia"><p class="can-dropcap">The pitch class a chord should sit on in the bass: its slash bass if slashed (e.g. I maj7&#x2F;vii), else its root.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">modeAt</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> Int <span class="g">→</span> Int</span><div class="value-body"><span class="name">modeAt m n</span><span class="sep">=</span><span class="type">fromMaybe 0 (modeIntervals m !! (n `mod` 7))</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Look up a degree&#39;s semitone offset in a mode.  Degrees wrap at 7.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">applyTension</span><span class="sep">::</span><span class="type">Array Int <span class="g">→</span> Tension <span class="g">→</span> Array Int</span><pre class="defn-body">applyTension acc = case _ of
+  Add n <span class="g">→</span>
+    case defaultIntervalFor n of
+      Just iv <span class="g">→</span> cons (iv `mod` 12) acc
+      Nothing <span class="g">→</span> acc
+  Sharp n <span class="g">→</span>
+    case defaultIntervalFor n of
+      Just iv <span class="g">→</span> cons ((iv + 1) `mod` 12) acc
+      Nothing <span class="g">→</span> acc
+  Flat n <span class="g">→</span>
+    case defaultIntervalFor n of
+      Just iv <span class="g">→</span> cons ((iv + 11) `mod` 12) acc
+      Nothing <span class="g">→</span> acc
+  Sus n <span class="g">→</span>
+    case defaultIntervalFor n of
+      Just iv <span class="g">→</span> cons (iv `mod` 12) (removeThird acc)
+      Nothing <span class="g">→</span> acc
+  NoFifth <span class="g">→</span> filter (\x <span class="g">→</span> x &#x2F;= 6 &amp;&amp; x &#x2F;= 7 &amp;&amp; x &#x2F;= 8) acc
+  NoThird <span class="g">→</span> removeThird acc</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Apply a single tension to an interval set.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">removeThird</span><span class="sep">::</span><span class="type">Array Int <span class="g">→</span> Array Int</span><div class="value-body"><span class="name">removeThird</span><span class="sep">=</span><span class="type">filter (\x <span class="g">→</span> x &#x2F;= 3 &amp;&amp; x &#x2F;= 4)</span></div></section><section class="row kind-section"><div class="section-title">mcmullenYellow — Joe McMullen&#39;s third Plaits chord table (Yellow column).<br/>18 chords, encoded as key-relative DegreeChord recipes.</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">mcmullenYellow</span><span class="sep">::</span><span class="type">Array DegreeChord</span><pre class="defn-body">mcmullenYellow =
+  [ borrow Aeolian (deg IV  Min  [Add 6, Add 9])     -- 1.  iv 6&#x2F;9
+  , deg II  HalfDim [Sus 4]                          -- 2.  iio 7sus4
+  , borrow Aeolian (deg VII Maj  [Add 6])            -- 3.  VII 6
+  , deg V   Min  [Add 11]                            -- 4.  v m11
+  , borrow Aeolian (deg III Maj  [Add 4])            -- 5.  III add4
+  , deg I   Min  [Flat 13]                           -- 6.  i addb13
+  , borrow Aeolian (deg VI  Maj  [Sharp 11])         -- 7.  VI add#11
+  , borrow Aeolian (deg IV  Min  [Add 6])            -- 8.  iv m6
+  , deg II  Dim  []                                  -- 9.  iio
+  , deg VII Dim  []                                  -- 10. viio
+  , deg V   Dom7 []                                  -- 11. V7
+  , deg III Min  [Flat 9]                            -- 12. iii addb9
+  , deg I   Maj7 []                                  -- 13. I maj7
+  , deg VI  Min7 [Add 9]                             -- 14. vi m9
+  , deg IV  Maj7 [Add 9]                             -- 15. IV maj9
+  , deg II  Min7 []                                  -- 16. ii m7
+  , slashed (deg I Maj7 [Sus 4]) VII                 -- 17. I maj7sus4&#x2F;vii
+  , deg V   Dom7 [Sus 4]                             -- 18. V 7sus4
+  ]</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">mcmullenYellowNames</span><span class="sep">::</span><span class="type">Array String</span><pre class="defn-body">mcmullenYellowNames =
+  [ &quot;iv6&#x2F;9&quot;, &quot;iiø&quot;, &quot;♭VII6&quot;, &quot;v11&quot;, &quot;♭III+4&quot;, &quot;i♭13&quot;, &quot;♭VI♯11&quot;, &quot;iv6&quot;
+  , &quot;ii°&quot;, &quot;vii°&quot;, &quot;V7&quot;, &quot;iii♭9&quot;, &quot;Imaj7&quot;, &quot;vi9&quot;, &quot;IVmaj9&quot;, &quot;ii7&quot;
+  , &quot;Imaj7&#x2F;7&quot;, &quot;V7sus4&quot; ]</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Short display names, parallel (index-for-index) to <code>mcmullenYellow</code>.</p></div></section></div><footer class="specimen-foot"><div class="field">module from harmonia v0.2.0</div></footer></article></div>
+<div class="book-module" id="mod-Harmonia-Anchor" data-module="Harmonia.Anchor" style="--accent: hsl(100, 58%, 43%)"><article class="specimen-doc"><header class="specimen-head"><div class="kicker">PureScript Module</div><h1>Harmonia.Anchor</h1><div class="exports"><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">classify</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">grade<wbr/>Anchor</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">permitted</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">permits</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">scale<wbr/>PCs</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">chord<wbr/>In<wbr/>Scale</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">diatonic<wbr/>Quality</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">is<wbr/>Seventh</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Anchor(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Grade(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Op(..)</span></div><div class="export-cell exp-empty"></div></div></header><div class="specimen-stack"><section class="row kind-imports"><span class="label">Imports</span><div class="specimen-imports"><span class="kw">import</span><span class="mod">Prelude</span><span class="as"></span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Array</span><span class="as"></span><span class="list">(elem, (!!))</span><span class="kw">import</span><span class="mod">Data.Foldable</span><span class="as"></span><span class="list">(all)</span><span class="kw">import</span><span class="mod">Data.Maybe</span><span class="as"></span><span class="list">(Maybe(..), fromMaybe)</span><span class="kw">import</span><span class="mod">Harmonia.Chord</span><span class="as"></span><span class="list"></span></div></section><section class="row kind-section"><div class="section-title">Grade — the ordinal capability ladder</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Grade</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">ShiftOnly</span><span class="ctor-comment">^ no scale reading — only absolute semitone motion</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Keyed</span><span class="ctor-comment">^ located to a key, but borrowed &#x2F; foreign to it: can modulate</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Diatonic</span><span class="ctor-comment">^ fully at home in its key: can also reflavour and substitute</span></span></div><div class="marginalia"><p class="can-dropcap">How much harmonic leverage a chord affords, low to high. The order is the whole point: capabilities nest, so <code>Ord</code> is meaningful — a <code>Diatonic</code> chord can do everything a <code>Keyed</code> one can, and more.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqGrade</span><span class="sep">::</span><span class="type">Eq Grade</span><pre class="defn-body">derive instance ordGrade :: Ord Grade</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showGrade</span><span class="sep">::</span><span class="type">Show Grade<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    ShiftOnly <span class="g">→</span> &quot;ShiftOnly&quot;
+    Keyed     <span class="g">→</span> &quot;Keyed&quot;
+    Diatonic  <span class="g">→</span> &quot;Diatonic&quot;</pre></section><section class="row kind-section"><div class="section-title">Op — the closed set of grade-gated verbs</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Op</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Shift</span><span class="ctor-comment">^ absolute semitone transposition</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Modulate</span><span class="ctor-comment">^ move the tonic, preserve the degree</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Reflavour</span><span class="ctor-comment">^ keep tonic + degree, change the mode, re-derive</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Substitute</span><span class="ctor-comment">^ replace with another chord of the same function</span></span></div><div class="marginalia"><p class="can-dropcap">The operations a chord can be asked to undergo. <code>Shift</code> is the floor (always available); the rest need progressively richer readings. A closed set: these are program-logic alternatives, so extending them is a deliberate recompile, never open user data.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqOp</span><span class="sep">::</span><span class="type">Eq Op</span><pre class="defn-body">derive instance ordOp :: Ord Op</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showOp</span><span class="sep">::</span><span class="type">Show Op<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    Shift      <span class="g">→</span> &quot;Shift&quot;
+    Modulate   <span class="g">→</span> &quot;Modulate&quot;
+    Reflavour  <span class="g">→</span> &quot;Reflavour&quot;
+    Substitute <span class="g">→</span> &quot;Substitute&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">permitted</span><span class="sep">::</span><span class="type">Grade <span class="g">→</span> Array Op</span><pre class="defn-body">permitted = case _ of
+  ShiftOnly <span class="g">→</span> [ Shift ]
+  Keyed     <span class="g">→</span> [ Shift, Modulate ]
+  Diatonic  <span class="g">→</span> [ Shift, Modulate, Reflavour, Substitute ]</pre><div class="marginalia"><p class="can-dropcap">The verbs a grade permits — nested, so higher grades are supersets. This is where the musical knowledge &quot;reflavour ⇒ modulate ⇒ shift&quot; lives, so no caller has to re-derive it.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">permits</span><span class="sep">::</span><span class="type">Op <span class="g">→</span> Grade <span class="g">→</span> Boolean</span><div class="value-body"><span class="name">permits op g</span><span class="sep">=</span><span class="type">elem op (permitted g)</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Is this operation available at this grade?</p></div></section><section class="row kind-section"><div class="section-title">Anchor — the reading (or its absence)</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Anchor</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Located</span> <span class="ctor-args">Key DegreeChord</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Free</span></span></div><div class="marginalia"><p class="can-dropcap">A chord&#39;s scale reading. <code>Located</code> carries the full recipe and its key; <code>Free</code> is a chord that has left home (hand-entered, dragged out of key, or caught with no context) and can only be shifted.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqAnchor</span><span class="sep">::</span><span class="type">Eq Anchor</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showAnchor</span><span class="sep">::</span><span class="type">Show Anchor<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    Located key dc <span class="g">→</span> &quot;Located &quot; &lt;&gt; show key.tonic &lt;&gt; &quot; &quot; &lt;&gt; show key.mode &lt;&gt; &quot; &quot; &lt;&gt; show dc
+    Free           <span class="g">→</span> &quot;Free&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">gradeAnchor</span><span class="sep">::</span><span class="type">Anchor <span class="g">→</span> Grade</span><pre class="defn-body">gradeAnchor = case _ of
+  Free            <span class="g">→</span> ShiftOnly
+  Located key dc  <span class="g">→</span> classify key dc</pre><div class="marginalia"><p class="can-dropcap">The grade of an anchor, derived. <code>Free</code> is always <code>ShiftOnly</code>; a <code>Located</code> chord is classified against its key.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">classify</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> DegreeChord <span class="g">→</span> Grade</span><pre class="defn-body">classify key dc@(DegreeChord r) = case r.mode of
+  Just m | m &#x2F;= key.mode <span class="g">→</span> Keyed
+  _ <span class="g">→</span> if chordInScale key dc then Diatonic else Keyed</pre><div class="marginalia"><p class="can-dropcap">The v1 judgment. A located chord is <code>Diatonic</code> when it wears no modal- interchange override *and* every pitch it realizes falls inside the key&#39;s scale. Otherwise it is <code>Keyed</code> — it still has a tonic to modulate around, but it is foreign enough that reflavouring it into another mode is ill-defined (there is no single &quot;same degree&quot; to re-read).</p><p>This is deliberately conservative and needs no chord-analyser: an out-of-scale chord simply drops to <code>Keyed</code>, so downstream operations pass it through under blame rather than silently mangling it. The place to grow later is *upward* — recognising a chromatic chord as a secondary function (V&#x2F;x, viio&#x2F;x) of a phrase degree and promoting it back to <code>Diatonic</code> in context. That promotion belongs to the phrase, not the lone chord (see <code>Harmonia.Graded</code>).</p></div></section><section class="row kind-section"><div class="section-title">Scale membership</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">scalePCs</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> Array Int</span><div class="value-body"><span class="name">scalePCs key</span><span class="sep">=</span><span class="type">map (\iv <span class="g">→</span> (key.tonic + iv) `mod` 12) (modeIntervals key.mode)</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">The pitch classes of a key&#39;s scale.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">chordInScale</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> DegreeChord <span class="g">→</span> Boolean</span><pre class="defn-body">chordInScale key dc =
+  let Chord pcs = realize key dc
+  in all (\p <span class="g">→</span> elem p (scalePCs key)) pcs</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Does every pitch class of the realized chord lie in the key&#39;s scale?</p></div></section><section class="row kind-section"><div class="section-title">diatonicQuality — the substance of a reflavour</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">diatonicQuality</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> Numeral <span class="g">→</span> Boolean <span class="g">→</span> Quality</span><pre class="defn-body">diatonicQuality m n seventh =
+  let
+    idx = numeralIndex n
+    r   = scaleDegreeSemi m idx
+    t   = (scaleDegreeSemi m (idx + 2) - r) `mod` 12
+    f   = (scaleDegreeSemi m (idx + 4) - r) `mod` 12
+    s   = (scaleDegreeSemi m (idx + 6) - r) `mod` 12
+  in
+    if seventh then seventhQuality t f s else triadQuality t f</pre><div class="marginalia"><p class="can-dropcap">The diatonic chord quality on a given degree of a mode, built by stacking thirds *within the scale*. This is what makes reflavouring real: the same numeral read in a new mode becomes whatever that mode&#39;s own harmony makes it — I maj7 in Ionian becomes i m7 in Aeolian, not a transposed Imaj7.</p><p><code>seventh</code> chooses a four-note (true) or three-note (triad) reading, so a reflavour preserves the chord&#39;s *size* while re-deriving its *flavour*.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">scaleDegreeSemi</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> Int <span class="g">→</span> Int</span><pre class="defn-body">scaleDegreeSemi m k =
+  let base = fromMaybe 0 (modeIntervals m !! (k `mod` 7))
+  in base + 12 * (k `div` 7)</pre><div class="marginalia"><p class="can-dropcap">Semitone offset of the k-th scale degree above the tonic, wrapping past the octave so third-stacking above degree 7 keeps climbing.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">seventhQuality</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int <span class="g">→</span> Int <span class="g">→</span> Quality</span><pre class="defn-body">seventhQuality third fifth sev = case [ third, fifth, sev ] of
+  [ 4, 7, 11 ] <span class="g">→</span> Maj7
+  [ 4, 7, 10 ] <span class="g">→</span> Dom7
+  [ 3, 7, 10 ] <span class="g">→</span> Min7
+  [ 3, 6, 10 ] <span class="g">→</span> HalfDim
+  [ 3, 6, 9 ]  <span class="g">→</span> FullyDim
+  [ 3, 7, 11 ] <span class="g">→</span> MinMaj7
+  [ 4, 8, 11 ] <span class="g">→</span> AugMaj7
+  _            <span class="g">→</span> triadQuality third fifth</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">triadQuality</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int <span class="g">→</span> Quality</span><pre class="defn-body">triadQuality third fifth = case [ third, fifth ] of
+  [ 4, 7 ] <span class="g">→</span> Maj
+  [ 3, 7 ] <span class="g">→</span> Min
+  [ 3, 6 ] <span class="g">→</span> Dim
+  [ 4, 8 ] <span class="g">→</span> Aug
+  _        <span class="g">→</span> Maj</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">isSeventh</span><span class="sep">::</span><span class="type">Quality <span class="g">→</span> Boolean</span><pre class="defn-body">isSeventh = case _ of
+  Maj7     <span class="g">→</span> true
+  Min7     <span class="g">→</span> true
+  Dom7     <span class="g">→</span> true
+  HalfDim  <span class="g">→</span> true
+  FullyDim <span class="g">→</span> true
+  MinMaj7  <span class="g">→</span> true
+  AugMaj7  <span class="g">→</span> true
+  _        <span class="g">→</span> false</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Does this quality carry a seventh?</p></div></section></div><footer class="specimen-foot"><div class="field">module from harmonia v0.2.0</div></footer></article></div>
+<div class="book-module" id="mod-Harmonia-Voicing" data-module="Harmonia.Voicing" style="--accent: hsl(200, 58%, 43%)"><article class="specimen-doc"><header class="specimen-head"><div class="kicker">PureScript Module</div><h1>Harmonia.Voicing</h1><div class="exports"><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">voicing<wbr/>Midi</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">close<wbr/>Voicing -- Primitives</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">open<wbr/>Triad</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">rootless</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">drop2</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">drop2and4</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">quartal</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">cluster</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">spread -- Composition alias</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">take<wbr/>Chord</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">take<wbr/>Voicing -- Voice leading (V-C)</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">voice<wbr/>Lead</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">enumerate<wbr/>Voicings</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">play</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">play<wbr/>From</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">nearest<wbr/>Note</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Voicing(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Voicing<wbr/>Strategy -- Selectors</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Selector(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Progression</span></div></div></header><div class="specimen-stack"><section class="row kind-imports"><span class="label">Imports</span><div class="specimen-imports"><span class="kw">import</span><span class="mod">Prelude</span><span class="as"></span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Array</span><span class="as">as Array</span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Array</span><span class="as"></span><span class="list">(cons, deleteAt, filter, nub, range, sort, (!!), zipWith)</span><span class="kw">import</span><span class="mod">Data.Foldable</span><span class="as"></span><span class="list">(elem, foldl, sum)</span><span class="kw">import</span><span class="mod">Data.Function</span><span class="as"></span><span class="list">(on)</span><span class="kw">import</span><span class="mod">Data.Maybe</span><span class="as"></span><span class="list">(Maybe(..), fromMaybe)</span><span class="kw">import</span><span class="mod">Data.Tuple</span><span class="as"></span><span class="list">(Tuple(..), fst)</span><span class="kw">import</span><span class="mod">Harmonia.Chord</span><span class="as"></span><span class="list">(Chord(..), DegreeChord, Key, realize)</span></div></section><section class="row kind-section"><div class="section-title">Voicing — sorted-ascending array of MIDI note numbers</div></section><section class="row kind-data kind-newtype"><span class="label">Newtype</span><span class="name"><span class="kw">newtype </span>Voicing</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Voicing</span> <span class="ctor-args">(Array Int)</span></span></div><div class="marginalia"><p class="can-dropcap">A voicing is an ordered array of MIDI note numbers, sorted ascending (low to high).  Each element is a concrete realisable note; the octave is implicit in the number (<code>n </code>div<code> 12</code>).</p><p>MIDI convention: middle C (C4) is 60; octave 4 spans 60..71.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqVoicing</span><span class="sep">::</span><span class="type">Eq Voicing</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showVoicing</span><span class="sep">::</span><span class="type">Show Voicing<span class="inst-where"> where</span></span><div class="value-body"><span class="name">show (Voicing xs)</span><span class="sep">=</span><span class="type">&quot;Voicing &quot; &lt;&gt; show xs</span></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">voicingMidi</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Array Int</span><div class="value-body"><span class="name">voicingMidi (Voicing xs)</span><span class="sep">=</span><span class="type">xs</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Extract the MIDI note numbers from a voicing.</p></div></section><section class="row kind-section"><div class="section-title">closeVoicing — the one Chord → Voicing lift</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">closeVoicing</span><span class="sep">::</span><span class="type">{ centre :: Int } <span class="g">→</span> Chord <span class="g">→</span> Voicing</span><pre class="defn-body">closeVoicing { centre } (Chord pcs) =
+  Voicing (map (\pc <span class="g">→</span> pc + 12 * (centre + 1)) (sort pcs))</pre><div class="marginalia"><p class="can-dropcap">Produce a default close-position voicing of a chord, placed so all notes sit in the named octave.  Chord pitch classes are played in ascending pitch-class order at the centre octave.</p><p><code>closeVoicing { centre: 4 } (Chord [0, 4, 7]) = Voicing [60, 64, 67]</code></p><p>Doesn&#39;t read slash info from the source DegreeChord — the slash was baked into the Chord&#39;s pitch-class set at realize time and the bass-below-other-notes arrangement is the caller&#39;s choice via <code>spread</code> or octave-shifts.</p></div></section><section class="row kind-section"><div class="section-title">Voicing transformations — composable through (&lt;&lt;&lt;)</div></section><section class="row kind-type"><span class="label">Type</span><span class="name"><span class="kw">type </span>VoicingStrategy</span><span class="sep">=</span><span class="type">Voicing <span class="g">→</span> Voicing</span><div class="marginalia"><p class="can-dropcap">A voicing strategy is a transformation on a voicing.  Strategies compose through ordinary function composition.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">openTriad</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">openTriad (Voicing xs) =
+  if Array.length xs &lt; 2 then Voicing xs
+  else case xs !! 1, deleteAt 1 xs of
+    Just second, Just rest <span class="g">→</span> Voicing (sort (cons (second + 12) rest))
+    _, _ <span class="g">→</span> Voicing xs</pre><div class="marginalia"><p class="can-dropcap">Open the triad: for a 3-note voicing [root, 3rd, 5th] produces [root, 5th, 3rd-an-octave-up].  More generally: lifts the second- from-bottom note up an octave and re-sorts.  No-op on voicings shorter than 2 notes.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">rootless</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">rootless (Voicing xs) = case Array.uncons xs of
+  Just { tail } <span class="g">→</span> Voicing tail
+  Nothing <span class="g">→</span> Voicing xs</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Omit the bottom note (root).</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">drop2</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">drop2 (Voicing xs) =
+  let n = Array.length xs
+  in if n &lt; 2 then Voicing xs
+     else case xs !! (n - 2), deleteAt (n - 2) xs of
+       Just second, Just rest <span class="g">→</span> Voicing (sort (cons (second - 12) rest))
+       _, _ <span class="g">→</span> Voicing xs</pre><div class="marginalia"><p class="can-dropcap">Drop-2 voicing: lower the 2nd-highest note an octave.  Standard jazz transformation that &quot;opens&quot; a close-position voicing.</p><p><code>drop2 (Voicing [60, 64, 67, 71]) = Voicing [55, 60, 64, 71]</code> (Cmaj7 close → G2 C E B drop-2)</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">drop2and4</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">drop2and4 v@(Voicing xs) =
+  let n = Array.length xs
+  in if n &lt; 4 then drop2 v
+     else
+       case xs !! (n - 2), xs !! (n - 4) of
+         Just two, Just four <span class="g">→</span>
+           case deleteAt (n - 2) xs &gt;&gt;= deleteAt (n - 4) of
+             Just rest <span class="g">→</span> Voicing (sort (cons (two - 12) (cons (four - 12) rest)))
+             Nothing <span class="g">→</span> Voicing xs
+         _, _ <span class="g">→</span> Voicing xs</pre><div class="marginalia"><p class="can-dropcap">Drop the 2nd and 4th notes from the top, each down an octave. For 4-note voicings: lower the second-from-top and bottom note. Falls back to <code>drop2</code> on voicings shorter than 4 notes.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">quartal</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">quartal (Voicing xs) = case Array.uncons xs of
+  Nothing <span class="g">→</span> Voicing []
+  Just { head: bottom } <span class="g">→</span>
+    let
+      pcsPresent = nub (map (\n <span class="g">→</span> n `mod` 12) xs)
+      bottomPc = bottom `mod` 12
+      -- pitch classes in cycle-of-4ths order from the bottom PC,
+      -- filtered to those actually in the chord
+      cycleOrder = filter (\pc <span class="g">→</span> elem pc pcsPresent)
+                          (map (\i <span class="g">→</span> (bottomPc + 5 * i) `mod` 12) (range 0 11))
+      -- skip the first (it&#39;s the bottom&#39;s PC, already placed)
+      restPcs = fromMaybe [] (Array.tail cycleOrder)
+      stacked = foldl placeNext [bottom] restPcs
+    in
+      Voicing stacked
+  where
+    placeNext acc pc = case Array.last acc of
+      Nothing <span class="g">→</span> acc
+      Just prev <span class="g">→</span>
+        let
+          target = prev + 5
+          base = (target `div` 12) * 12
+          candidate = base + pc
+          n = if candidate &gt;= target then candidate else candidate + 12
+        in acc &lt;&gt; [n]</pre><div class="marginalia"><p class="can-dropcap">Restack the voicing&#39;s pitch classes in cycle-of-4ths order from the bottom note, placing each subsequent note at the lowest octave giving at least a perfect-4th interval (5 semitones) above the previous.  Quartal voicings sound &quot;open&quot; and modal; works well on chords that contain a 4th-stack (sus4, m11, jazz quartals), less well on pure triads where the natural intervals are 3rds.</p><p><code>quartal (Voicing [60, 65, 70, 67]) = Voicing [60, 65, 70, 79]</code> (sus chord C F Bb G → C F Bb G5; G placed above Bb)</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">cluster</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">cluster (Voicing xs) = case Array.uncons xs of
+  Nothing <span class="g">→</span> Voicing []
+  Just { head: bottom } <span class="g">→</span>
+    let
+      bottomOct = bottom `div` 12
+      pcs = sort (nub (map (\n <span class="g">→</span> n `mod` 12) xs))
+    in
+      Voicing (map (\pc <span class="g">→</span> pc + 12 * bottomOct) pcs)</pre><div class="marginalia"><p class="can-dropcap">Compress the voicing into the smallest octave window — distinct pitch classes in ascending order at the bottom note&#39;s octave. Effectively <code>closeVoicing</code> applied to whatever PCs are present.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">spread</span><span class="sep">::</span><span class="type">{ low :: Int, high :: Int } <span class="g">→</span> Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">spread { low, high } (Voicing xs) =
+  let n = Array.length xs
+  in if n == 0 then Voicing []
+     else if n == 1
+       then Voicing (map (\note <span class="g">→</span> shiftToOctave low note) xs)
+     else
+       let
+         lowMidi = 12 * (low + 1)
+         highMidi = 12 * (high + 1) + 11
+         span = highMidi - lowMidi
+         step = if n <span class="g">⇐</span> 1 then 0 else span &#x2F; (n - 1)
+         placed = Array.mapWithIndex
+           (\i note <span class="g">→</span>
+              let
+                pc = note `mod` 12
+                targetMidi = lowMidi + step * i
+                targetOctave = targetMidi `div` 12
+                candidate = pc + 12 * targetOctave
+              in
+                nearest candidate targetMidi)
+           xs
+       in
+         Voicing (sort placed)
+  where
+    shiftToOctave o n = (n `mod` 12) + 12 * (o + 1)
+    nearest candidate target =
+      let
+        below = candidate - 12
+        above = candidate + 12
+        d0 = absVal (candidate - target)
+        dBelow = absVal (below - target)
+        dAbove = absVal (above - target)
+      in
+        if dBelow &lt; d0 &amp;&amp; dBelow <span class="g">⇐</span> dAbove then below
+        else if dAbove &lt; d0 then above
+        else candidate
+    absVal n = if n &lt; 0 then -n else n</pre><div class="marginalia"><p class="can-dropcap">Distribute the voicing&#39;s notes across an octave range.  Lowest note shifted to (or near) the <code>low</code> octave, highest to (or near) the <code>high</code> octave, intermediate notes spaced evenly across the range.  Preserves pitch classes.</p></div></section><section class="row kind-section"><div class="section-title">Selectors — sub-chord plumbing</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>Selector</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">TakeLow</span> <span class="ctor-args">Int</span><span class="ctor-comment">^ The N lowest voices.</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">TakeHigh</span> <span class="ctor-args">Int</span><span class="ctor-comment">^ The N highest voices.</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">TakeRange</span> <span class="ctor-args">Int Int</span><span class="ctor-comment">^ Voices [i..j) — half-open.</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">TakeIndices</span> <span class="ctor-args">(Array Int)</span><span class="ctor-comment">^ Explicit voice indices (0-based, low-to-high).</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">TakeEvery</span> <span class="ctor-args">Int Int</span><span class="ctor-comment">^ (offset, stride) — modulo selector.</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">DropS</span> <span class="ctor-args">Selector</span><span class="ctor-comment">^ Complement of a selector.</span></span></div><div class="marginalia"><p class="can-dropcap">A Selector carves a sub-chord out of a chord or voicing.  Output is the same type as input, so selectors are composable and feed back into the Notation fabric like any other chord-shaped value.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqSelector</span><span class="sep">::</span><span class="type">Eq Selector</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showSelector</span><span class="sep">::</span><span class="type">Show Selector<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    TakeLow n        <span class="g">→</span> &quot;TakeLow &quot; &lt;&gt; show n
+    TakeHigh n       <span class="g">→</span> &quot;TakeHigh &quot; &lt;&gt; show n
+    TakeRange i j    <span class="g">→</span> &quot;TakeRange &quot; &lt;&gt; show i &lt;&gt; &quot; &quot; &lt;&gt; show j
+    TakeIndices xs   <span class="g">→</span> &quot;TakeIndices &quot; &lt;&gt; show xs
+    TakeEvery o s    <span class="g">→</span> &quot;TakeEvery &quot; &lt;&gt; show o &lt;&gt; &quot; &quot; &lt;&gt; show s
+    DropS s          <span class="g">→</span> &quot;DropS (&quot; &lt;&gt; show s &lt;&gt; &quot;)&quot;</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">takeChord</span><span class="sep">::</span><span class="type">Selector <span class="g">→</span> Chord <span class="g">→</span> Chord</span><pre class="defn-body">takeChord sel (Chord pcs) =
+  Chord (selectFrom sel (sort (nub pcs)))</pre><div class="marginalia"><p class="can-dropcap">Apply a selector to a Chord&#39;s sorted pitch-class array.  Positions are interpreted against the sort order; the lowest PC numerically is position 0.  Output is itself a Chord, so selectors chain.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">takeVoicing</span><span class="sep">::</span><span class="type">Selector <span class="g">→</span> Voicing <span class="g">→</span> Voicing</span><pre class="defn-body">takeVoicing sel (Voicing notes) =
+  Voicing (selectFrom sel notes)</pre><div class="marginalia"><p class="can-dropcap">Apply a selector to a Voicing.  Positions are interpreted against the low-to-high order; the bottom voice is position 0.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">selectFrom</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Selector <span class="g">→</span> Array <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Array <var class="sig-var" style="--vc:#1f5fa8">a</var></span><pre class="defn-body">selectFrom sel xs =
+  let ixs = selectIndices sel (Array.length xs)
+  in  Array.mapMaybe (\i <span class="g">→</span> xs !! i) ixs</pre><div class="marginalia"><p class="can-dropcap">Selector arithmetic over an ordered array.  Resolves to selected indices first, then looks them up — avoids an Eq constraint on the element type.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">selectIndices</span><span class="sep">::</span><span class="type">Selector <span class="g">→</span> Int <span class="g">→</span> Array Int</span><pre class="defn-body">selectIndices sel len = case sel of
+  TakeLow n
+    | n <span class="g">⇐</span> 0 || len <span class="g">⇐</span> 0 <span class="g">→</span> []
+    | otherwise          <span class="g">→</span> allIndices (min n len)
+  TakeHigh n
+    | n <span class="g">⇐</span> 0 || len <span class="g">⇐</span> 0 <span class="g">→</span> []
+    | otherwise          <span class="g">→</span>
+        let start = max 0 (len - n)
+        in if start &gt;= len then [] else rangeIncl start (len - 1)
+  TakeRange i j <span class="g">→</span>
+    let lo = max 0 i
+        hi = min len (max 0 j) - 1
+    in if hi &lt; lo then [] else rangeIncl lo hi
+  TakeIndices ixs <span class="g">→</span>
+    filter (\i <span class="g">→</span> i &gt;= 0 &amp;&amp; i &lt; len) ixs
+  TakeEvery offset stride <span class="g">→</span>
+    let validStride = if stride &lt; 1 then 1 else stride
+        countMax = if validStride == 0 then 0 else (len + validStride) &#x2F; validStride
+        candidates = map (\k <span class="g">→</span> offset + k * validStride) (allIndices countMax)
+    in  filter (\i <span class="g">→</span> i &gt;= 0 &amp;&amp; i &lt; len) candidates
+  DropS inner <span class="g">→</span>
+    let kept = selectIndices inner len
+    in  filter (\i <span class="g">→</span> not (elem i kept)) (allIndices len)</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">Resolve a Selector to the indices it picks, given an array length.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">allIndices</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Array Int</span><pre class="defn-body">allIndices len
+  | len <span class="g">⇐</span> 0  = []
+  | otherwise = rangeIncl 0 (len - 1)</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">rangeIncl</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int <span class="g">→</span> Array Int</span><pre class="defn-body">rangeIncl lo hi
+  | hi &lt; lo   = []
+  | otherwise = range lo hi</pre></section><section class="row kind-section"><div class="section-title">Voice leading — V-C</div></section><section class="row kind-type"><span class="label">Type</span><span class="name"><span class="kw">type </span>Progression</span><span class="sep">=</span><span class="type">Array DegreeChord</span><div class="marginalia marginalia-compact"><p class="can-dropcap">A progression is an ordered list of chord recipes.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">voiceLead</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Chord <span class="g">→</span> Voicing</span><pre class="defn-body">voiceLead (Voicing []) chord =
+  closeVoicing { centre: 4 } chord
+voiceLead voicing@(Voicing current) (Chord pcs) =
+  let
+    nextPcs = nub pcs
+    n = Array.length current
+    m = Array.length nextPcs
+  in
+    if n &#x2F;= m
+      then closeVoicing { centre: bottomOctave voicing } (Chord nextPcs)
+      else case fst &lt;$&gt; bestPerm current nextPcs of
+        Just v  <span class="g">→</span> v
+        Nothing <span class="g">→</span> closeVoicing { centre: bottomOctave voicing } (Chord nextPcs)</pre><div class="marginalia"><p class="can-dropcap">Voice-lead from the current voicing into the next chord.  Returns a voicing of <code>nextChord</code> whose notes are as close as possible to <code>currentVoicing</code> — common pitch classes stay at the same MIDI number, non-common ones move to the nearest octave.</p><p>Implementation: enumerate every permutation of the next chord&#39;s distinct pitch classes (factorial in chord size — fine for ≤7 voices), pair each current voice with one PC via nearest-octave placement, score by total |motion|, return the minimum.</p><p>If the current voicing and next chord have different sizes, falls back to <code>closeVoicing</code> centred on the current voicing&#39;s bottom octave.  Voice-counts-changing-mid-progression is V-D territory.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">enumerateVoicings</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Chord <span class="g">→</span> Array (Tuple Voicing Int)</span><pre class="defn-body">enumerateVoicings (Voicing []) chord =
+  [ Tuple (closeVoicing { centre: 4 } chord) 0 ]
+enumerateVoicings voicing@(Voicing current) (Chord pcs) =
+  let
+    nextPcs = nub pcs
+    n = Array.length current
+    m = Array.length nextPcs
+  in
+    if n &#x2F;= m
+      then [ Tuple (closeVoicing { centre: bottomOctave voicing } (Chord nextPcs)) 0 ]
+      else
+        Array.sortBy (compare `on` snd)
+          (Array.nubByEq (\a b <span class="g">→</span> fst a == fst b)
+             (map (scorePerm current) (permutations nextPcs)))
+  where
+    snd (Tuple _ s) = s</pre><div class="marginalia"><p class="can-dropcap">All distinct (voicing, motion) candidates for voice-leading from a current voicing into a next chord, sorted by motion ascending. The smallest-motion result is <code>voiceLead</code>&#39;s output; subsequent entries are progressively less smooth alternatives.</p><p>Same size constraint as <code>voiceLead</code> — returns a single fallback entry on size mismatch.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">playFrom</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Key <span class="g">→</span> VoicingStrategy <span class="g">→</span> Progression <span class="g">→</span> Array Voicing</span><pre class="defn-body">playFrom centre key strategy chords =
+  case Array.uncons chords of
+    Nothing <span class="g">→</span> []
+    Just { head: first, tail: rest } <span class="g">→</span>
+      let
+        firstV = strategy (closeVoicing { centre } (realize key first))
+      in
+        cons firstV
+          (Array.scanl (\prev dc <span class="g">→</span> voiceLead prev (realize key dc)) firstV rest)</pre><div class="marginalia"><p class="can-dropcap">Glue: realise a progression in a key, applying the voicing strategy to the first chord and voice-leading every subsequent one from the previous voicing.  Returns one Voicing per DegreeChord in the progression.</p><p><code>centre</code> is the octave the first voicing centres on; subsequent voicings drift via voice-leading.  See <code>play</code> for a centre-4 default.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">play</span><span class="sep">::</span><span class="type">Key <span class="g">→</span> VoicingStrategy <span class="g">→</span> Progression <span class="g">→</span> Array Voicing</span><div class="value-body"><span class="name">play</span><span class="sep">=</span><span class="type">playFrom 4</span></div><div class="marginalia"><p class="code-led"><span class="code-cap">play</span> with the default centre octave 4 (middle C area).</p></div></section><section class="row kind-section"><div class="section-title">Voice-leading internals</div></section><section class="row kind-value"><span class="label">Function</span><span class="name">bestPerm</span><span class="sep">::</span><span class="type">Array Int <span class="g">→</span> Array Int <span class="g">→</span> Maybe (Tuple Voicing Int)</span><pre class="defn-body">bestPerm current nextPcs = case permutations nextPcs of
+  [] <span class="g">→</span> Nothing
+  perms <span class="g">→</span>
+    let scored = map (scorePerm current) perms
+        sorted = Array.sortBy (compare `on` (\(Tuple _ s) <span class="g">→</span> s)) scored
+    in  Array.head sorted</pre><div class="marginalia"><p class="can-dropcap">The best (lowest-motion) permutation pairing of current voices to next-chord PCs.  Returns Nothing if no permutations exist (i.e. empty next-chord PC list).</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">scorePerm</span><span class="sep">::</span><span class="type">Array Int <span class="g">→</span> Array Int <span class="g">→</span> Tuple Voicing Int</span><pre class="defn-body">scorePerm current perm =
+  let
+    placed = zipWith nearestNote current perm
+    motion = sum (zipWith (\c p <span class="g">→</span> absInt (c - p)) current placed)
+  in
+    Tuple (Voicing (sort placed)) motion</pre><div class="marginalia"><p class="can-dropcap">Score one permutation: pair each current voice with the nth PC from the perm, place that PC at the octave closest to the voice, sum the absolute motions.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">nearestNote</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int <span class="g">→</span> Int</span><pre class="defn-body">nearestNote target pc =
+  let
+    -- truncating div toward zero; for positive (target - pc) this is floor
+    base = (target - pc) `div` 12
+    c0 = pc + 12 * base
+    cAbove = c0 + 12
+    cBelow = c0 - 12
+    d0 = absInt (c0 - target)
+    dA = absInt (cAbove - target)
+    dB = absInt (cBelow - target)
+  in
+    if dA &lt; d0 &amp;&amp; dA <span class="g">⇐</span> dB then cAbove
+    else if dB &lt; d0 &amp;&amp; dB &lt; dA then cBelow
+    else c0</pre><div class="marginalia"><p class="can-dropcap">Place a pitch class at the octave whose MIDI number is closest to the target.  Checks the natural octave, one above, and one below.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">bottomOctave</span><span class="sep">::</span><span class="type">Voicing <span class="g">→</span> Int</span><pre class="defn-body">bottomOctave (Voicing xs) = case Array.head xs of
+  Just n  <span class="g">→</span> (n `div` 12) - 1
+  Nothing <span class="g">→</span> 4</pre><div class="marginalia"><p class="can-dropcap">The bottom note&#39;s octave in MIDI convention (octave 4 = middle-C octave).  Used as the centre when voicing-leading falls back to closeVoicing on size mismatch.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">permutations</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Array <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Array (Array <var class="sig-var" style="--vc:#1f5fa8">a</var>)</span><pre class="defn-body">permutations xs = case Array.length xs of
+  0 <span class="g">→</span> [[]]
+  _ <span class="g">→</span>
+    Array.concatMap
+      (\i <span class="g">→</span> case xs !! i, deleteAt i xs of
+         Just x, Just rest <span class="g">→</span> map (cons x) (permutations rest)
+         _, _              <span class="g">→</span> [])
+      (allIndices (Array.length xs))</pre><div class="marginalia marginalia-compact"><p class="can-dropcap">All permutations of an array (recursive; factorial in size).</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">absInt</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int</span><div class="value-body"><span class="name">absInt n</span><span class="sep">=</span><span class="type">if n &lt; 0 then -n else n</span></div></section></div><footer class="specimen-foot"><div class="field">module from harmonia v0.2.0</div></footer></article></div>
+<div class="book-module" id="mod-Harmonia-Graded" data-module="Harmonia.Graded" style="--accent: hsl(300, 58%, 43%)"><article class="specimen-doc"><header class="specimen-head"><div class="kicker">PureScript Module</div><h1>Harmonia.Graded</h1><div class="exports"><div class="export-cell exp-class"><span class="export-kind">Class</span><span class="export-name">Harmonic</span></div><div class="export-cell exp-class"><span class="export-kind">Class</span><span class="export-name">Reflavourable</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">value</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">blame</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">clean</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">blamed</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">grade</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">transpose</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">modulate</span></div><div class="export-cell exp-value"><span class="export-kind">Function</span><span class="export-name">reflavour</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Blame<wbr/>Reason(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Blame</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Graded(..)</span></div><div class="export-cell exp-type"><span class="export-kind">Type</span><span class="export-name">Phrase(..)</span></div><div class="export-cell exp-empty"></div><div class="export-cell exp-empty"></div></div></header><div class="specimen-stack"><section class="row kind-imports"><span class="label">Imports</span><div class="specimen-imports"><span class="kw">import</span><span class="mod">Prelude</span><span class="as"></span><span class="list"></span><span class="kw">import</span><span class="mod">Data.Array</span><span class="as"></span><span class="list">(concatMap, mapWithIndex)</span><span class="kw">import</span><span class="mod">Data.Foldable</span><span class="as"></span><span class="list">(foldl)</span><span class="kw">import</span><span class="mod">Data.Maybe</span><span class="as"></span><span class="list">(Maybe(..))</span><span class="kw">import</span><span class="mod">Harmonia.Chord</span><span class="as"></span><span class="list">(DegreeChord(..), Mode)</span><span class="kw">import</span><span class="mod">Harmonia.Anchor</span><span class="as"></span><span class="list"></span></div></section><section class="row kind-section"><div class="section-title">Blame — where an operation&#39;s reading ran out</div></section><section class="row kind-data"><span class="label">Data</span><span class="name"><span class="kw">data </span>BlameReason</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">NoReading</span><span class="ctor-comment">^ `Free`: no scale context at all — only shifting is possible</span></span></div><div class="ctor-line"><span class="ctor-sep">|</span><span class="ctor-body"><span class="ctor-name">Borrowed</span><span class="ctor-comment">^ located but foreign to its key — can&#39;t be cleanly reflavoured</span></span></div><div class="marginalia"><p class="can-dropcap">Why a chord could not follow an operation. Closed, and richer than a bare reference on purpose: the reason is exactly what a renderer needs to mark the boundary (a passed-through chord in a reflavoured phrase, say) — but the *choice* of how to mark it stays with the caller.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqBlameReason</span><span class="sep">::</span><span class="type">Eq BlameReason</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showBlameReason</span><span class="sep">::</span><span class="type">Show BlameReason<span class="inst-where"> where</span></span><pre class="defn-body">  show = case _ of
+    NoReading <span class="g">→</span> &quot;NoReading&quot;
+    Borrowed  <span class="g">→</span> &quot;Borrowed&quot;</pre></section><section class="row kind-type"><span class="label">Type</span><span class="name"><span class="kw">type </span>Blame</span><span class="sep">=</span><span class="type">{ index :: Int, reason :: BlameReason }</span><div class="marginalia"><p class="can-dropcap">A single blame: which position (0 for a lone chord; the phrase index for a member of a <code>Phrase</code>) and why.</p></div></section><section class="row kind-section"><div class="section-title">Graded — a result carrying its blame</div></section><section class="row kind-data kind-newtype"><span class="label">Newtype</span><span class="name"><span class="kw">newtype </span>Graded a</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Graded</span> <span class="ctor-args">{ value :: a, blame :: Array Blame }</span></span></div><div class="marginalia"><p class="can-dropcap">The outcome of a grade-gated operation: a value plus the blame accrued applying it. Empty blame = a clean, fully-applied result; non-empty blame = a partial result whose listed positions were passed through untouched.</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive newtype instance</span> eqGraded</span><span class="sep">::</span><span class="type">Eq a <span class="g">⇒</span> Eq (Graded a)</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> functorGraded</span><span class="sep">::</span><span class="type">Functor Graded<span class="inst-where"> where</span></span><div class="value-body"><span class="name">map f (Graded g)</span><span class="sep">=</span><span class="type">Graded { value: f g.value, blame: g.blame }</span></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">value</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Graded <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var></span><div class="value-body"><span class="name">value (Graded g)</span><span class="sep">=</span><span class="type">g.value</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">The result value (always present).</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">blame</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Graded <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Array Blame</span><div class="value-body"><span class="name">blame (Graded g)</span><span class="sep">=</span><span class="type">g.blame</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">The blame accrued (empty when the operation applied cleanly).</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">clean</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Graded <var class="sig-var" style="--vc:#1f5fa8">a</var></span><div class="value-body"><span class="name">clean a</span><span class="sep">=</span><span class="type">Graded { value: a, blame: [] }</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">A clean result — the operation applied with nothing passed through.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">blamed</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Int <span class="g">→</span> BlameReason <span class="g">→</span> <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Graded <var class="sig-var" style="--vc:#1f5fa8">a</var></span><div class="value-body"><span class="name">blamed i r a</span><span class="sep">=</span><span class="type">Graded { value: a, blame: [ { index: i, reason: r } ] }</span></div><div class="marginalia"><p class="can-dropcap">A blamed result — the value (typically the input, unchanged) plus one reason it could not be transformed at the given position.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">reindexTo</span><span class="sep">::</span><span class="type"><span class="g">∀</span> <var class="sig-var" style="--vc:#1f5fa8">a</var>. Int <span class="g">→</span> Graded <var class="sig-var" style="--vc:#1f5fa8">a</var> <span class="g">→</span> Graded <var class="sig-var" style="--vc:#1f5fa8">a</var></span><pre class="defn-body">reindexTo i (Graded g) =
+  Graded (g { blame = map (\b <span class="g">→</span> b { index = i }) g.blame })</pre><div class="marginalia"><p class="can-dropcap">Rewrite every blame&#39;s position — used to give a phrase member the index it sits at, since a lone-chord operation only ever knows position 0.</p></div></section><section class="row kind-section"><div class="section-title">The classes</div></section><section class="row kind-class"><span class="label">Class</span><code class="class-head"><span class="kw">class</span> Harmonic a where</code><div class="class-method"><span class="name">grade</span><span class="sep">::</span><span class="type">a <span class="g">→</span> Grade</span></div><div class="class-method"><span class="name">transpose</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> a <span class="g">→</span> a</span></div><div class="marginalia"><p class="can-dropcap">Everything harmonic reports its <code>grade</code> and can be <code>transpose</code>d. Transpose is the floor: pure semitone arithmetic, always total, never blames.</p></div></section><section class="row kind-class"><span class="label">Class</span><code class="class-head"><span class="kw">class</span> Harmonic a <span class="g">⇐</span> Reflavourable a where</code><div class="class-method"><span class="name">modulate</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> a <span class="g">→</span> Graded a</span></div><div class="class-method"><span class="name">reflavour</span><span class="sep">::</span><span class="type">Mode <span class="g">→</span> a <span class="g">→</span> Graded a</span></div><div class="marginalia"><p class="can-dropcap">Operations that consult the reading and may not apply. <code>modulate</code> moves the tonic (needs a key); <code>reflavour</code> re-reads the same degree in a new mode (needs a diatonic reading). Both return <code>Graded</code>, blaming what they cannot move.</p></div></section><section class="row kind-section"><div class="section-title">Anchor instances — a single chord&#39;s reading</div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> harmonicAnchor</span><span class="sep">::</span><span class="type">Harmonic Anchor<span class="inst-where"> where</span></span><pre class="defn-body">  grade = gradeAnchor
+  -- Shifting a located chord moves its key&#39;s tonic (the reading rides along,
+  -- degree preserved); a Free chord has no reading to move — the caller shifts
+  -- its raw pitches. Either way the audible result is +n semitones.
+  transpose n = case _ of
+    Located key dc <span class="g">→</span> Located (key { tonic = wrap (key.tonic + n) }) dc
+    Free           <span class="g">→</span> Free</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> reflavourableAnchor</span><span class="sep">::</span><span class="type">Reflavourable Anchor<span class="inst-where"> where</span></span><pre class="defn-body">  modulate newTonic = case _ of
+    Free           <span class="g">→</span> blamed 0 NoReading Free
+    -- A located chord is always at least `Keyed`, and `Keyed` permits Modulate,
+    -- so this never blames.
+    Located key dc <span class="g">→</span> clean (Located (key { tonic = wrap newTonic }) dc)
+
+  reflavour newMode a = case a of
+    Free <span class="g">→</span> blamed 0 NoReading Free
+    Located key (DegreeChord r) <span class="g">→</span> case gradeAnchor a of
+      Diatonic <span class="g">→</span>
+        -- Re-read the same degree in the new mode: preserve numeral (and slash),
+        -- re-derive the quality from the new mode&#39;s own diatonic harmony, and
+        -- reset colour — tensions and any override were the *old* mode&#39;s, so a
+        -- reflavour hands back the clean diatonic chord of that degree. (Whether
+        -- tensions should carry across is a judgment call worth revisiting.)
+        let
+          q&#39; = diatonicQuality newMode r.numeral (isSeventh r.quality)
+          dc&#39; = DegreeChord (r { quality = q&#39;, tensions = [], mode = Nothing })
+        in
+          clean (Located (key { mode = newMode }) dc&#39;)
+      -- Keyed (borrowed&#x2F;foreign): there is no single &quot;same degree&quot; to re-read,
+      -- so pass it through and say why.
+      _ <span class="g">→</span> blamed 0 Borrowed a</pre></section><section class="row kind-section"><div class="section-title">Phrase — a sequence of readings; the fractal, one level up</div></section><section class="row kind-data kind-newtype"><span class="label">Newtype</span><span class="name"><span class="kw">newtype </span>Phrase</span><div class="ctor-line"><span class="ctor-sep">=</span><span class="ctor-body"><span class="ctor-name">Phrase</span> <span class="ctor-args">(Array Anchor)</span></span></div><div class="marginalia"><p class="can-dropcap">An ordered sequence of chord readings. Its grade is *emergent*: in v1 the meet of its members, so a single foreign chord drops the whole phrase to what all of it can uniformly do. (The intended growth is to *absorb* subordinate chromaticism — a secondary dominant read against a phrase degree shouldn&#39;t lower the phrase — which is why this is the meet *for now*, with a clearly-marked seam rather than a claim that the meet is the last word.)</p></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">derive instance</span> eqPhrase</span><span class="sep">::</span><span class="type">Eq Phrase</span></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> showPhrase</span><span class="sep">::</span><span class="type">Show Phrase<span class="inst-where"> where</span></span><div class="value-body"><span class="name">show (Phrase as)</span><span class="sep">=</span><span class="type">&quot;Phrase &quot; &lt;&gt; show as</span></div></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> harmonicPhrase</span><span class="sep">::</span><span class="type">Harmonic Phrase<span class="inst-where"> where</span></span><pre class="defn-body">  grade (Phrase as) = foldl min Diatonic (map gradeAnchor as)
+  transpose n (Phrase as) = Phrase (map (transpose n) as)</pre></section><section class="row kind-instance"><span class="label">Instance</span><span class="name"><span class="kw">instance</span> reflavourablePhrase</span><span class="sep">::</span><span class="type">Reflavourable Phrase<span class="inst-where"> where</span></span><pre class="defn-body">  modulate newTonic (Phrase as) = phraseOp (modulate newTonic) as
+  reflavour newMode (Phrase as) = phraseOp (reflavour newMode) as</pre></section><section class="row kind-value"><span class="label">Function</span><span class="name">phraseOp</span><span class="sep">::</span><span class="type">(Anchor <span class="g">→</span> Graded Anchor) <span class="g">→</span> Array Anchor <span class="g">→</span> Graded Phrase</span><pre class="defn-body">phraseOp f as =
+  let gs = mapWithIndex (\i a <span class="g">→</span> reindexTo i (f a)) as
+  in Graded { value: Phrase (map value gs), blame: concatMap blame gs }</pre><div class="marginalia"><p class="can-dropcap">Apply a per-chord operation across a phrase, tagging each chord&#39;s blame with its position and concatenating. The multi-blame result is exactly the &quot;reflavour the located spine, pass the foreign chords through&quot; behaviour: the blame list names precisely the boundaries where the reading stopped.</p></div></section><section class="row kind-value"><span class="label">Function</span><span class="name">wrap</span><span class="sep">::</span><span class="type">Int <span class="g">→</span> Int</span><div class="value-body"><span class="name">wrap n</span><span class="sep">=</span><span class="type">((n `mod` 12) + 12) `mod` 12</span></div><div class="marginalia marginalia-compact"><p class="can-dropcap">Wrap a possibly-out-of-range pitch class back into 0..11.</p></div></section></div><footer class="specimen-foot"><div class="field">module from harmonia v0.2.0</div></footer></article></div>
+  </div>
+  <footer class="book-colophon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  
+  <circle cx="240" cy="240" r="234" fill="none" stroke="#111" stroke-width="3"/>
+  <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
+  <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
+  <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; HARMONIA</textPath>
+  </text>
+  <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.35007822961046" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="148.8382788644337" cy="237.70619758146813" r="89.50958167249192" fill="#111"/><circle cx="325.18548482433863" cy="237.70619758146813" r="82.18770251702347" fill="#111"/><circle cx="243.28081653989727" cy="360.1668668605533" r="60.488511231936876" fill="#111"/><circle cx="243.19565729105096" cy="117.7790678020115" r="58.43745367187392" fill="#111"/></g>
+</svg>
+    <div class="facts">
+      harmonia v0.2.0 &middot; stable since July 2026<br>
+      4 modules &middot; 112 declarations &middot; 1164 lines<br>
+      typeset by specimen &middot; 2026-07-25
+    </div>
+  </footer>
+</main>
+
+<div id="ffi-modal" hidden>
+  <div class="ffi-backdrop"></div>
+  <div class="ffi-card">
+    <header>
+      <span class="ffi-title"></span>
+      <span class="ffi-sub">foreign implementation</span>
+      <nav></nav>
+      <button class="ffi-close" aria-label="close">&#10005;</button>
+    </header>
+    <pre></pre>
+  </div>
+</div>
+
+<script>
+const DATA = [{"name":"Harmonia.Chord","slug":"Harmonia-Chord","level":0,"loc":360,"accent":"hsl(0, 58%, 43%)","imports":[],"ax":0.2875,"ay":0.5054,"bx":88,"by":40,"rA":94.9,"rB":21.8,"pack":[{"dx":-25.2,"dy":-2,"r":22},{"dx":20.2,"dy":-2,"r":22},{"dx":-2.5,"dy":35.2,"r":20.2},{"dx":-2.5,"dy":-37.7,"r":19},{"dx":-40.8,"dy":-40.4,"r":18.1},{"dx":34.6,"dy":-39.5,"r":16.8},{"dx":35.8,"dy":35,"r":16.8},{"dx":-39.3,"dy":34.1,"r":15.3},{"dx":56.2,"dy":-14.7,"r":14.8},{"dx":-60.4,"dy":11.4,"r":14.3},{"dx":-64.9,"dy":-17.6,"r":13.7},{"dx":59.3,"dy":14.4,"r":13.1},{"dx":16.7,"dy":-65.1,"r":13.1},{"dx":-20.6,"dy":-65.1,"r":12.5},{"dx":-25.6,"dy":58.3,"r":11.2},{"dx":19.5,"dy":59.4,"r":11.2},{"dx":-2.3,"dy":-82.3,"r":11.2},{"dx":-67,"dy":37.4,"r":11.2},{"dx":-3.9,"dy":67.9,"r":11.2},{"dx":63.2,"dy":-40.4,"r":10.5},{"dx":14.4,"dy":81.8,"r":10.5},{"dx":64.1,"dy":38.9,"r":10.5},{"dx":-47.8,"dy":59,"r":9.7},{"dx":-69.2,"dy":-41.1,"r":8.9},{"dx":39.1,"dy":-65.1,"r":7.9},{"dx":39.9,"dy":60.8,"r":7.9},{"dx":-41.2,"dy":-66.7,"r":6.9},{"dx":-79.1,"dy":-0.9,"r":6.9},{"dx":74.4,"dy":-0.6,"r":6.9},{"dx":-65.6,"dy":56.7,"r":6.9},{"dx":-20.3,"dy":75.6,"r":5.6},{"dx":53,"dy":-54.5,"r":5.6},{"dx":-78.1,"dy":23.1,"r":5.6},{"dx":53.8,"dy":-66.9,"r":5.6},{"dx":52.1,"dy":52.3,"r":5.6},{"dx":64,"dy":56.3,"r":5.6}]},{"name":"Harmonia.Anchor","slug":"Harmonia-Anchor","level":1,"loc":195,"accent":"hsl(100, 58%, 43%)","imports":["Harmonia-Chord"],"ax":0.5,"ay":0.7239,"bx":117.9,"by":450,"rA":69.8,"rB":16.1,"pack":[{"dx":-16.4,"dy":2.3,"r":17.9},{"dx":19.7,"dy":2.3,"r":16.9},{"dx":2.6,"dy":31.7,"r":15.8},{"dx":2.6,"dy":-26.4,"r":15.2},{"dx":-27.8,"dy":-28.9,"r":14},{"dx":-28.4,"dy":33.2,"r":14},{"dx":32.5,"dy":-26.6,"r":13.3},{"dx":33.1,"dy":30.8,"r":13.3},{"dx":-47.3,"dy":-7.9,"r":13.3},{"dx":-52.5,"dy":18.9,"r":12.6},{"dx":47.9,"dy":-5.8,"r":11.1},{"dx":54.8,"dy":16.8,"r":11.1},{"dx":-11.9,"dy":-49.1,"r":10.3},{"dx":19,"dy":-46.6,"r":9.4},{"dx":-13.4,"dy":52.9,"r":9.4},{"dx":20.3,"dy":50.1,"r":8.4},{"dx":5.1,"dy":-59.8,"r":8.4},{"dx":4.4,"dy":56.4,"r":7.3},{"dx":54.4,"dy":-24.6,"r":7.3},{"dx":-49.1,"dy":-28.5,"r":6}]},{"name":"Harmonia.Voicing","slug":"Harmonia-Voicing","level":1,"loc":427,"accent":"hsl(200, 58%, 43%)","imports":["Harmonia-Chord"],"ax":0.5,"ay":0.3897,"bx":73.1,"by":450,"rA":103.3,"rB":23.8,"pack":[{"dx":-26.1,"dy":1,"r":28.4},{"dx":26.6,"dy":1,"r":22.9},{"dx":5.3,"dy":41.3,"r":21.4},{"dx":5.3,"dy":-38.8,"r":20.9},{"dx":-35.8,"dy":-47.4,"r":19.6},{"dx":-35.9,"dy":48.9,"r":19.2},{"dx":45.7,"dy":-37,"r":18.3},{"dx":45.1,"dy":38.2,"r":17.3},{"dx":-64.6,"dy":-23.9,"r":16.2},{"dx":-63.9,"dy":26.1,"r":15.7},{"dx":64.1,"dy":11,"r":14.5},{"dx":73.9,"dy":-17.7,"r":14.5},{"dx":-10.5,"dy":-71.4,"r":13.9},{"dx":-11.9,"dy":73.6,"r":13.9},{"dx":29,"dy":-65.2,"r":13.2},{"dx":30.8,"dy":66.6,"r":13.2},{"dx":-81.8,"dy":1.6,"r":13.2},{"dx":12.8,"dy":-87.8,"r":13.2},{"dx":12.8,"dy":87.8,"r":13.2},{"dx":-68.9,"dy":55.9,"r":13.2},{"dx":-68.1,"dy":-53.1,"r":11.8},{"dx":75.5,"dy":36.3,"r":11.8},{"dx":-35.5,"dy":-79.5,"r":11.1},{"dx":-36.6,"dy":79.7,"r":10.3},{"dx":55.6,"dy":65.1,"r":10.3},{"dx":53.9,"dy":-65.7,"r":10.3},{"dx":74.8,"dy":-43.8,"r":10.3},{"dx":88,"dy":3.2,"r":9.4},{"dx":-89.2,"dy":23.4,"r":8.4},{"dx":-88.9,"dy":-19,"r":7.3},{"dx":-53.2,"dy":69,"r":5.9},{"dx":-54.6,"dy":-66.6,"r":5.9},{"dx":69.5,"dy":54.4,"r":5.9}]},{"name":"Harmonia.Graded","slug":"Harmonia-Graded","level":2,"loc":182,"accent":"hsl(300, 58%, 43%)","imports":["Harmonia-Chord","Harmonia-Anchor"],"ax":0.7125,"ay":0.5024,"bx":88,"by":860,"rA":67.5,"rB":15.5,"pack":[{"dx":-21.6,"dy":-1.7,"r":30.1},{"dx":28.1,"dy":-1.7,"r":18.2},{"dx":13.6,"dy":32.5,"r":17.6},{"dx":12.9,"dy":-31.9,"r":14.4},{"dx":-12.9,"dy":-45.9,"r":13.6},{"dx":-16,"dy":41.4,"r":12},{"dx":39.6,"dy":-30,"r":11.1},{"dx":41.7,"dy":24.7,"r":10.2},{"dx":-37.3,"dy":-40.2,"r":10.2},{"dx":-37.6,"dy":35.6,"r":9.1},{"dx":8.8,"dy":-56.4,"r":9.1},{"dx":0.2,"dy":57,"r":9.1},{"dx":53.9,"dy":-13.9,"r":9.1},{"dx":-51.6,"dy":-27.1,"r":7.9},{"dx":-49.6,"dy":23.8,"r":6.4},{"dx":29.8,"dy":-46.2,"r":6.4},{"dx":51.4,"dy":9.7,"r":6.4},{"dx":37.1,"dy":42,"r":6.4},{"dx":-57,"dy":11.7,"r":6.4}]}];
+const svg = document.getElementById('stage');
+const NS = 'http://www.w3.org/2000/svg';
+const MORPH = 700;
+const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+const edgeG = document.createElementNS(NS, 'g'); svg.appendChild(edgeG);
+const edges = [];
+for (const d of DATA) for (const i of d.imports) {
+  const e = document.createElementNS(NS, 'path');
+  e.setAttribute('fill', 'none'); e.setAttribute('stroke', '#111');
+  e.setAttribute('stroke-width', '0.6');
+  edgeG.appendChild(e); edges.push({ e, a: d.slug, b: i });
+}
+const gs = {};
+for (const d of DATA) {
+  const a = document.createElementNS(NS, 'a');
+  a.setAttribute('href', '#mod-' + d.slug);
+  const g = document.createElementNS(NS, 'g');
+  const bubble = document.createElementNS(NS, 'circle');   // rail identity (accent)
+  bubble.setAttribute('fill', d.accent); bubble.setAttribute('opacity', '0');
+  g.appendChild(bubble);
+  const ring = document.createElementNS(NS, 'circle');     // banner identity (ink plate)
+  ring.setAttribute('class', 'ring');
+  ring.setAttribute('fill', '#fff'); ring.setAttribute('stroke', '#111');
+  ring.setAttribute('stroke-width', '1.4'); g.appendChild(ring);
+  const inner = document.createElementNS(NS, 'g');
+  for (const p of d.pack) {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', p.dx); c.setAttribute('cy', p.dy); c.setAttribute('r', p.r);
+    c.setAttribute('fill', '#111'); inner.appendChild(c);
+  }
+  g.appendChild(inner);
+  const label = document.createElementNS(NS, 'text');
+  label.textContent = d.name;
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('y', -(d.rA + 9));
+  label.setAttribute('style', 'font-family: Inter, sans-serif; font-size: 10px; letter-spacing: 0.08em; fill: #777; stroke: rgba(250,250,247,0.88); stroke-width: 3px; paint-order: stroke; stroke-linejoin: round;');
+  g.appendChild(label);
+  const t = document.createElementNS(NS, 'title'); t.textContent = d.name; g.appendChild(t);
+  a.appendChild(g); svg.appendChild(a);
+  gs[d.slug] = { g, bubble, ring, inner, label, d };
+}
+
+let active = null;
+const heroEl = document.getElementById('hero-title');
+function layout() {
+  const W = innerWidth, H = innerHeight;
+  const p = ease(Math.min(1, Math.max(0, scrollY / MORPH)));
+  svg.classList.toggle('railed', p > 0.95);
+  const bannerH = H * 0.66;
+  // at rest the banner band sits below the hero block (tall left columns
+  // were overwriting the masthead); the band's top eases back toward the
+  // page top as the morph runs, since layout B's rail already lives there
+  const bandTop = Math.max(90, heroEl.getBoundingClientRect().bottom + 28) * (1 - p) + 90 * p;
+  heroEl.style.opacity = String(Math.max(0, 1 - p * 1.4));
+  // rail column: centred in the left margin, same slot as the-prelude's beeswarm
+  const railLeft = Math.max(12, 0.5 * W - 36 * 16 - 12 * 16);
+  for (const s of Object.values(gs)) {
+    const d = s.d;
+    const axp = d.ax * W, ayp = bandTop + d.ay * (bannerH - 90);
+    const bxp = railLeft + d.bx, byp = 60 + (d.by / 900) * (H - 120);
+    const x = axp + (bxp - axp) * p, y = ayp + (byp - ayp) * p;
+    const r = d.rA + (d.rB - d.rA) * p;
+    s.g.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+    s.ring.setAttribute('r', r);
+    s.inner.setAttribute('transform', 'scale(' + (r / d.rA) + ')');
+    s.inner.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
+    s.label.setAttribute('y', -(r + 9));
+    s.label.setAttribute('opacity', String(Math.max(0, 1 - p * 1.7)));
+    s.bubble.setAttribute('r', r);
+    s.x = x; s.y = y; s.r = r;
+    const isActive = s.d.slug === active;
+    // rail state: coloured bubbles, muted except the active one (the-prelude grammar)
+    const railOn = p > 0.5;
+    s.bubble.setAttribute('opacity', String(railOn ? (isActive || p < 0.95 ? p : 0.35) : 0));
+    s.ring.setAttribute('stroke-width', isActive ? '2.6' : '1.4');
+    s.ring.setAttribute('fill', railOn ? 'none' : '#fff');
+    s.ring.setAttribute('opacity', String(railOn && !isActive ? 0.35 : 1));
+  }
+  for (const { e, a, b } of edges) {
+    const A = gs[a], B = gs[b];
+    e.setAttribute('opacity', String(0.10 * (1 - p) + 0.05 * p));
+    e.setAttribute('d', 'M ' + A.x + ' ' + A.y + ' C ' + (A.x + B.x) / 2 + ' ' + A.y + ', ' + (A.x + B.x) / 2 + ' ' + B.y + ', ' + B.x + ' ' + B.y);
+  }
+}
+
+function spy() {
+  let best = null, bestD = 1e9;
+  for (const sec of document.querySelectorAll('.book-module')) {
+    const d = Math.abs(sec.getBoundingClientRect().top - innerHeight * 0.35);
+    if (d < bestD) { bestD = d; best = sec.id.replace(/^mod-/, ''); }
+  }
+  active = best;
+}
+addEventListener('scroll', () => { spy(); requestAnimationFrame(layout); }, { passive: true });
+addEventListener('resize', () => requestAnimationFrame(layout));
+spy(); layout();
+
+// ── FFI modal ──
+const FFI = {};
+const LANG_NAMES = { javascript: 'JavaScript', erlang: 'Erlang', julia: 'Julia', python: 'Python', go: 'Go' };
+const modal = document.getElementById('ffi-modal');
+const mTitle = modal.querySelector('.ffi-title');
+const mTabs = modal.querySelector('nav');
+const mPre = modal.querySelector('pre');
+function openFfi(slug) {
+  const entry = FFI[slug];
+  if (!entry) return;
+  mTitle.textContent = entry.name;
+  mTabs.innerHTML = '';
+  const langs = Object.keys(entry.langs);
+  const show = lang => {
+    mPre.textContent = entry.langs[lang];
+    for (const b of mTabs.children) b.classList.toggle('on', b.dataset.lang === lang);
+  };
+  for (const lang of langs) {
+    const b = document.createElement('button');
+    b.textContent = LANG_NAMES[lang] ?? lang;
+    b.dataset.lang = lang;
+    b.addEventListener('click', () => show(lang));
+    mTabs.appendChild(b);
+  }
+  show(langs[0]);
+  modal.hidden = false;
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest('.row.kind-foreign[data-ffi]');
+  if (row) { openFfi(row.dataset.ffi); return; }
+  if (e.target.closest('.ffi-close') || e.target.classList.contains('ffi-backdrop')) modal.hidden = true;
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') modal.hidden = true; });
+</script>
+</body>
+</html>

@@ -4,8 +4,8 @@
   <circle cx="240" cy="240" r="194" fill="none" stroke="#111" stroke-width="1.2"/>
   <defs><path id="rim" d="M 25 240 a 215 215 0 1 1 430 0"/></defs>
   <text font-family="Inter, sans-serif" font-size="17" font-weight="600" letter-spacing="7" fill="#111">
-    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; MAYBE</textPath>
+    <textPath href="#rim" startOffset="50%" text-anchor="middle">PURESCRIPT &#183; HARMONIA</textPath>
   </text>
   <text x="240" y="458" font-family="Georgia, serif" font-size="30" text-anchor="middle" fill="#111">λ</text>
-  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.4252268213884" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="240" cy="240" r="180.85045364277678" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="188.95254939518605" cy="224.39086415621358" r="122.89509096722631" fill="#111"/><circle cx="365.8669596272447" cy="224.39086415621358" r="49.44454608622068" fill="#111"/><circle cx="335.61286269037174" cy="323.33256947765585" r="49.44454608622068" fill="#111"/></g>
+  <g transform="translate(0,6)"><circle cx="240" cy="240" r="185.35007822961046" fill="none" stroke="#111" stroke-width="1.3"/><circle cx="148.8382788644337" cy="237.70619758146813" r="89.50958167249192" fill="#111"/><circle cx="325.18548482433863" cy="237.70619758146813" r="82.18770251702347" fill="#111"/><circle cx="243.28081653989727" cy="360.1668668605533" r="60.488511231936876" fill="#111"/><circle cx="243.19565729105096" cy="117.7790678020115" r="58.43745367187392" fill="#111"/></g>
 </svg>

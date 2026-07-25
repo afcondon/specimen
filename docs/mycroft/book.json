@@ -2,10 +2,10 @@
   "name": "purescript-mycroft",
   "version": "local",
   "title": "Mycroft",
-  "modules": 5,
-  "decls": 79,
-  "loc": 641,
-  "layers": 3,
+  "modules": 3,
+  "decls": 65,
+  "loc": 463,
+  "layers": 2,
   "stableSince": null,
   "releases": []
 }
