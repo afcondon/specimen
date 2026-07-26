@@ -190,7 +190,9 @@ Specimen-specific idea.
   the only thing left that assembles markup by concatenation. It ports
   the way the book generator did: the covers and book cards want the
   typed-HTML treatment, and the page assembly mirrors `Site.Book`.
-  Everything it needs already exists.
+  Its design should change with the port, because the shelf currently
+  *requires* hand-written editorial (`shelf.config.json`) and needs to be
+  able to derive itself from the books instead — see `notes/wizard.md`.
 - **`docs/` is behind the generator.** The published shelf still has the
   older self-contained pages; regenerating now also emits `book.css` and
   `book.js` beside each book. Worth doing as one republish once the
