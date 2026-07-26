@@ -3,8 +3,7 @@ workspace:
     registry: 77.13.1
   extraPackages:
     hylograph-layout: "0.3.0"
-    hylograph-halogen-ui:
-      path: /Users/afc/work/afc-work/purescript-hylograph-halogen-ui
+    halogen-widgets: "0.2.0"
 
 package:
   name: specimen

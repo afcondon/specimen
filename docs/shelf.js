@@ -6262,19 +6262,19 @@
     };
   })();
 
-  // output/Hylograph.Halogen.UI.Style/index.js
-  var uiFont = "var(--hg-font, system-ui,-apple-system,'Segoe UI',sans-serif)";
-  var surfaceAlt = "var(--hg-surface-alt, #f4f3f0)";
-  var surface = "var(--hg-surface, #ffffff)";
+  // output/Halogen.Widgets.Style/index.js
+  var uiFont = "var(--hw-font, system-ui,-apple-system,'Segoe UI',sans-serif)";
+  var surfaceAlt = "var(--hw-surface-alt, #f4f3f0)";
+  var surface = "var(--hw-surface, #ffffff)";
   var sty = /* @__PURE__ */ attr2("style");
-  var line = "var(--hg-line, rgba(0,0,0,0.09))";
-  var inkSoft = "var(--hg-ink-soft, #7a7a7a)";
-  var ink = "var(--hg-ink, #2b2b2b)";
+  var line = "var(--hw-line, rgba(0,0,0,0.09))";
+  var inkSoft = "var(--hw-ink-soft, #7a7a7a)";
+  var ink = "var(--hw-ink, #2b2b2b)";
   var cls = function(s) {
     return class_(s);
   };
 
-  // output/Hylograph.Halogen.UI.SegmentedControl/index.js
+  // output/Halogen.Widgets.SegmentedControl/index.js
   var map16 = /* @__PURE__ */ map(functorArray);
   var bind5 = /* @__PURE__ */ bind(bindHalogenM);
   var get2 = /* @__PURE__ */ get(monadStateHalogenM);
@@ -6330,7 +6330,7 @@
         return "background:" + (surfaceAlt + (";color:" + inkSoft));
       }
       ;
-      throw new Error("Failed pattern match at Hylograph.Halogen.UI.SegmentedControl (line 117, column 9 - line 121, column 72): " + [v.constructor.name, v1.constructor.name]);
+      throw new Error("Failed pattern match at Halogen.Widgets.SegmentedControl (line 117, column 9 - line 121, column 72): " + [v.constructor.name, v1.constructor.name]);
     };
   };
   var segBtn = function(input3) {
@@ -6354,7 +6354,7 @@
     };
   };
   var render = function(v) {
-    return div2([cls("hg-segmented"), sty("display:inline-flex;border:1px solid " + (line + (";border-radius:var(--hg-radius,7px);overflow:hidden;" + ("font-family:" + (uiFont + (";" + (function() {
+    return div2([cls("hg-segmented"), sty("display:inline-flex;border:1px solid " + (line + (";border-radius:var(--hw-radius,7px);overflow:hidden;" + ("font-family:" + (uiFont + (";" + (function() {
       if (v.input.disabled) {
         return "opacity:0.5";
       }
@@ -6401,7 +6401,7 @@
         });
       }
       ;
-      throw new Error("Failed pattern match at Hylograph.Halogen.UI.SegmentedControl (line 78, column 16 - line 82, column 78): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Halogen.Widgets.SegmentedControl (line 78, column 16 - line 82, column 78): " + [v.constructor.name]);
     };
   };
   var defaultInput = function(segments) {

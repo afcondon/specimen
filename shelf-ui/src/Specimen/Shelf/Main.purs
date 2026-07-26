@@ -10,7 +10,7 @@
 -- | which is the whole reason the sections are hidden from here rather
 -- | than being left out of the generated HTML.
 -- |
--- | The tab bar is `Hylograph.Halogen.UI.SegmentedControl`, used the
+-- | The tab bar is `Halogen.Widgets.SegmentedControl`, used the
 -- | way the library's contract intends: it owns nothing. `active` lives
 -- | in this component's state, the widget raises `Selected` as a
 -- | *request*, and `handleAction` is what decides to honour it — which
@@ -32,7 +32,7 @@ import Halogen.VDom.Driver (runUI)
 import Type.Proxy (Proxy(..))
 import Web.DOM.ParentNode (QuerySelector(..))
 
-import Hylograph.Halogen.UI.SegmentedControl as Segmented
+import Halogen.Widgets.SegmentedControl as Segmented
 
 import Specimen.Shelf.Page (Shelf, readShelves, showOnly)
 

@@ -7,7 +7,7 @@ package:
     - console
     - effect
     - halogen
-    - hylograph-halogen-ui
+    - halogen-widgets
     - maybe
     - prelude
     - web-dom
