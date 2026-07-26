@@ -20,6 +20,41 @@ shifting (most recently, the addition of swappable commentary tracks).
 Consume it via a `path:` extra-package entry in your `spago.yaml`
 until it stabilises.
 
+## Try it on your own code
+
+Specimen ships as a repository, not a package. Clone it and run it —
+there is nothing to build first, because `cli/specimen-site.js` is a
+committed, self-contained Node bundle with no dependencies:
+
+```bash
+git clone https://github.com/afcondon/specimen.git
+cd specimen
+./specimen ~/code/purescript-my-library
+```
+
+That's it. No spago, no PureScript toolchain, no `npm install` — Node 18
+or later is the only requirement. You get a directory holding a complete
+static site: the typeset book, its stylesheets, the banner plate, the
+waxseal, and a `book.json` of the facts.
+
+```bash
+./specimen <package-name | directory> [options]
+
+  -o, --out <dir>    where to write        (default ./site/<package>)
+  --title <string>   book title            (default: the package name)
+  --deck <string>    the line under the title
+  --mark <glyph>     the mark at the seal's foot   (default λ)
+  --include-tests    include test/ modules
+```
+
+A **directory** is scanned for its `.purs` files and needs nothing else.
+A **registry package name** — `./specimen aff` — is fetched with
+`spago fetch` into a throwaway workspace, which is the one case that
+needs spago on your PATH.
+
+Open `index.html` in the output directory. Every page is self-contained
+and can be served from `file://` or any static host.
+
 ## Pipeline
 
 ```
@@ -120,39 +155,42 @@ Things easier as text than as CST surgery:
 figures, hung in the outer margin so they don't compete with the code's
 left edge.
 
-## Building
+## Building from source
+
+Only needed if you want to change Specimen itself.
 
 ```bash
 spago build
 spago test                       # golden tests over the pure pipeline
 SPECIMEN_ACCEPT=1 spago test     # re-record goldens after an intended change
 
-spago bundle                     # public/bundle.js
+spago bundle -p specimen-site    # rebuilds cli/specimen-site.js
+spago bundle                     # public/bundle.js, for the live viewer
 npm run serve                    # the viewer on :3007
 ```
 
 The viewer takes a `?module=` query parameter naming any module under
 `public/examples/`, e.g. `localhost:3007/?module=Data.Variant`.
 
-## Making a book
+`cli/specimen-site.js` is committed deliberately: it is what makes the
+clone-and-run path work for people who don't have the PureScript
+toolchain. Rebundle it when you change anything under `site/` or `src/`.
+
+## The shelf
+
+The shelf page — the index over many books, as at
+[afcondon.github.io/specimen](https://afcondon.github.io/specimen/) — is
+a separate step, and presently needs hand-written editorial (shelf
+titles, blurbs, per-book authors and pull quotes) in
+`cli/shelf.config.json`:
 
 ```bash
-spago bundle -p specimen-site                     # builds cli/specimen-site.js
-node cli/specimen-site.js <package-name | workspace-dir> [-o dir]
 node cli/specimen-shelf.mjs cli/shelf.config.json --sites docs
 ```
 
-`specimen-site` resolves a registry package with `spago fetch`, renders
-every module through the pipeline, and writes a self-contained static
-site — plus `banner.svg`, `waxseal.svg` and `book.json` for the shelf
-page to draw from. `docs/` in this repo is the generated shelf.
-
-A registry package is vendored into a throwaway workspace under the temp
-directory and kept between runs. The cache is only trusted when it
-actually carries sources: a `spago fetch` that dies partway leaves an
-empty directory behind, and believing it produces an empty book. If one
-is found, it is cleared and refetched — clearing first, because spago
-consults its own lockfile and will otherwise no-op straight over it.
+`docs/` in this repo is the generated shelf. Making a shelf that derives
+itself from the books, so it is useful without that editorial, is open
+work — see `notes/wizard.md`.
 
 ## The book's geometry
 

@@ -18,10 +18,10 @@ $ npx specimen
   → ./specimen  (open index.html)
 ```
 
-- **A book per package, plus a shelf over them**, by default. The shelf is
-  the most striking thing Specimen makes; burying it behind a flag would
-  be a mistake. A single-package project gets a book and either a shelf of
-  one or no shelf.
+- **One book for one library** is the whole job. An earlier draft had this
+  producing a book per package plus a shelf over them; that was scope the
+  tool doesn't need. A single page for a single library is what someone
+  trying Specimen on their own code actually wants.
 - **Zero prompts when it can infer.** Reads `spago.yaml` and just runs.
   Prompts only on genuine ambiguity (several packages, no target given),
   and every prompt has a flag equivalent so it stays scriptable. `--yes`
@@ -47,15 +47,16 @@ So the engine is done. What is missing is distribution and the shelf.
 
 ## The gaps
 
-### 1. The shelf can't be generated generically — the real work
+### 1. The shelf — no longer a prerequisite
 
 `cli/specimen-shelf.mjs` requires `cli/shelf.config.json`: per-book
 authors, invented pull quotes, fake periodical names, shelf titles,
 blurbs. That is editorial voice. A stranger has none, and inventing it for
 them would be worse than omitting it.
 
-So the port of the shelf generator (the last JavaScript in the repo) and
-this are **one job**, and the port's design changes because of it:
+Since the CLI produces a single book, none of this blocks it. It matters
+if the shelf is ever to be useful to anyone but this repo, and the port
+of the shelf generator (the last JavaScript here) is the moment to do it:
 
 - the shelf must **derive itself from the books** it is given — names,
   module counts, versions, timelines all already live in each
@@ -86,36 +87,29 @@ Discovery belongs in `Specimen.Site.Sources` beside `resolvePackage`,
 which already knows how to walk a tree and skip `output`, `node_modules`
 and (by default) `test`.
 
-## Ordering — ship narrow first
+## Distribution: the repo is the package
 
-The existing CLI already *is* the tool: one command, someone else's code,
-only Node needed. What is missing is distribution, not capability. So the
-packaging can go out well before the wizard, and should, because it puts
-Specimen in front of real projects while the defaults are still cheap to
-change.
+Not npm. The PureScript community is small enough that cloning is a
+reasonable ask, and a clone gives someone both halves at once — the
+source to build and tweak, and a tool that runs immediately.
 
-**v0 — packaging only, no new code.**
+That works today because **`cli/specimen-site.js` is a committed build
+artifact**: a self-contained Node bundle with no dependencies. Verified
+against a fresh clone of the public repo with no build step and no spago
+on PATH. `./specimen` at the repo root is the ergonomic entry point.
 
-```
-npx purescript-specimen ./my-project
-```
+`package.json` stays `private: true` so nothing can be published by
+accident. If that is ever revisited, note `specimen` is taken on npm;
+`purescript-specimen` and `@afcondon/specimen` were both free.
 
-A `bin` entry over `cli/specimen-site.js`, a `files` list covering the
-bundle and `cli/assets/`, and a `prepublishOnly` running
-`spago bundle -p specimen-site` so the shipped artifact cannot drift from
-source. ~580K, **zero runtime dependencies**.
+## Still open
 
-Names: `specimen` is taken on npm. `purescript-specimen` and
-`@afcondon/specimen` are both free.
-
-**v1 — the wizard.**
-
-1. **Port `specimen-shelf.mjs` to PureScript, with editorial optional.**
-   The real work, and the piece that unblocks everything else: the shelf
-   must derive itself from the books rather than require
-   `shelf.config.json`.
-2. **Workspace discovery** in `Sources`.
-3. **The `specimen` entry point** — infers, prompts only when stuck.
+1. **Workspace discovery** — reading `spago.yaml` to offer packages,
+   rather than making the user reason about whether to point at the root,
+   a package, or `src/`. Belongs in `Specimen.Site.Sources`.
+2. **Port `specimen-shelf.mjs` to PureScript, with editorial optional.**
+   Removes the last JavaScript from the repo, and is what would make the
+   shelf useful to anyone but this repo.
 
 ## Deferred
 
