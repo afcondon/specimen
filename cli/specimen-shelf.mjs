@@ -150,6 +150,28 @@ const page = `<!DOCTYPE html>
   h1 { font-family: Inter, sans-serif; font-size: 4rem; font-weight: 800; letter-spacing: -0.035em; margin: 0 0 0.8rem; }
   .deck { font-size: 1.02rem; color: var(--soft-ink); max-width: 44rem; margin: 0 0 1rem; line-height: 1.65; }
   .scale-note { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--margin); margin: 0 0 4rem; }
+
+  /* Shelf tabs. Each tab wears a thumbnail of the covers it selects — the
+     same tripartite Penguin band as the books below, drawn as a gradient
+     off currentColor, which the widget has already set to that shelf's
+     colour. Colour alone was too quiet to read as a key. */
+  .shelf-tabs { margin: 0 0 3.5rem; }
+  .shelf-tabs .hg-segmented { border-color: var(--rule); }
+  .shelf-tabs .hg-segmented__seg {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 0.55rem 0.9rem !important;
+    font-size: 0.72rem !important; letter-spacing: 0.06em;
+  }
+  .shelf-tabs .hg-segmented__seg::before {
+    content: ""; flex: 0 0 auto; width: 13px; height: 19px;
+    /* The middle band is transparent rather than paper-coloured, so it
+       takes whatever the tab sits on: the page behind an unselected tab,
+       and the shelf's own colour behind the selected one. One rule, and
+       the cover reads in both states instead of going blank when the
+       ink turns white. */
+    background: linear-gradient(currentColor 0 32%, transparent 32% 68%, currentColor 68% 100%);
+    box-shadow: 0 0 0 1px currentColor;
+  }
   .shelf { margin: 7rem 0; }
   .shelf h2 { font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.24em;
     color: var(--soft-ink); border-top: 1px solid var(--ink); padding-top: 0.7rem; margin: 0 0 0.6rem; }
