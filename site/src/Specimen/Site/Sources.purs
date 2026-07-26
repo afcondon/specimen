@@ -10,6 +10,7 @@ module Specimen.Site.Sources
   ( Vendored
   , Cache(..)
   , plausiblePackageName
+  , packageNameOfDirectory
   , findVendored
   , inspectCache
   , isSourceFile
@@ -58,6 +59,19 @@ instance Show Cache where
     NotFetched -> "NotFetched"
     Incomplete v -> "Incomplete " <> v.dir
     Usable v -> "Usable " <> v.dir <> " (" <> v.version <> ")"
+
+-- | The package name a directory stands for.
+-- |
+-- | Repositories are conventionally `purescript-foo` while the package
+-- | inside them is `foo` — the registry drops the prefix, and so does
+-- | this. Without it a book built from a checkout is captioned
+-- | "PURESCRIPT · PURESCRIPT FOO", which is what pointing the CLI at a
+-- | cloned repo does every time.
+packageNameOfDirectory :: String -> String
+packageNameOfDirectory dir =
+  case String.stripPrefix (Pattern "purescript-") dir of
+    Just rest | rest /= "" -> rest
+    _ -> dir
 
 -- | Registry package names are lowercase, digits and hyphens, opening on
 -- | a letter. Anything else was meant to be a directory.
@@ -138,7 +152,7 @@ resolvePackage { target, includeTests } = do
   if isDir then do
     let dir = absolute target
     files <- findPurs includeTests dir
-    pure { name: basename dir, version: "local", files, local: true }
+    pure { name: packageNameOfDirectory (basename dir), version: "local", files, local: true }
   else do
     unless (plausiblePackageName target) $
       die (show target <> " is neither a directory nor a plausible registry package name")

@@ -1,13 +1,46 @@
 {
-  "name": "specimen",
+  "name": "purescript-specimen",
   "version": "0.1.0",
+  "description": "Typeset PureScript source as a printed-quality specimen book \u2014 a static site generated from the code itself.",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "bin": {
+    "specimen": "bin/specimen.js"
+  },
+  "files": [
+    "bin/",
+    "cli/specimen-site.js",
+    "cli/assets/style.css",
+    "cli/assets/sigil.css",
+    "cli/assets/book.css",
+    "cli/assets/book.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afcondon/specimen.git"
+  },
+  "homepage": "https://afcondon.github.io/specimen/",
+  "bugs": {
+    "url": "https://github.com/afcondon/specimen/issues"
+  },
+  "keywords": [
+    "purescript",
+    "documentation",
+    "typography",
+    "static-site",
+    "specimen"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "spago build",
     "test": "spago test",
-    "bundle": "spago bundle",
+    "bundle": "spago bundle -p specimen-site && spago bundle -p specimen-shelf-ui",
     "serve": "npx http-server public -p 3007 -c-1 --cors",
-    "site": "node cli/specimen-site.mjs"
+    "site": "node cli/specimen-site.js",
+    "prepublishOnly": "spago bundle -p specimen-site"
   }
 }

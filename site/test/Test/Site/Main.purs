@@ -19,6 +19,7 @@ import Specimen.Site.Sources
   , findVendored
   , inspectCache
   , isSourceFile
+  , packageNameOfDirectory
   , plausiblePackageName
   , skipDirectory
   )
@@ -40,6 +41,15 @@ spec = do
       plausiblePackageName "" `shouldEqual` false
     it "rejects a leading digit" do
       plausiblePackageName "2fast" `shouldEqual` false
+
+  describe "packageNameOfDirectory" do
+    it "drops the conventional repo prefix" do
+      -- otherwise the seal reads "PURESCRIPT · PURESCRIPT HALOGEN WIDGETS"
+      packageNameOfDirectory "purescript-halogen-widgets" `shouldEqual` "halogen-widgets"
+    it "leaves anything else alone" do
+      packageNameOfDirectory "my-app" `shouldEqual` "my-app"
+      packageNameOfDirectory "purescript" `shouldEqual` "purescript"
+      packageNameOfDirectory "purescript-" `shouldEqual` "purescript-"
 
   describe "findVendored" do
     it "finds the package at its version" do

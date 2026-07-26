@@ -19,3 +19,6 @@ spago.lock
 
 # spec-node run cache
 .spec-results
+
+# npm pack output
+*.tgz

@@ -11576,10 +11576,18 @@ var skipDirectory = function(includeTests) {
 var packageStore = function(name3) {
   return joinPath2([workspace(name3), ".spago", "p"]);
 };
+var packageNameOfDirectory = function(dir) {
+  var v = stripPrefix("purescript-")(dir);
+  if (v instanceof Just && v.value0 !== "") {
+    return v.value0;
+  }
+  ;
+  return dir;
+};
 var isSourceFile = /* @__PURE__ */ (function() {
-  var $69 = stripSuffix(".purs");
-  return function($70) {
-    return isJust($69($70));
+  var $73 = stripSuffix(".purs");
+  return function($74) {
+    return isJust($73($74));
   };
 })();
 var isLower = function(c) {
@@ -11601,14 +11609,14 @@ var plausiblePackageName = function(s) {
     return false;
   }
   ;
-  throw new Error("Failed pattern match at Specimen.Site.Sources (line 66, column 3 - line 69, column 21): " + [v.constructor.name]);
+  throw new Error("Failed pattern match at Specimen.Site.Sources (line 80, column 3 - line 83, column 21): " + [v.constructor.name]);
 };
 var findVendored = function(name3) {
   var match = function(dir) {
     return bind11(stripPrefix(name3 + "-")(dir))(function(rest) {
       return bind11(charAt2(0)(rest))(function(first) {
-        var $49 = isDigit(first);
-        if ($49) {
+        var $53 = isDigit(first);
+        if ($53) {
           return new Just({
             dir,
             version: rest
@@ -11640,7 +11648,7 @@ var inspectCache = function(name3) {
         ;
       }
       ;
-      throw new Error("Failed pattern match at Specimen.Site.Sources (line 96, column 3 - line 100, column 41): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Specimen.Site.Sources (line 110, column 3 - line 114, column 41): " + [v.constructor.name]);
     };
   };
 };
@@ -11652,16 +11660,16 @@ var findPurs = function(includeTests) {
         return function __do() {
           var isDir = directoryExists(path)();
           if (isDir) {
-            var $53 = skipDirectory(includeTests)(entry);
-            if ($53) {
+            var $57 = skipDirectory(includeTests)(entry);
+            if ($57) {
               return [];
             }
             ;
             return go(path)();
           }
           ;
-          var $54 = isSourceFile(entry);
-          if ($54) {
+          var $58 = isSourceFile(entry);
+          if ($58) {
             return [path];
           }
           ;
@@ -11677,8 +11685,8 @@ var findPurs = function(includeTests) {
     };
     return function __do() {
       var present = directoryExists(root)();
-      var $55 = !present;
-      if ($55) {
+      var $59 = !present;
+      if ($59) {
         return [];
       }
       ;
@@ -11691,8 +11699,8 @@ var readCache = function(name3) {
     var store = packageStore(name3);
     return function __do() {
       var present = directoryExists(store)();
-      var $56 = !present;
-      if ($56) {
+      var $60 = !present;
+      if ($60) {
         return NotFetched.value;
       }
       ;
@@ -11707,7 +11715,7 @@ var readCache = function(name3) {
         return inspectCache(name3)(entries)($$const(length(sources)));
       }
       ;
-      throw new Error("Failed pattern match at Specimen.Site.Sources (line 186, column 5 - line 190, column 72): " + [v.constructor.name]);
+      throw new Error("Failed pattern match at Specimen.Site.Sources (line 200, column 5 - line 204, column 72): " + [v.constructor.name]);
     };
   };
 };
@@ -11734,7 +11742,7 @@ var fetchIfNeeded = function(name3) {
             return die2("spago fetch ran but " + (name3 + (" is not under " + packageStore(name3))))();
           }
           ;
-          throw new Error("Failed pattern match at Specimen.Site.Sources (line 172, column 5 - line 177, column 86): " + [cache.constructor.name]);
+          throw new Error("Failed pattern match at Specimen.Site.Sources (line 186, column 5 - line 191, column 86): " + [cache.constructor.name]);
         };
       };
     };
@@ -11752,7 +11760,7 @@ var fetchIfNeeded = function(name3) {
         return refetch("re-fetching (cached " + (cache.value0.dir + " has no sources)"))(new Just(cache.value0))();
       }
       ;
-      throw new Error("Failed pattern match at Specimen.Site.Sources (line 156, column 3 - line 160, column 93): " + [cache.constructor.name]);
+      throw new Error("Failed pattern match at Specimen.Site.Sources (line 170, column 3 - line 174, column 93): " + [cache.constructor.name]);
     };
   };
 };
@@ -11763,7 +11771,7 @@ var resolvePackage = function(v) {
       var dir = absolute(v.target);
       var files = findPurs(v.includeTests)(dir)();
       return {
-        name: basename(dir),
+        name: packageNameOfDirectory(basename(dir)),
         version: "local",
         files,
         local: true
