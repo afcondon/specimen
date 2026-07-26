@@ -86,14 +86,43 @@ Discovery belongs in `Specimen.Site.Sources` beside `resolvePackage`,
 which already knows how to walk a tree and skip `output`, `node_modules`
 and (by default) `test`.
 
-## Ordering
+## Ordering — ship narrow first
+
+The existing CLI already *is* the tool: one command, someone else's code,
+only Node needed. What is missing is distribution, not capability. So the
+packaging can go out well before the wizard, and should, because it puts
+Specimen in front of real projects while the defaults are still cheap to
+change.
+
+**v0 — packaging only, no new code.**
+
+```
+npx purescript-specimen ./my-project
+```
+
+A `bin` entry over `cli/specimen-site.js`, a `files` list covering the
+bundle and `cli/assets/`, and a `prepublishOnly` running
+`spago bundle -p specimen-site` so the shipped artifact cannot drift from
+source. ~580K, **zero runtime dependencies**.
+
+Names: `specimen` is taken on npm. `purescript-specimen` and
+`@afcondon/specimen` are both free.
+
+**v1 — the wizard.**
 
 1. **Port `specimen-shelf.mjs` to PureScript, with editorial optional.**
-   Unblocks the wizard and removes the last JavaScript from the repo.
+   The real work, and the piece that unblocks everything else: the shelf
+   must derive itself from the books rather than require
+   `shelf.config.json`.
 2. **Workspace discovery** in `Sources`.
-3. **The `specimen` entry point** — subcommand-free, infers, prompts only
-   when stuck.
-4. **npm packaging** and a first publish.
+3. **The `specimen` entry point** — infers, prompts only when stuck.
+
+## Deferred
+
+**Nicer tab design.** Wants arbitrary content in a `Segment` rather than a
+decoration keyed off colour, which is a `halogen-widgets` feature — 0.3.0,
+a publish cycle, and a Specimen bump. Not worth the loop for a visual
+tweak; revisit when something else needs a widget release anyway.
 
 ## Related, but independent
 
